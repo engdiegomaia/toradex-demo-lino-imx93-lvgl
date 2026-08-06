@@ -41,6 +41,13 @@ if [ -d "${project_dir}/assets" ]; then
         "${target}:${remote_dir}/assets/"
 fi
 
+# Sync host-side diagnostic scripts (collect-m33-diag.sh etc).
+if [ -d "${project_dir}/scripts" ]; then
+    rsync -av --delete \
+        "${project_dir}/scripts/" \
+        "${target}:${remote_dir}/scripts/"
+fi
+
 echo "[sync] Done. Next on target:"
 echo "  cd ${remote_dir}"
 echo "  docker compose -f docker/docker-compose.yml down --remove-orphans"
