@@ -28,26 +28,6 @@
 
 /* The A55-1 (logical CPU 1) is the target of the multicore demo. */
 #define CPU_INFO_A_CORE_INDEX 1
-/* Frequency scales at runtime with cpufreq; refresh every 1s. */
-#define CPU_INFO_FREQ_REFRESH_MS 1000
-
-static void cpu_info_freq_timer_cb(lv_timer_t * t)
-{
-    lv_obj_t * table = lv_timer_get_user_data(t);
-    if (!lv_obj_is_valid(table)) {
-        lv_timer_delete(t);
-        return;
-    }
-    char freq[CPU_INFO_CELL_LEN];
-    cpu_info_refresh_frequency(CPU_INFO_A_CORE_INDEX, freq, sizeof(freq));
-    lv_table_set_cell_value(table, 0, 1, freq);
-}
-
-static void cpu_info_screen_delete_cb(lv_event_t * e)
-{
-    lv_timer_t * t = lv_event_get_user_data(e);
-    if (t) lv_timer_delete(t);
-}
 
 void setup_CpuInfo(gg_ui_t * ui)
 {
@@ -244,12 +224,7 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_style_text_font(ui->CpuInfo.table_coreM33, &lv_font_montserratMedium_15, LV_PART_ITEMS | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui->CpuInfo.table_coreM33, lv_color_hex(0x27364A), LV_PART_ITEMS | LV_STATE_DEFAULT);
 
-    // CpuInfo custom code: live frequency refresh
-    lv_timer_t * freq_timer = lv_timer_create(cpu_info_freq_timer_cb,
-                                              CPU_INFO_FREQ_REFRESH_MS,
-                                              ui->CpuInfo.table_coreA1);
-    lv_obj_add_event_cb(ui->CpuInfo.screen, cpu_info_screen_delete_cb,
-                        LV_EVENT_DELETE, freq_timer);
+    // CpuInfo custom code
 
     // Update CpuInfo layout.
     lv_obj_update_layout(ui->CpuInfo.screen);
