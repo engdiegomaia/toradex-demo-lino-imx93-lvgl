@@ -8,6 +8,9 @@
 
 CORE=$1
 
+log() { echo "[stop.sh] $*" >&2; }
+log "invoked: CORE=$CORE cwd=$PWD (called by pid $PPID)"
+
 find_rproc() {
     match="$1"
     for rp in /sys/class/remoteproc/remoteproc*; do
@@ -35,6 +38,8 @@ fi
 # returns EINVAL and spams the log with 'No such file or directory' from the
 # echo redirection.
 current=$(cat "$CMD_DIR/state" 2>/dev/null || echo "")
+log "state before stop: $current (on $CMD_DIR)"
 if [ "$current" = "running" ]; then
     echo stop > "$CMD_DIR/state" 2>/dev/null || true
+    log "state after stop: $(cat "$CMD_DIR/state" 2>/dev/null)"
 fi

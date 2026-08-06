@@ -71,6 +71,17 @@ static void paint_state(int am_idx, home_core_state_t state)
     home_core_widgets_t *w = &s_widgets[am_idx];
 
     if (!w->icon || !w->status_label || !w->anim_target) return;
+
+    /* Always re-assert LT-button visibility from the observed state, even
+     * when the coarse HOME_STATE didn't change. The Start-click handler in
+     * gg_event_Home.c hides LT for hello_world at click time; the observed
+     * state may not have transitioned yet (still IDLE when the click fires),
+     * so relying on the last_state gate below would trap LT hidden forever. */
+    if (w->lt_container) {
+        if (state == HOME_STATE_IDLE || state == HOME_STATE_FAILED)
+            lv_obj_remove_flag(w->lt_container, LV_OBJ_FLAG_HIDDEN);
+    }
+
     if (state == w->last_state) return;
 
     uint32_t color;
@@ -92,15 +103,6 @@ static void paint_state(int am_idx, home_core_state_t state)
     lv_obj_set_style_image_recolor_opa(w->icon,
                                        state == HOME_STATE_RUNNING ? 255 : 100,
                                        LV_PART_MAIN);
-
-    /* Restore the Latency Test button whenever the core is not running.
-     * The Start-click handler hides LT for hello_world so the user can't reach
-     * a chart that will never have data; on Stop / failure the button must
-     * come back so the next Start (rt_latency) can navigate to BenchMarking. */
-    if (w->lt_container) {
-        if (state == HOME_STATE_IDLE || state == HOME_STATE_FAILED)
-            lv_obj_remove_flag(w->lt_container, LV_OBJ_FLAG_HIDDEN);
-    }
 
     /* Spin only while running; stop the animation for every other state.
      * Mirrors the anim setup in gg_event_Home.c click handler. */
