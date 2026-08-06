@@ -20,7 +20,11 @@ RUN apt-get update \
         libwayland-cursor0 \
         libxkbcommon0 \
         bash \
+        util-linux \
     && rm -rf /var/lib/apt/lists/*
+# util-linux gives us nsenter(1) and mount(8) — start.sh uses them to bind
+# a tmpfs on the host's /lib/firmware and drop the selected ELF there so the
+# kernel's request_firmware_direct() can find it.
 
 WORKDIR /app
 COPY app/platform/linux/build-aarch64-docker/gui_guider /app/gui_guider

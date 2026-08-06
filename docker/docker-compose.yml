@@ -95,6 +95,11 @@ services:
     environment:
       - XDG_RUNTIME_DIR=/tmp/1000-runtime-dir
       - WAYLAND_DISPLAY=wayland-0
+    # start.sh stages the selected firmware into the host's /lib/firmware
+    # tmpfs via `nsenter -t 1 -m` — reaching the host mount namespace requires
+    # pid: host. Without it, remoteproc's request_firmware_direct() can't find
+    # any ELF but rt_latency_cm33.elf (the one m33-loader staged at boot).
+    pid: host
     volumes:
       - /tmp:/tmp
       # The backend drives remoteproc by writing to sysfs (see
