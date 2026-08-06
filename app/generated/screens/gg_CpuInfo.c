@@ -24,9 +24,38 @@
 #include "gui_guider.h"
 #include "gg_utils.h"
 #include "events/gg_event.h"
+#include "cpu_info.h"
+
+/* The A55-1 (logical CPU 1) is the target of the multicore demo. */
+#define CPU_INFO_A_CORE_INDEX 1
+/* Frequency scales at runtime with cpufreq; refresh every 1s. */
+#define CPU_INFO_FREQ_REFRESH_MS 1000
+
+static void cpu_info_freq_timer_cb(lv_timer_t * t)
+{
+    lv_obj_t * table = lv_timer_get_user_data(t);
+    if (!lv_obj_is_valid(table)) {
+        lv_timer_delete(t);
+        return;
+    }
+    char freq[CPU_INFO_CELL_LEN];
+    cpu_info_refresh_frequency(CPU_INFO_A_CORE_INDEX, freq, sizeof(freq));
+    lv_table_set_cell_value(table, 0, 1, freq);
+}
+
+static void cpu_info_screen_delete_cb(lv_event_t * e)
+{
+    lv_timer_t * t = lv_event_get_user_data(e);
+    if (t) lv_timer_delete(t);
+}
 
 void setup_CpuInfo(gg_ui_t * ui)
 {
+    cortex_a_info_t a_info;
+    cortex_m_info_t m_info;
+    cpu_info_read_cortex_a(CPU_INFO_A_CORE_INDEX, &a_info);
+    cpu_info_read_cortex_m(&m_info);
+
     // Create screen: CpuInfo
     ui->CpuInfo.screen = lv_obj_create(NULL);
     lv_obj_set_user_data(ui->CpuInfo.screen, &ui->CpuInfo.screen);
@@ -147,19 +176,19 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_table_set_column_width(ui->CpuInfo.table_coreA1, 0, 230);
     lv_table_set_column_width(ui->CpuInfo.table_coreA1, 1, 230);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 0, 0, "Frequency");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 0, 1, "1.7GHz");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 0, 1, a_info.frequency);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 1, 0, "L1-I Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 1, 1, "32KB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 1, 1, a_info.l1i_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 2, 0, "L1-D Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 2, 1, "32KB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 2, 1, a_info.l1d_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 3, 0, "L2 Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 3, 1, "64KB per core");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 3, 1, a_info.l2_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 4, 0, "L3 Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 4, 1, "256kB (ECC)");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 4, 1, a_info.l3_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 5, 0, "MPE with NEON");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 5, 1, "VFPv4-D16 architecture");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 5, 1, a_info.mpe);
     lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 6, 0, "Architecture");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 6, 1, "64-bit Arm®v8-A");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreA1, 6, 1, a_info.architecture);
 
     // Style: ui->CpuInfo.table_coreA1 [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_radius(ui->CpuInfo.table_coreA1, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -187,19 +216,19 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_table_set_column_width(ui->CpuInfo.table_coreM33, 0, 230);
     lv_table_set_column_width(ui->CpuInfo.table_coreM33, 1, 230);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 0, 0, "Frequency");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 0, 1, "250MHz");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 0, 1, m_info.frequency);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 1, 0, "System Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 1, 1, "16kB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 1, 1, m_info.system_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 2, 0, "Code Cache");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 2, 1, "16KB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 2, 1, m_info.code_cache);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 3, 0, "Boot ROM");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 3, 1, "256KB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 3, 1, m_info.boot_rom);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 4, 0, "TCM");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 4, 1, "256KB");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 4, 1, m_info.tcm);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 5, 0, "NVIC");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 5, 1, "support");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 5, 1, m_info.nvic);
     lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 6, 0, "Architecture");
-    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 6, 1, "32-bit Arm®v8-M");
+    lv_table_set_cell_value(ui->CpuInfo.table_coreM33, 6, 1, m_info.architecture);
 
     // Style: ui->CpuInfo.table_coreM33 [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_radius(ui->CpuInfo.table_coreM33, 10, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -215,7 +244,12 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_style_text_font(ui->CpuInfo.table_coreM33, &lv_font_montserratMedium_15, LV_PART_ITEMS | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui->CpuInfo.table_coreM33, lv_color_hex(0x27364A), LV_PART_ITEMS | LV_STATE_DEFAULT);
 
-    // CpuInfo custom code
+    // CpuInfo custom code: live frequency refresh
+    lv_timer_t * freq_timer = lv_timer_create(cpu_info_freq_timer_cb,
+                                              CPU_INFO_FREQ_REFRESH_MS,
+                                              ui->CpuInfo.table_coreA1);
+    lv_obj_add_event_cb(ui->CpuInfo.screen, cpu_info_screen_delete_cb,
+                        LV_EVENT_DELETE, freq_timer);
 
     // Update CpuInfo layout.
     lv_obj_update_layout(ui->CpuInfo.screen);
