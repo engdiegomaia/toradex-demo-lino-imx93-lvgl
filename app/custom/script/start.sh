@@ -25,6 +25,9 @@ TYPE=$3     # h = hello_world, r = rt_latency
 
 ELF_DIR="$PWD/elf"
 
+log() { echo "[start.sh] $*" >&2; }
+log "invoked: CORE=$CORE RTOS=$RTOS TYPE=$TYPE cwd=$PWD"
+
 find_rproc() {
     match="$1"
     for rp in /sys/class/remoteproc/remoteproc*; do
@@ -87,30 +90,57 @@ fi
 FW_NAME=$(basename "$FW")
 
 if ! ensure_host_firmware_tmpfs; then
-    echo "start.sh: failed to mount tmpfs on host /lib/firmware — is lvgl-app running with pid: host + privileged?" >&2
+    log "FAIL: could not mount tmpfs on host /lib/firmware (need pid: host + privileged)"
     exit 3
 fi
+log "host /lib/firmware type: $(nsenter -t 1 -m -- stat -f -c %T /lib/firmware 2>/dev/null)"
+log "host /lib/firmware ls before staging:"
+nsenter -t 1 -m -- ls -la /lib/firmware >&2 2>/dev/null || true
 
 # Push the requested ELF into the host's /lib/firmware tmpfs so
 # request_firmware_direct() can find it.
 if ! cat "$FW" | nsenter -t 1 -m -- sh -c "cat > /lib/firmware/$FW_NAME"; then
-    echo "start.sh: failed to stage $FW_NAME into host /lib/firmware" >&2
+    log "FAIL staging $FW_NAME into host /lib/firmware"
     exit 3
 fi
+log "host /lib/firmware ls after staging:"
+nsenter -t 1 -m -- ls -la /lib/firmware >&2 2>/dev/null || true
 
 # Stop current firmware if it's running — remoteproc rejects a firmware write
 # while state=running.
 current=$(cat "$CMD_DIR/state" 2>/dev/null || echo "")
+log "current state before stop: $current"
 if [ "$current" = "running" ]; then
     echo stop > "$CMD_DIR/state" 2>/dev/null || true
-    # Wait for state to settle. remoteproc stop is async — writing 'start'
-    # too early races with the tear-down and yields EBUSY.
     for _ in 1 2 3 4 5; do
         s=$(cat "$CMD_DIR/state" 2>/dev/null || echo "")
         [ "$s" != "running" ] && break
         sleep 0.2
     done
+    log "state after stop wait: $(cat "$CMD_DIR/state" 2>/dev/null)"
 fi
 
-printf '%s' "$FW_NAME" > "$CMD_DIR/firmware"
-echo start > "$CMD_DIR/state"
+log "remoteproc node: $CMD_DIR firmware=$FW_NAME"
+log "state before write: $(cat "$CMD_DIR/state" 2>/dev/null)"
+
+if ! printf '%s' "$FW_NAME" > "$CMD_DIR/firmware" 2>/tmp/fw.err; then
+    log "FAIL writing firmware: $(cat /tmp/fw.err 2>/dev/null)"
+    exit 3
+fi
+log "firmware attr now: $(cat "$CMD_DIR/firmware" 2>/dev/null)"
+
+if ! echo start > "$CMD_DIR/state" 2>/tmp/start.err; then
+    log "FAIL writing state=start: $(cat /tmp/start.err 2>/dev/null)"
+    log "last dmesg:"
+    nsenter -t 1 -m -- dmesg 2>/dev/null | tail -20 >&2 || true
+    exit 3
+fi
+
+sleep 1
+final=$(cat "$CMD_DIR/state" 2>/dev/null)
+log "state after start: $final"
+if [ "$final" != "running" ]; then
+    log "remoteproc did NOT reach running state. Last dmesg:"
+    nsenter -t 1 -m -- dmesg 2>/dev/null | tail -30 >&2 || true
+    exit 3
+fi
