@@ -1,20 +1,40 @@
 #!/bin/bash
 # Copyright 2025 NXP
 # NXP Proprietary. This software is owned or controlled by NXP and may only be used strictly in
-# accordance with the applicable license terms. By expressly accepting such terms or by downloading, installing,
-# activating and/or otherwise using the software, you are agreeing that you have read, and that you agree to
-# comply with and are bound by, such license terms.  If you do not agree to be bound by the applicable license
-# terms, then you may not retain, install, activate or otherwise use the software.
+# accordance with the applicable license terms.
 #
+# Stop a firmware running on one of the auxiliary cores.
+# See start.sh for the rationale behind the class-alias path discovery.
 
 CORE=$1
 
-ELF_DIR=/examples/heterogeneous-multicore
-ACMD_DIR="/sys/devices/platform/remoteproc-ca55-1/remoteproc/remoteproc0"
-MCMD_DIR="/sys/devices/platform/remoteproc-cm33/remoteproc/remoteproc1"
+find_rproc() {
+    match="$1"
+    for rp in /sys/class/remoteproc/remoteproc*; do
+        [ -d "$rp" ] || continue
+        name=$(cat "$rp/name" 2>/dev/null || echo "")
+        case "$name" in
+            *${match}*) echo "$rp"; return 0 ;;
+        esac
+    done
+    return 1
+}
 
 if [ "$CORE" == "a" ]; then
-    echo stop > $ACMD_DIR/state
+    CMD_DIR=$(find_rproc "ca55" || find_rproc "cortex-a" || true)
 else
-    echo stop > $MCMD_DIR/state
+    CMD_DIR=$(find_rproc "cm33" || find_rproc "imx-rproc" || find_rproc "cortex-m" || true)
+fi
+
+if [ -z "$CMD_DIR" ]; then
+    # Nothing to stop — the target core has no remoteproc node.
+    exit 0
+fi
+
+# Only issue the stop if the firmware is actually running; otherwise remoteproc
+# returns EINVAL and spams the log with 'No such file or directory' from the
+# echo redirection.
+current=$(cat "$CMD_DIR/state" 2>/dev/null || echo "")
+if [ "$current" = "running" ]; then
+    echo stop > "$CMD_DIR/state" 2>/dev/null || true
 fi
