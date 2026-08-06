@@ -48,6 +48,10 @@ services:
       # mount point. A directory mount keeps the file as a regular dentry
       # inside a normal directory, so rename works.
       - ./weston-xdg:/etc/xdg/weston
+      # The Torizon entrypoint honours `--developer` and switches its config
+      # path to /etc/xdg/weston-dev/. Mount our file there too so the same
+      # kiosk config applies regardless of which path Weston picks.
+      - ./weston-xdg:/etc/xdg/weston-dev
     device_cgroup_rules:
       - "c 4:* rmw"     # /dev/tty*
       - "c 13:* rmw"    # /dev/input/*
@@ -55,7 +59,12 @@ services:
       - "c 226:* rmw"   # /dev/dri/*
       - "c 253:* rmw"   # dynamic misc majors (varies per kernel)
       - "c 10:223 rmw"  # /dev/uinput
-    command: --developer
+    # Explicit empty CMD to override the image's default '--developer' flag,
+    # which would switch config path to /etc/xdg/weston-dev/ AND re-enable
+    # desktop-shell. We want production kiosk mode (kiosk-shell.so per our
+    # weston.ini). The bind-mount to /etc/xdg/weston-dev covers the case where
+    # the entrypoint forces --developer anyway.
+    command: ""
     restart: unless-stopped
 
   # One-shot service: loads rt_latency_cm33.elf into the Cortex-M33 via
