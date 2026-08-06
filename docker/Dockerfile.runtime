@@ -19,10 +19,17 @@ RUN apt-get update \
         libwayland-client0 \
         libwayland-cursor0 \
         libxkbcommon0 \
+        bash \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 COPY app/platform/linux/build-aarch64-docker/gui_guider /app/gui_guider
+# The backend spawns ./start.sh / ./stop.sh from CWD to drive remoteproc
+# (see app/custom/real_time_edge/main.c). Firmware ELFs live under ./elf/.
+COPY app/custom/script/start.sh /app/start.sh
+COPY app/custom/script/stop.sh  /app/stop.sh
+COPY app/custom/elf/            /app/elf/
+RUN chmod +x /app/start.sh /app/stop.sh
 
 # Torizon convention: weston exposes its socket under /tmp/1000-runtime-dir.
 ENV XDG_RUNTIME_DIR=/tmp/1000-runtime-dir \

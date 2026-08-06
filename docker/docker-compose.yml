@@ -70,13 +70,15 @@ services:
     depends_on:
       weston:
         condition: service_started
-      m33-loader:
-        condition: service_completed_successfully
     environment:
       - XDG_RUNTIME_DIR=/tmp/1000-runtime-dir
       - WAYLAND_DISPLAY=wayland-0
     volumes:
       - /tmp:/tmp
+      # The backend drives remoteproc by writing to sysfs (see
+      # app/custom/script/start.sh). Needs /sys mounted rw and the sysfs
+      # remoteproc nodes reachable from inside the container.
+      - /sys:/sys
     # The GUI-Guider "Real-Time Edge" demo reads A55/M33 telemetry from
     # physical shared memory via /dev/mem + mmap (see
     # app/custom/real_time_edge/mem_mgr.c). Without this the CPU/latency
@@ -86,4 +88,9 @@ services:
       - /dev/mem:/dev/mem
     cap_add:
       - SYS_RAWIO
+      - SYS_ADMIN   # needed to write /sys/.../remoteproc*/{firmware,state}
+    # remoteproc firmware loading requires unrestricted access to sysfs;
+    # SYS_ADMIN alone is not enough because the sysfs mount inherited from
+    # host is read-only in the default seccomp profile.
+    privileged: true
     restart: unless-stopped
