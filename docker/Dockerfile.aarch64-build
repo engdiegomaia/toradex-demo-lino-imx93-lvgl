@@ -1,0 +1,18 @@
+FROM debian:bookworm-slim
+
+RUN dpkg --add-architecture arm64 \
+    && apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        build-essential \
+        cmake \
+        g++-aarch64-linux-gnu \
+        gcc-aarch64-linux-gnu \
+        libdrm-dev:arm64 \
+        libwayland-dev:arm64 \
+        libxkbcommon-dev:arm64 \
+        ninja-build \
+        pkg-config \
+        wayland-protocols \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src

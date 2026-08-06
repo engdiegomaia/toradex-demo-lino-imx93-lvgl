@@ -1,0 +1,19 @@
+[Unit]
+Description=gui_guider Service
+Requires=weston.service
+After=weston.service systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+Environment=XDG_RUNTIME_DIR=/run/user/0
+Environment=WAYLAND_DISPLAY=wayland-0
+WorkingDirectory=/root/demo/
+ExecStart=/root/demo/gui_guider.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=graphical.target

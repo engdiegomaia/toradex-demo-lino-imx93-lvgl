@@ -1,0 +1,31 @@
+# Runtime image for the LVGL GUI-Guider demo on Torizon (aarch64, Wayland client).
+#
+# Platform note: the base image is `torizon/wayland-base-imx93:4`, matching the
+# i.MX93 variant of the compositor (`torizon/weston-imx93:4`). Torizon OS 7 uses
+# tag major 4; do not mix with major 3 (Torizon OS 6) or with -vivante variants
+# (i.MX8 GPU userspace) — those crash-loop on i.MX93.
+#
+# The application binary is cross-built via docker/build-aarch64.sh into
+# app/platform/linux/build-aarch64-docker/gui_guider and must be present before
+# building this image.
+
+ARG TORIZON_TAG=4
+FROM --platform=linux/arm64 torizon/wayland-base-imx93:${TORIZON_TAG}
+
+USER root
+
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+        libwayland-client0 \
+        libwayland-cursor0 \
+        libxkbcommon0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY app/platform/linux/build-aarch64-docker/gui_guider /app/gui_guider
+
+# Torizon convention: weston exposes its socket under /tmp/1000-runtime-dir.
+ENV XDG_RUNTIME_DIR=/tmp/1000-runtime-dir \
+    WAYLAND_DISPLAY=wayland-0
+
+CMD ["/app/gui_guider"]

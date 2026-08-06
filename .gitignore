@@ -1,0 +1,17 @@
+# Build artifacts
+app/platform/linux/build-*/
+app/platform/linux/build/
+*.o
+*.d
+*.a
+*.so
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db

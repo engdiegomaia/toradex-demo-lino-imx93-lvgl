@@ -1,0 +1,170 @@
+/*
+* Copyright 2025 NXP
+* NXP Proprietary. This software is owned or controlled by NXP and may only be used strictly in
+* accordance with the applicable license terms. By expressly accepting such terms or by downloading, installing,
+* activating and/or otherwise using the software, you are agreeing that you have read, and that you agree to
+* comply with and are bound by, such license terms.  If you do not agree to be bound by the applicable license
+* terms, then you may not retain, install, activate or otherwise use the software.
+*/
+
+#include "ram_console.h"
+#include "log_tools.h"
+#include "rt_stats.h"
+#include "mem_mgr.h"
+#include "lvgl_gui.h"
+
+
+int reset_rt_stats(uint8_t am_idx)
+{
+	core_session_t *ps = get_core_session(am_idx);
+	size_t shm_len = sizeof(rt_latency_shm_t);
+	rt_latency_shm_t *pshm = ps->rt_shm;
+
+	ps->boot_fail = 0;
+	ps->boot_flag = 0;
+	ps->boot_cnt = 0;
+	ps->boot_sec = 0;
+
+	if (pshm) {
+		pshm->flag = 0;
+		pshm->type = 0;
+		pshm->rd_idx = 0;
+		pshm->wr_idx = 0;
+		wr_flush_cache((uint8_t*)pshm, shm_len);
+	}
+
+	if (ps->shm_virt) {
+		mem_unmap(ps->shm_virt, ps->shm_len);
+		ps->shm_virt = NULL;
+		ps->shm_len = 0;
+		ps->rt_shm = NULL;
+	}
+
+	return 0;
+}
+
+int set_boot_flag(uint8_t am_idx, int flag)
+{
+	core_session_t *ps = get_core_session(am_idx);
+
+	if (!ps->boot_flag && flag) {
+		ps->boot_flag = flag;
+		ps->boot_fail = 0;
+		log_printf(am_idx, "Done\n\n");
+	}
+
+	return 0;
+}
+
+int is_boot_failed(uint8_t am_idx)
+{
+	core_session_t *ps = get_core_session(am_idx);
+
+	return ps->boot_fail;
+}
+
+static void stats_print(uint8_t am_idx, char *pn, rt_latency_shm_stat *s)
+{
+	log_printf(am_idx, "%s: min %d mean %d max %d rms^2 %lu stddev^2 %lu absmin %d absmax %d\n",
+		pn, s->min, s->mean, s->max, s->rms, s->var, s->abs_min, s->abs_max);
+}
+
+static void update_tic_tac(uint8_t am_idx)
+{
+	static int tic = 1;
+	static int cnt = 0;
+
+	if (tic)
+		log_printf(am_idx, "tic ");
+	else
+		log_printf(am_idx, "tac ");
+
+	cnt++;
+	if (cnt >= 20) {
+		log_printf(am_idx, "\n");
+		cnt = 0;
+	}
+
+	tic = !tic;
+}
+
+static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
+{
+	core_session_t *ps = get_core_session(am_idx);
+	size_t shm_len = sizeof(rt_latency_shm_t);
+	uint8_t boot_type = ps->boot_type;
+	uint8_t test_type = ps->test_type;
+	uint8_t *p = NULL;
+
+	p = (uint8_t*)pshm;
+	rd_invalid_cache(p, shm_len);
+
+	if (!pshm->flag)
+		pshm->flag = 1;
+
+	if (test_type)
+		pshm->type = test_type;
+
+	ps->boot_cnt++;
+	if (!ps->boot_flag) {
+		if (pshm->flag == 2)
+		      set_boot_flag(am_idx, 1);
+		else if (ps->boot_cnt > 3)
+		      ps->boot_fail = 1;
+	}
+
+	if (BOOT_TYPE_RTLAT(boot_type) && !ps->boot_fail)
+		log_printf(am_idx, ".");
+
+	if (get_debug_mode() & DEBUG_MODE(2))
+		printf("%s() am_idx:%d rd_idx:%d wr_idx:%d type:%d flag:%d fail:%d\n", __func__,\
+			am_idx, pshm->rd_idx, pshm->wr_idx, pshm->type, pshm->flag, ps->boot_fail);
+
+	if (pshm->rd_idx == pshm->wr_idx)
+		goto ret_tag;
+
+	/* For M-core hello_world */
+	if (BOOT_TYPE_HELLO(boot_type))
+		update_tic_tac(am_idx);
+
+	if (BOOT_TYPE_RTLAT(boot_type)) {
+		if (pshm->wr_idx > 1)
+			log_printf(am_idx, "\nsec:%d cpu_load:%.2f%%\n", ps->boot_sec, pshm->cpu_load);
+		else
+			log_printf(am_idx, "\nsec:%d\n", ps->boot_sec);
+
+		stats_print(am_idx, "irq_delay", &pshm->irq_delay);
+		stats_print(am_idx, "irq_sched", &pshm->irq_sched);
+
+		notify_update_gui_latency(am_idx, &pshm->irq_sched);
+	}
+
+	pshm->rd_idx++;
+
+ret_tag:
+	wr_flush_cache(p, shm_len);
+	return 0;
+}
+
+int show_stat_shm_data(uint8_t am_idx, uint64_t addr)
+{
+	core_session_t *ps = get_core_session(am_idx);
+	size_t shm_len = sizeof(rt_latency_shm_t);
+	rt_latency_shm_t *pshm = ps->rt_shm;
+
+	if (!pshm) {
+		pshm = (rt_latency_shm_t *)mem_map_page(addr, &shm_len, &ps->shm_virt);
+		ps->shm_len = shm_len;
+		ps->rt_shm = pshm;
+
+		pshm->rd_idx = 0;
+		pshm->wr_idx = 0;
+		wr_flush_cache((uint8_t*)pshm, shm_len);
+	}
+
+	ps->boot_sec++;
+	if (ps->boot_type)
+		update_shm_data(am_idx, pshm);
+
+	return 0;
+}

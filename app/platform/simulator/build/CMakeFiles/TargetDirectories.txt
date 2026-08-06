@@ -1,0 +1,16 @@
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/generated.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/simulator.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/run.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/edit_cache.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/rebuild_cache.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/list_install_components.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/install.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/install/local.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/CMakeFiles/install/strip.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/lvgl.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/edit_cache.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/rebuild_cache.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/list_install_components.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/install.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/install/local.dir
+/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app/platform/simulator/build/lvgl/CMakeFiles/install/strip.dir

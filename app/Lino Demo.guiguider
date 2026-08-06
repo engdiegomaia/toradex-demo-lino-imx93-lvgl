@@ -1,0 +1,3701 @@
+{
+  "projectId": "project-MSDY23X3Z3MW",
+  "projectName": "Lino Demo",
+  "projectPath": "/home/diego-maia/toradex/demo/lino-imx93-mallow-dsi-lvgl/app",
+  "version": "2.0.0",
+  "toolVendor": "NXP Semiconductors",
+  "createDate": "2026-08-04",
+  "createVersion": "2.0.0",
+  "lastModified": "2026-08-05T19:38:38.852Z",
+  "description": "",
+  "metadata": {
+    "board": {
+      "id": 12,
+      "name": "MCIMX93FRDM"
+    },
+    "application": {
+      "id": 11,
+      "name": "HeterogeneousMulticore"
+    }
+  },
+  "projectSettings": {
+    "lvglVersion": "9.4.0",
+    "width": 1024,
+    "height": 600,
+    "targetConfig": {
+      "targetRun": false,
+      "targetBuild": true,
+      "toolchainAlias": "linux",
+      "toolchain": "GCC: 15.2.0",
+      "display": "waveshare-7inch-c",
+      "colorDepth": 32
+    },
+    "imageConfig": {
+      "storage_type": "CArray",
+      "sd_path": "/sdcard/images/",
+      "flash_address": "0xFFFFFFFFU",
+      "color_format": "RGB565A8",
+      "aligned": 0,
+      "origin_size": 0,
+      "compress": "",
+      "dither": ""
+    },
+    "fontConfig": {
+      "default_family": "montserratMedium.ttf",
+      "default_size": 14,
+      "enable_base_chars": 1,
+      "base_chars": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    }
+  },
+  "lvConf": {
+    "LV_USE_OS": "LV_OS_PTHREAD",
+    "LV_USE_G2D": 0,
+    "LV_MEM_SIZE": 10240,
+    "LV_LOG_PRINTF": 1,
+    "LV_USE_WAYLAND": 1,
+    "LV_EVDEV_DEVICE": "/dev/input/event2",
+    "LV_USE_LINUX_DRM": 0,
+    "LV_LINUX_DRM_CARD": "/dev/dri/card0",
+    "LV_SYSMON_GET_IDLE": "lv_os_get_idle_percent"
+  },
+  "UI": {
+    "screen_list": [
+      {
+        "type": "layer_sys",
+        "name": "layer_sys",
+        "id": "layer_sys",
+        "children": []
+      },
+      {
+        "type": "layer_top",
+        "name": "layer_top",
+        "id": "layer_top",
+        "children": []
+      },
+      {
+        "type": "layer_bottom",
+        "name": "layer_bottom",
+        "id": "layer_bottom",
+        "children": []
+      },
+      {
+        "type": "screen",
+        "id": "screen",
+        "name": "Home",
+        "default_screen": true,
+        "children": [
+          {
+            "id": "image_MSGDTAOO5VE2",
+            "type": "image",
+            "name": "image_1",
+            "width": 164,
+            "width_unit": "px",
+            "height": 45,
+            "height_unit": "px",
+            "x": 13,
+            "x_unit": "px",
+            "y": 541,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT"
+              }
+            },
+            "src": "resources/image/US Logo.png"
+          },
+          {
+            "id": "dropdown_MNZN3G9RWWT0",
+            "type": "dropdown",
+            "name": "ddlist_apps",
+            "width": 422,
+            "width_unit": "px",
+            "height": 0,
+            "height_unit": "content",
+            "x": 181,
+            "x_unit": "px",
+            "y": 173,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#ffffff",
+                "text_color": "#023c6c",
+                "border_color": "#023c6c"
+              }
+            },
+            "part": [
+              {
+                "type": "obj",
+                "name": "list",
+                "object": "list",
+                "id": "obj_MNZN3G9R1SUI",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_opa": 255,
+                    "bg_color": "#ffffff",
+                    "text_color": "#014B88"
+                  }
+                }
+              }
+            ],
+            "option": [
+              {
+                "id": "MNZN3YMHQNWF",
+                "text": "RT Latency of Zephyr"
+              },
+              {
+                "id": "MNZN3ZBW7ZN4",
+                "text": "RT Latency of FreeRTOS"
+              },
+              {
+                "id": "MNZN47CTXTU6",
+                "text": "Application on Zephyr"
+              }
+            ]
+          },
+          {
+            "id": "MNZMDFY1KD96",
+            "type": "label",
+            "name": "label_start",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 797,
+            "x_unit": "px",
+            "y": 163,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT"
+              }
+            },
+            "text": "START",
+            "children": []
+          },
+          {
+            "id": "image_MNZLNZ5EL4DK",
+            "type": "button",
+            "name": "btn_start",
+            "width": 87,
+            "width_unit": "px",
+            "height": 57,
+            "height_unit": "px",
+            "x": 779,
+            "x_unit": "px",
+            "y": 94,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#97C838",
+                "bg_opa": 200
+              }
+            },
+            "pivot_x": 32,
+            "pivot_y": 30,
+            "children": [
+              {
+                "id": "label_MO70D036BEFU",
+                "type": "label",
+                "name": "label_start_icon",
+                "width": 39,
+                "width_unit": "px",
+                "height": 43,
+                "height_unit": "px",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_image_src": "resources/image/started.png",
+                    "bg_image_config": {
+                      "color_format": "ARGB8888"
+                    }
+                  }
+                },
+                "text": ""
+              }
+            ]
+          },
+          {
+            "id": "container_MNZLMRQGLS7J",
+            "type": "container",
+            "name": "container_1",
+            "width": 487,
+            "width_unit": "px",
+            "height": 110,
+            "height_unit": "px",
+            "x": 119,
+            "x_unit": "px",
+            "y": 47,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "pad_top": 0,
+                "pad_bottom": 0,
+                "pad_left": 0,
+                "pad_right": 0,
+                "border_color": "#27364A",
+                "bg_opa": 0
+              }
+            },
+            "children": [
+              {
+                "id": "container_MNZV4Z3XTID8",
+                "type": "container",
+                "name": "container_radio",
+                "width": 294,
+                "width_unit": "px",
+                "height": 40,
+                "height_unit": "px",
+                "x": 167,
+                "x_unit": "px",
+                "y": 61,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_opa": 0,
+                    "pad_top": 0,
+                    "pad_bottom": 0,
+                    "pad_left": 0,
+                    "pad_right": 0,
+                    "border_opa": 0,
+                    "bg_color": "#0E1522",
+                    "bg_grad_color": "#0E1522",
+                    "border_color": "#1E2B3D"
+                  }
+                },
+                "children": [
+                  {
+                    "id": "checkbox_MNZNHGL9NKWZ",
+                    "type": "checkbox",
+                    "name": "cb_core_m33",
+                    "width": 0,
+                    "width_unit": "content",
+                    "height": 0,
+                    "height_unit": "content",
+                    "x": 168,
+                    "x_unit": "px",
+                    "y": 19,
+                    "y_unit": "px",
+                    "align": "LV_ALIGN_TOP_LEFT",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "text_color": "#023c6c"
+                      },
+                      "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_INDICATOR",
+                        "state": "LV_STATE_DEFAULT",
+                        "border_color": "#0098DB",
+                        "bg_opa": 0
+                      }
+                    },
+                    "text": "Cortex-M33",
+                    "add_flag": [
+                      "LV_OBJ_FLAG_CLICKABLE"
+                    ],
+                    "remove_flag": []
+                  },
+                  {
+                    "id": "MNZNHQ18IRTR",
+                    "type": "checkbox",
+                    "name": "cb_core_A1",
+                    "width": 0,
+                    "width_unit": "content",
+                    "height": 0,
+                    "height_unit": "content",
+                    "x": 17,
+                    "x_unit": "px",
+                    "y": 19,
+                    "y_unit": "px",
+                    "align": "LV_ALIGN_TOP_LEFT",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "text_color": "#023c6c"
+                      },
+                      "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_INDICATOR",
+                        "state": "LV_STATE_DEFAULT",
+                        "border_color": "#FBB102",
+                        "bg_opa": 0
+                      }
+                    },
+                    "text": "Cortex-A55-1",
+                    "children": []
+                  }
+                ]
+              },
+              {
+                "id": "MNZNBDMWFRQI",
+                "type": "image",
+                "name": "core_A1_icon",
+                "width": 64,
+                "width_unit": "px",
+                "height": 63,
+                "height_unit": "px",
+                "x": 205,
+                "x_unit": "px",
+                "y": 12,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#FBB102",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/cortexA.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "add_flag": [
+                  "LV_OBJ_FLAG_CLICKABLE"
+                ],
+                "remove_flag": [],
+                "children": []
+              },
+              {
+                "id": "image_MNZN9GO5T8YI",
+                "type": "image",
+                "name": "core_A0_icon",
+                "width": 64,
+                "width_unit": "px",
+                "height": 63,
+                "height_unit": "px",
+                "x": 52,
+                "x_unit": "px",
+                "y": 13,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#97C838",
+                    "image_opa": 255,
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/cortexA.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": []
+              },
+              {
+                "id": "MNZNBQJI641J",
+                "type": "image",
+                "name": "core_m33_icon",
+                "width": 64,
+                "width_unit": "px",
+                "height": 63,
+                "height_unit": "px",
+                "x": 359,
+                "x_unit": "px",
+                "y": 13,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "add_flag": [
+                  "LV_OBJ_FLAG_CLICKABLE"
+                ],
+                "remove_flag": [],
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#0098DB",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/cortexM.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": []
+              },
+              {
+                "id": "MNZNGO3TZQ5P",
+                "type": "label",
+                "name": "label_core_A0",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 29,
+                "x_unit": "px",
+                "y": 84,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Cortex-A55-0",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "label_MNZLLJC260FX",
+            "type": "label",
+            "name": "board_name",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 13,
+            "x_unit": "px",
+            "y": 88,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#023c6c"
+              }
+            },
+            "text": "i.MX93-FRDM",
+            "children": []
+          },
+          {
+            "id": "label_MNZLC245V8WU",
+            "type": "label",
+            "name": "title_name",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#014B88"
+              }
+            },
+            "text": "Heterogeneous Multicore Control and Monitor"
+          },
+          {
+            "id": "MNZME3XQRS10",
+            "type": "button",
+            "name": "btn_stop",
+            "width": 77,
+            "width_unit": "px",
+            "height": 57,
+            "height_unit": "px",
+            "x": 903,
+            "x_unit": "px",
+            "y": 95,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#FBB102",
+                "bg_opa": 200
+              }
+            },
+            "children": [
+              {
+                "id": "label_MO70EP9P14EA",
+                "type": "label",
+                "name": "label_stop_icon",
+                "width": 42,
+                "width_unit": "px",
+                "height": 42,
+                "height_unit": "px",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_image_src": "resources/image/pause.png",
+                    "bg_image_config": {
+                      "color_format": "ARGB8888"
+                    }
+                  }
+                },
+                "text": ""
+              }
+            ],
+            "add_flag": [
+              "LV_OBJ_FLAG_CLICKABLE"
+            ],
+            "remove_flag": [],
+            "pivot_x": 30,
+            "pivot_y": 30
+          },
+          {
+            "id": "MNZME3XQ5A3S",
+            "type": "label",
+            "name": "label_stop",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 923,
+            "x_unit": "px",
+            "y": 164,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT"
+              }
+            },
+            "text": "STOP",
+            "children": []
+          },
+          {
+            "id": "MNZME5SZGXIF",
+            "type": "button",
+            "name": "btn_cpu_info",
+            "width": 87,
+            "width_unit": "px",
+            "height": 57,
+            "height_unit": "px",
+            "x": 650,
+            "x_unit": "px",
+            "y": 95,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#0098DB",
+                "bg_opa": 255
+              }
+            },
+            "children": [
+              {
+                "id": "label_MO70A7PTI5GX",
+                "type": "label",
+                "name": "label_cpu_info_icon",
+                "width": 51,
+                "width_unit": "px",
+                "height": 30,
+                "height_unit": "px",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_image_src": "resources/image/information.png",
+                    "bg_image_config": {
+                      "color_format": "ARGB8888"
+                    }
+                  }
+                },
+                "text": ""
+              }
+            ],
+            "add_flag": [
+              "LV_OBJ_FLAG_CLICKABLE"
+            ],
+            "remove_flag": [],
+            "pivot_x": 35,
+            "pivot_y": 20
+          },
+          {
+            "id": "MNZME5SZX7WX",
+            "type": "label",
+            "name": "label_cpu_info",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 659,
+            "x_unit": "px",
+            "y": 164,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT"
+              }
+            },
+            "text": "CPU info",
+            "children": []
+          },
+          {
+            "id": "MNZN2EG7QO3A",
+            "type": "label",
+            "name": "app_name",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 15,
+            "x_unit": "px",
+            "y": 186,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#023c6c"
+              }
+            },
+            "text": "Real-Time Application",
+            "children": []
+          },
+          {
+            "id": "MNZN5WALBX88",
+            "type": "container",
+            "name": "container_cortexA0",
+            "width": 211,
+            "width_unit": "px",
+            "height": 370,
+            "height_unit": "px",
+            "x": 4,
+            "x_unit": "px",
+            "y": 223,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "pad_top": 0,
+                "pad_bottom": 0,
+                "pad_left": 0,
+                "pad_right": 0,
+                "bg_opa": 0,
+                "border_color": "#97C838"
+              }
+            },
+            "children": [
+              {
+                "id": "image_MSGDSL25QRUS",
+                "type": "image",
+                "name": "image_1",
+                "width": 188,
+                "width_unit": "px",
+                "height": 72,
+                "height_unit": "px",
+                "x": -4,
+                "x_unit": "px",
+                "y": 245,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT"
+                  }
+                },
+                "src": "resources/image/TorizonOS_Regular.jpg"
+              },
+              {
+                "id": "MO6YXILOCG9C",
+                "type": "label",
+                "name": "coreA0_L1",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 7,
+                "x_unit": "px",
+                "y": 168,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "L1-I Cache: 32KB",
+                "children": []
+              },
+              {
+                "id": "MO6XQXANUSJW",
+                "type": "label",
+                "name": "coreA0_status",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 8,
+                "x_unit": "px",
+                "y": 78,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Status:",
+                "children": []
+              },
+              {
+                "id": "MNZNSOO6SQSW",
+                "type": "label",
+                "name": "coreA0_Frequency",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 107,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Frequency: 1.7GHz  ",
+                "children": []
+              },
+              {
+                "id": "label_MNZNPEOID0FF",
+                "type": "label",
+                "name": "title_coreA0",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 2,
+                "x_unit": "px",
+                "y": 12,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 20,
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Cortex-A55-0",
+                "children": []
+              },
+              {
+                "id": "image_MNZNN0A2V4ON",
+                "type": "image",
+                "name": "img_Logo",
+                "width": 52,
+                "width_unit": "px",
+                "height": 53,
+                "height_unit": "px",
+                "x": 145,
+                "x_unit": "px",
+                "y": 30,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_opa": 255,
+                    "image_recolor": "#97C838",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/cortexA.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                }
+              },
+              {
+                "id": "MNZNTQG8S4S7",
+                "type": "label",
+                "name": "coreA0_status_value",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 64,
+                "x_unit": "px",
+                "y": 79,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#22C55E"
+                  }
+                },
+                "text": "Running",
+                "children": []
+              },
+              {
+                "id": "MNZNTSVT10G1",
+                "type": "label",
+                "name": "coreA0_os",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 8,
+                "x_unit": "px",
+                "y": 50,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "OS:  TorizonOS ",
+                "children": []
+              },
+              {
+                "id": "MO6Z0988ZAH2",
+                "type": "label",
+                "name": "coreA0_FPU",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 7,
+                "x_unit": "px",
+                "y": 198,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "FPU: VFPv4-D16",
+                "children": []
+              },
+              {
+                "id": "MO6Z0BWPXG7D",
+                "type": "label",
+                "name": "coreA0_Architecture",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 8,
+                "x_unit": "px",
+                "y": 229,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Architecture: Arm 64bit",
+                "children": []
+              },
+              {
+                "id": "MO6Z0CSC9FS4",
+                "type": "label",
+                "name": "coreA0_MPE",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 7,
+                "x_unit": "px",
+                "y": 137,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "MPE with NEON: support",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "MNZN6CLM9T1D",
+            "type": "container",
+            "name": "container_cortexA1",
+            "width": 383,
+            "width_unit": "px",
+            "height": 370,
+            "height_unit": "px",
+            "x": 230,
+            "x_unit": "px",
+            "y": 223,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "pad_top": 0,
+                "pad_bottom": 0,
+                "pad_left": 0,
+                "pad_right": 0,
+                "border_opa": 255,
+                "border_width": 4,
+                "bg_opa": 0,
+                "border_color": "#FBB102"
+              }
+            },
+            "children": [
+              {
+                "id": "textarea_MNZOC9FKJL0C",
+                "type": "textarea",
+                "name": "ta_coreA1_log",
+                "width": 368,
+                "width_unit": "px",
+                "height": 232,
+                "height_unit": "px",
+                "x": 3,
+                "x_unit": "px",
+                "y": 125,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_color": "#ffffff",
+                    "text_color": "#014B88",
+                    "bg_grad_color": "#dcdcdc",
+                    "border_color": "#1E2B3D"
+                  }
+                },
+                "text": "Cortex-A55-1:  ",
+                "add_flag": [],
+                "remove_flag": [
+                  "LV_OBJ_FLAG_CLICK_FOCUSABLE"
+                ]
+              },
+              {
+                "id": "image_MNZO9FJM5ZYK",
+                "type": "image",
+                "name": "coreA1_run",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 307,
+                "x_unit": "px",
+                "y": 28,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#FBB102",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/refresh.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": [],
+                "pivot_x": 24,
+                "pivot_y": 24
+              },
+              {
+                "id": "MNZO7ULNKDNK",
+                "type": "label",
+                "name": "coreA1_app",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 97,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "RT-Latency of Zephyr",
+                "children": []
+              },
+              {
+                "id": "MNZO6ILGEEST",
+                "type": "label",
+                "name": "label_coreA1_status",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 69,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "Status:",
+                "children": []
+              },
+              {
+                "id": "label_MNZO2CPM87C8",
+                "type": "label",
+                "name": "title_coreA1",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 5,
+                "x_unit": "px",
+                "y": 12,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 20,
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "Cortex-A55-1"
+              },
+              {
+                "id": "MNZO3E17WK19",
+                "type": "label",
+                "name": "coreA1_status",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 66,
+                "x_unit": "px",
+                "y": 69,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#F59E0B"
+                  }
+                },
+                "text": "Pending",
+                "children": []
+              },
+              {
+                "id": "MNZO4I2MG3EY",
+                "type": "label",
+                "name": "label_coreA1_os",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 45,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "OS:",
+                "children": []
+              },
+              {
+                "id": "MNZO6YTQ1KKK",
+                "type": "label",
+                "name": "coreA1_os",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 47,
+                "x_unit": "px",
+                "y": 45,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#023c6c"
+                  }
+                },
+                "text": "RTOS",
+                "children": []
+              },
+              {
+                "id": "MNZOAYX13KCX",
+                "type": "image",
+                "name": "coreA1_icon",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 243,
+                "x_unit": "px",
+                "y": 28,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#FBB102",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/cortexA.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": []
+              },
+              {
+                "id": "MNZOB2NWQ6ZK",
+                "type": "button",
+                "name": "coreA1_LT",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 178,
+                "x_unit": "px",
+                "y": 28,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_image_src": "resources/image/performance.png",
+                    "bg_image_config": {
+                      "color_format": "ARGB8888"
+                    },
+                    "bg_color": "#FBB102",
+                    "bg_opa": 255,
+                    "radius": 5
+                  }
+                },
+                "children": []
+              }
+            ],
+            "add_flag": [
+              "LV_OBJ_FLAG_CLICKABLE"
+            ],
+            "remove_flag": []
+          },
+          {
+            "id": "MNZT0KFTHMYF",
+            "type": "container",
+            "name": "container_cortexM33",
+            "width": 383,
+            "width_unit": "px",
+            "height": 370,
+            "height_unit": "px",
+            "x": 629,
+            "x_unit": "px",
+            "y": 223,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "add_flag": [],
+            "remove_flag": [
+              "LV_OBJ_FLAG_CLICK_FOCUSABLE",
+              "LV_OBJ_FLAG_SCROLLABLE",
+              "LV_OBJ_FLAG_SNAPPABLE",
+              "LV_OBJ_FLAG_PRESS_LOCK"
+            ],
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "pad_top": 0,
+                "pad_bottom": 0,
+                "pad_left": 0,
+                "pad_right": 0,
+                "border_color": "#0098DB",
+                "border_opa": 255,
+                "border_width": 4,
+                "bg_opa": 0
+              }
+            },
+            "children": [
+              {
+                "id": "MNZT0KFTI5MJ",
+                "type": "textarea",
+                "name": "ta_coreM33_log",
+                "width": 368,
+                "width_unit": "px",
+                "height": 232,
+                "height_unit": "px",
+                "x": 5,
+                "x_unit": "px",
+                "y": 127,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_color": "#ffffff",
+                    "text_color": "#014B88",
+                    "bg_grad_color": "#0E1522",
+                    "border_color": "#1E2B3D"
+                  }
+                },
+                "text": "Cortex-M33: ",
+                "children": [],
+                "add_flag": [],
+                "remove_flag": [
+                  "LV_OBJ_FLAG_CLICK_FOCUSABLE"
+                ]
+              },
+              {
+                "id": "MNZT0KFTTV37",
+                "type": "image",
+                "name": "coreM33_run",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 301,
+                "x_unit": "px",
+                "y": 29,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor": "#0098DB",
+                    "image_recolor_opa": 255
+                  }
+                },
+                "src": "resources/image/refresh.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": [],
+                "pivot_x": 24,
+                "pivot_y": 24
+              },
+              {
+                "id": "MNZT0KFTDXM7",
+                "type": "label",
+                "name": "coreM33_app",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 97,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "RT-Latency of Zephyr",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFT751A",
+                "type": "label",
+                "name": "label_coreM33_status",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 69,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "Status:",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFTEARH",
+                "type": "label",
+                "name": "title_coreM33",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 5,
+                "x_unit": "px",
+                "y": 12,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 20,
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "Cortex M33",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFT4PGE",
+                "type": "label",
+                "name": "coreM33_status",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 66,
+                "x_unit": "px",
+                "y": 69,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#F59E0B"
+                  }
+                },
+                "text": "Pending",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFTGQSX",
+                "type": "label",
+                "name": "label_coreM33_os",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 9,
+                "x_unit": "px",
+                "y": 45,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "OS:",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFTWLL5",
+                "type": "label",
+                "name": "coreM33_os",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 47,
+                "x_unit": "px",
+                "y": 45,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_color": "#014B88"
+                  }
+                },
+                "text": "RTOS",
+                "children": []
+              },
+              {
+                "id": "MNZT0KFTCIA8",
+                "type": "image",
+                "name": "coreM33_icon",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 231,
+                "x_unit": "px",
+                "y": 29,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "image_recolor_opa": 255,
+                    "image_recolor": "#0098DB"
+                  }
+                },
+                "src": "resources/image/cortexM.png",
+                "src_config": {
+                  "color_format": "ARGB8888"
+                },
+                "children": []
+              },
+              {
+                "id": "MNZT0KFTH552",
+                "type": "button",
+                "name": "coreM33_LT",
+                "width": 48,
+                "width_unit": "px",
+                "height": 48,
+                "height_unit": "px",
+                "x": 165,
+                "x_unit": "px",
+                "y": 29,
+                "y_unit": "px",
+                "align": "LV_ALIGN_TOP_LEFT",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "bg_image_src": "resources/image/performance.png",
+                    "bg_image_config": {
+                      "color_format": "ARGB8888"
+                    },
+                    "bg_color": "#0098DB",
+                    "bg_opa": 255,
+                    "radius": 5
+                  }
+                },
+                "children": []
+              }
+            ]
+          }
+        ],
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "radius": 0,
+            "bg_color": "#ffffff",
+            "bg_grad_color": "#0E1624",
+            "text_color": "#0E1624",
+            "bg_opa": 255
+          }
+        },
+        "custom_code": {
+          "include": "#include \"custom.h\"\r\nextern int cortexID;",
+          "code": "lv_obj_add_flag(ui->Home.container_radio_cb_core_A1, LV_OBJ_FLAG_EVENT_BUBBLE);\r\nlv_obj_add_flag(ui->Home.container_radio_cb_core_m33, LV_OBJ_FLAG_EVENT_BUBBLE);\r\nlv_obj_add_event_cb(ui->Home.container_1_container_radio, radio_event_handler, LV_EVENT_CLICKED, &cortexID);\r\nlv_obj_add_state(lv_obj_get_child(ui->Home.container_1_container_radio, 0), LV_STATE_CHECKED);"
+        },
+        "src": "resources/image/US Logo.png"
+      },
+      {
+        "id": "screen_717g8lq",
+        "name": "Console_A1",
+        "type": "screen",
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "bg_color": "#ffffff",
+            "bg_grad_color": "#0E1624",
+            "border_color": "#0B1220"
+          }
+        },
+        "children": [
+          {
+            "id": "button_MO003Y38PLW0",
+            "type": "button",
+            "name": "button_back",
+            "width": 50,
+            "width_unit": "px",
+            "height": 50,
+            "height_unit": "px",
+            "x": 952,
+            "x_unit": "px",
+            "y": 4,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#1A2435",
+                "bg_opa": 255,
+                "radius": 25,
+                "bg_grad_color": "#162033",
+                "border_color": "#3B82F6",
+                "text_color": "#E6EDF5"
+              },
+              "LV_PART_MAIN|LV_STATE_PRESSED": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_PRESSED",
+                "bg_color": "#162033",
+                "border_color": "#3B82F6"
+              }
+            },
+            "children": [
+              {
+                "id": "label_MO003Y38G3A1",
+                "type": "label",
+                "name": "button_1_label",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 26,
+                    "text_family": "FontAwesome7.otf",
+                    "pad_top": "",
+                    "pad_bottom": "",
+                    "pad_left": "",
+                    "pad_right": "",
+                    "text_color": "#3B82F6"
+                  }
+                },
+                "text": "##LV_SYMBOL_HOME##"
+              }
+            ]
+          },
+          {
+            "id": "label_MNZZZP159VZ1",
+            "type": "label",
+            "name": "label_title",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#023c6c"
+              }
+            },
+            "text": "A-Core Runtime Logs"
+          },
+          {
+            "id": "MO000RA8OP3I",
+            "type": "textarea",
+            "name": "ta_log",
+            "width": 1024,
+            "width_unit": "px",
+            "height": 534,
+            "height_unit": "px",
+            "x": 0,
+            "x_unit": "px",
+            "y": 65,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#ffffff",
+                "text_color": "#023c6c",
+                "text_line_space": 2,
+                "border_color": "#2563EB"
+              },
+              "LV_PART_TEXTAREA_PLACEHOLDER|LV_STATE_DEFAULT": {
+                "part": "LV_PART_TEXTAREA_PLACEHOLDER",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#6D7D92"
+              }
+            },
+            "text": "Cortex-A1: ",
+            "children": [],
+            "add_flag": [
+              "LV_OBJ_FLAG_CLICKABLE"
+            ],
+            "remove_flag": []
+          }
+        ]
+      },
+      {
+        "id": "MO001YC0Q5CD",
+        "name": "Console_M33",
+        "type": "screen",
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "bg_color": "#FFFFFF",
+            "bg_grad_color": "#FFFFFF",
+            "border_color": "#0B1220"
+          }
+        },
+        "children": [
+          {
+            "id": "MO001YC01HAI",
+            "type": "label",
+            "name": "label_title",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#023c6c"
+              }
+            },
+            "text": "M-Core Runtime Logs",
+            "children": []
+          },
+          {
+            "id": "MO001YC00U18",
+            "type": "textarea",
+            "name": "ta_log",
+            "width": 1024,
+            "width_unit": "px",
+            "height": 534,
+            "height_unit": "px",
+            "x": 0,
+            "x_unit": "px",
+            "y": 65,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#FFFFFF",
+                "text_color": "#023c6c",
+                "text_line_space": 2,
+                "border_color": "#0098DB",
+                "border_width": 2
+              },
+              "LV_PART_TEXTAREA_PLACEHOLDER|LV_STATE_DEFAULT": {
+                "part": "LV_PART_TEXTAREA_PLACEHOLDER",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#6D7D92"
+              }
+            },
+            "text": "Cortex-M33: ",
+            "children": [],
+            "add_flag": [
+              "LV_OBJ_FLAG_CLICKABLE"
+            ],
+            "remove_flag": []
+          },
+          {
+            "id": "MO0085T8I9BB",
+            "type": "button",
+            "name": "button_back",
+            "width": 50,
+            "width_unit": "px",
+            "height": 50,
+            "height_unit": "px",
+            "x": 952,
+            "x_unit": "px",
+            "y": 4,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#1A2435",
+                "bg_opa": 255,
+                "radius": 25,
+                "bg_grad_color": "#162033",
+                "border_color": "#3B82F6",
+                "text_color": "#E6EDF5"
+              },
+              "LV_PART_MAIN|LV_STATE_PRESSED": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_PRESSED",
+                "bg_color": "#162033",
+                "border_color": "#3B82F6"
+              }
+            },
+            "children": [
+              {
+                "id": "MO0085T8UA59",
+                "type": "label",
+                "name": "button_1_label_copy",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 26,
+                    "text_family": "FontAwesome7.otf",
+                    "text_color": "#2563EB"
+                  }
+                },
+                "text": "##LV_SYMBOL_HOME##",
+                "children": []
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "MO00NLWZTW22",
+        "name": "BenchMarking_A1",
+        "type": "screen",
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "bg_color": "#ffffff",
+            "bg_grad_color": "#0E1624",
+            "text_color": "#ffffff"
+          }
+        },
+        "children": [
+          {
+            "id": "label_MO0197XUA6PW",
+            "type": "label",
+            "name": "label_unit",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 58,
+            "x_unit": "px",
+            "y": 116,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#023c6c"
+              }
+            },
+            "text": "(ns)"
+          },
+          {
+            "id": "scale_MO0179MOFBF2",
+            "type": "scale",
+            "name": "scale_y",
+            "width": 877,
+            "width_unit": "px",
+            "height": 29,
+            "height_unit": "px",
+            "x": 79,
+            "x_unit": "px",
+            "y": 571,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "border_color": "#023c6c",
+                "text_color": "#023c6c",
+                "line_color": "#023c6c",
+                "line_width": 1
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 1,
+                "line_color": "#023c6c"
+              },
+              "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                "part": "LV_PART_INDICATOR",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 2,
+                "line_color": "#023c6c"
+              }
+            },
+            "mode": "LV_SCALE_MODE_HORIZONTAL_BOTTOM",
+            "total_tick_count": 10,
+            "major_tick_every": 1,
+            "label_show": true,
+            "min_value": 0,
+            "max_value": 10,
+            "angle_range": 270,
+            "rotation": 135,
+            "post_draw": false,
+            "draw_ticks_on_top": false
+          },
+          {
+            "id": "label_MO00TIT7TEBF",
+            "type": "label",
+            "name": "bm_core",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 20,
+            "x_unit": "px",
+            "y": 67,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 28,
+                "text_color": "#FBB102"
+              }
+            },
+            "text": "Cortex-A55-1"
+          },
+          {
+            "id": "line_MO00P3VE2GN7",
+            "type": "line",
+            "name": "line_Min",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 92,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#ff0027",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ]
+          },
+          {
+            "id": "label_MO00OII4ULHX",
+            "type": "label",
+            "name": "label_max",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 60,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#3B82F6"
+              }
+            },
+            "text": "Max",
+            "children": []
+          },
+          {
+            "id": "MO00NLWZ8HQX",
+            "type": "label",
+            "name": "label_title",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#023c6c"
+              }
+            },
+            "text": " Benchmarking",
+            "children": []
+          },
+          {
+            "id": "MO00NLWZCLJ4",
+            "type": "button",
+            "name": "button_back",
+            "width": 50,
+            "width_unit": "px",
+            "height": 50,
+            "height_unit": "px",
+            "x": 952,
+            "x_unit": "px",
+            "y": 4,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#1A2435",
+                "bg_opa": 255,
+                "radius": 25,
+                "bg_grad_color": "#162033",
+                "border_color": "#3B82F6",
+                "text_color": "#E6EDF5"
+              },
+              "LV_PART_MAIN|LV_STATE_PRESSED": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_PRESSED",
+                "bg_color": "#162033",
+                "border_color": "#3B82F6"
+              }
+            },
+            "children": [
+              {
+                "id": "MO00NLWZBFFS",
+                "type": "label",
+                "name": "button_1_label",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 26,
+                    "text_family": "FontAwesome7.otf",
+                    "text_color": "#3B82F6"
+                  }
+                },
+                "text": "##LV_SYMBOL_HOME##",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "MO00R4H4SLVF",
+            "type": "label",
+            "name": "label_avg",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 108,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#3B82F6"
+              }
+            },
+            "text": "Avg",
+            "children": []
+          },
+          {
+            "id": "MO00R4H4EXOJ",
+            "type": "line",
+            "name": "line_Avg",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 116,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#0017cb",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": "MO00RV3XQETK",
+            "type": "label",
+            "name": "label_min",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 84,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#3B82F6"
+              }
+            },
+            "text": "Min",
+            "children": []
+          },
+          {
+            "id": "MO00RV3XJQA8",
+            "type": "line",
+            "name": "line_Max",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 67,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#009200",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": "MO00UDCGA0ZD",
+            "type": "image",
+            "name": "bm_core_icon",
+            "width": 44,
+            "width_unit": "px",
+            "height": 48,
+            "height_unit": "px",
+            "x": 213,
+            "x_unit": "px",
+            "y": 60,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "image_recolor": "#FBB102",
+                "image_recolor_opa": 255
+              }
+            },
+            "src": "resources/image/cortexA.png",
+            "src_config": {
+              "color_format": "ARGB8888"
+            },
+            "children": []
+          },
+          {
+            "id": "MO6YBNDTN084",
+            "type": "scale",
+            "name": "scale_x",
+            "width": 52,
+            "width_unit": "px",
+            "height": 416,
+            "height_unit": "px",
+            "x": 23,
+            "x_unit": "px",
+            "y": 148,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#023c6c",
+                "bg_color": "#023c6c",
+                "line_color": "#023c6c",
+                "line_width": 1,
+                "line_opa": 255
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "line_color": "#023c6c",
+                "line_width": 1
+              },
+              "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                "part": "LV_PART_INDICATOR",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 2,
+                "line_color": "#023c6c"
+              }
+            },
+            "mode": "LV_SCALE_MODE_VERTICAL_LEFT",
+            "total_tick_count": 41,
+            "major_tick_every": 8,
+            "label_show": true,
+            "min_value": 0,
+            "max_value": 6000,
+            "angle_range": 270,
+            "rotation": 135,
+            "post_draw": false,
+            "draw_ticks_on_top": false,
+            "children": []
+          },
+          {
+            "id": "MO6YCHXRETDT",
+            "type": "chart",
+            "name": "chart_bm",
+            "width": 882,
+            "width_unit": "px",
+            "height": 420,
+            "height_unit": "px",
+            "x": 79,
+            "x_unit": "px",
+            "y": 144,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "border_color": "#27364A",
+                "border_opa": 255,
+                "bg_opa": 0,
+                "line_color": "#27364A"
+              }
+            },
+            "axis": {
+              "primary_y": {
+                "min": 0,
+                "max": 6000
+              },
+              "secondary_y": {
+                "min": 0,
+                "max": 6000
+              },
+              "primary_x": {
+                "min": 0,
+                "max": 100
+              },
+              "secondary_x": {
+                "min": 0,
+                "max": 100
+              }
+            },
+            "series": [
+              {
+                "id": "MO01028GECEZ",
+                "name": "Min",
+                "color": "#FF0000",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              {
+                "id": "MO011BXSM9FE",
+                "name": "Max",
+                "color": "#009200",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "id": "MO013IF9EES1",
+                "name": "average",
+                "color": "#0017cb",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              }
+            ],
+            "division_lines": {
+              "horizontal_count": 8,
+              "vertical_count": 10
+            },
+            "children": []
+          }
+        ],
+        "custom_code": {
+          "include": "#include \"custom.h\"",
+          "code": "lv_obj_add_event_cb(ui->BenchMarking_A1.chart_bm, chart_event_cb, LV_EVENT_ALL, NULL);\r\nlv_obj_refresh_ext_draw_size(ui->BenchMarking_A1.chart_bm);"
+        }
+      },
+      {
+        "id": "MO01BUR9OABA",
+        "name": "BenchMarking_M33",
+        "type": "screen",
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "bg_color": "#ffffff",
+            "bg_grad_color": "#27364A",
+            "border_color": "#e9e9e9"
+          }
+        },
+        "children": [
+          {
+            "id": "MO01BUR9CBJ2",
+            "type": "label",
+            "name": "label_unit",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 58,
+            "x_unit": "px",
+            "y": 116,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#27364A"
+              }
+            },
+            "text": "(ns)",
+            "children": []
+          },
+          {
+            "id": "MO01BUR9XDDT",
+            "type": "label",
+            "name": "bm_core",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 23,
+            "x_unit": "px",
+            "y": 67,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 28,
+                "text_color": "#0098DB"
+              }
+            },
+            "text": "Cortex-M33",
+            "children": []
+          },
+          {
+            "id": "MO01BUR9IJPY",
+            "type": "line",
+            "name": "line_Min",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 91,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#ff0027",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": "MO01BUR9ZQZW",
+            "type": "label",
+            "name": "label_max",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 59,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#2563EB"
+              }
+            },
+            "text": "Max",
+            "children": []
+          },
+          {
+            "id": "MO01BUR94STL",
+            "type": "label",
+            "name": "label_title",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#27364A"
+              }
+            },
+            "text": " Benchmarking",
+            "children": []
+          },
+          {
+            "id": "MO01BUR9HNIC",
+            "type": "button",
+            "name": "button_back",
+            "width": 50,
+            "width_unit": "px",
+            "height": 50,
+            "height_unit": "px",
+            "x": 952,
+            "x_unit": "px",
+            "y": 4,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#1A2435",
+                "bg_opa": 255,
+                "radius": 25,
+                "bg_grad_color": "#162033",
+                "border_color": "#3B82F6",
+                "text_color": "#E6EDF5"
+              },
+              "LV_PART_MAIN|LV_STATE_PRESSED": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_PRESSED",
+                "bg_color": "#162033",
+                "border_color": "#3B82F6"
+              }
+            },
+            "children": [
+              {
+                "id": "MO01BUR9NPEA",
+                "type": "label",
+                "name": "button_1_label",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 26,
+                    "text_family": "FontAwesome7.otf",
+                    "text_color": "#2563EB"
+                  }
+                },
+                "text": "##LV_SYMBOL_HOME##",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "MO01BUR9WKCE",
+            "type": "label",
+            "name": "label_avg",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 107,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#2563EB"
+              }
+            },
+            "text": "Avg",
+            "children": []
+          },
+          {
+            "id": "MO01BUR96X7Q",
+            "type": "line",
+            "name": "line_Avg",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 115,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#0017cb",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": "MO01BUR9VPQD",
+            "type": "label",
+            "name": "label_min",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 751,
+            "x_unit": "px",
+            "y": 83,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#2563EB"
+              }
+            },
+            "text": "Min",
+            "children": []
+          },
+          {
+            "id": "MO01BUR9S49B",
+            "type": "line",
+            "name": "line_Max",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 793,
+            "x_unit": "px",
+            "y": 66,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 4,
+                "line_color": "#009200",
+                "border_color": "#1E2B3D"
+              }
+            },
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 150,
+                "y": 0
+              }
+            ],
+            "children": []
+          },
+          {
+            "id": "MO01BUR9KJ2Q",
+            "type": "image",
+            "name": "bm_core_icon",
+            "width": 44,
+            "width_unit": "px",
+            "height": 48,
+            "height_unit": "px",
+            "x": 213,
+            "x_unit": "px",
+            "y": 60,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "image_recolor": "#0098DB",
+                "image_recolor_opa": 255
+              }
+            },
+            "src": "resources/image/cortexM.png",
+            "src_config": {
+              "color_format": "ARGB8888"
+            },
+            "children": []
+          },
+          {
+            "id": "MO6WRY0ZTAHS",
+            "type": "scale",
+            "name": "scale_x",
+            "width": 52,
+            "width_unit": "px",
+            "height": 416,
+            "height_unit": "px",
+            "x": 23,
+            "x_unit": "px",
+            "y": 148,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_color": "#27364A",
+                "bg_color": "#27364A",
+                "line_color": "#27364A",
+                "line_width": 1,
+                "line_opa": 255
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "line_color": "#27364A",
+                "line_width": 1
+              },
+              "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                "part": "LV_PART_INDICATOR",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 2,
+                "line_color": "#27364A"
+              }
+            },
+            "mode": "LV_SCALE_MODE_VERTICAL_LEFT",
+            "total_tick_count": 41,
+            "major_tick_every": 8,
+            "label_show": true,
+            "min_value": 0,
+            "max_value": 6000,
+            "angle_range": 270,
+            "rotation": 135,
+            "post_draw": false,
+            "draw_ticks_on_top": false,
+            "children": []
+          },
+          {
+            "id": "MO6WS52X1G67",
+            "type": "scale",
+            "name": "scale_y",
+            "width": 877,
+            "width_unit": "px",
+            "height": 29,
+            "height_unit": "px",
+            "x": 79,
+            "x_unit": "px",
+            "y": 571,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "border_color": "#d0d7e0",
+                "text_color": "#d0d7e0",
+                "line_color": "#d0d7e0",
+                "line_width": 1
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 1,
+                "line_color": "#d0d7e0"
+              },
+              "LV_PART_INDICATOR|LV_STATE_DEFAULT": {
+                "part": "LV_PART_INDICATOR",
+                "state": "LV_STATE_DEFAULT",
+                "line_width": 2,
+                "line_color": "#d0d7e0"
+              }
+            },
+            "mode": "LV_SCALE_MODE_HORIZONTAL_BOTTOM",
+            "total_tick_count": 10,
+            "major_tick_every": 1,
+            "label_show": true,
+            "min_value": 0,
+            "max_value": 10,
+            "angle_range": 270,
+            "rotation": 135,
+            "post_draw": false,
+            "draw_ticks_on_top": false,
+            "children": []
+          },
+          {
+            "id": "MO6WT1SIIVXG",
+            "type": "chart",
+            "name": "chart_bm",
+            "width": 882,
+            "width_unit": "px",
+            "height": 420,
+            "height_unit": "px",
+            "x": 79,
+            "x_unit": "px",
+            "y": 144,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "border_color": "#27364A",
+                "border_opa": 255,
+                "bg_opa": 0,
+                "line_color": "#27364A"
+              }
+            },
+            "axis": {
+              "primary_y": {
+                "min": 0,
+                "max": 6000
+              },
+              "secondary_y": {
+                "min": 0,
+                "max": 6000
+              },
+              "primary_x": {
+                "min": 0,
+                "max": 100
+              },
+              "secondary_x": {
+                "min": 0,
+                "max": 100
+              }
+            },
+            "series": [
+              {
+                "id": "MO01028GECEZ",
+                "name": "Min",
+                "color": "#FF0000",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2,
+                  2
+                ]
+              },
+              {
+                "id": "MO011BXSM9FE",
+                "name": "Max",
+                "color": "#009200",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              },
+              {
+                "id": "MO013IF9EES1",
+                "name": "average",
+                "color": "#0017cb",
+                "axis": "LV_CHART_AXIS_PRIMARY_Y",
+                "values": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ]
+              }
+            ],
+            "division_lines": {
+              "horizontal_count": 8,
+              "vertical_count": 10
+            },
+            "children": []
+          }
+        ],
+        "custom_code": {
+          "include": "#include \"custom.h\"",
+          "code": "lv_obj_add_event_cb(ui->BenchMarking_M33.chart_bm, chart_event_cb, LV_EVENT_ALL, NULL);\r\nlv_obj_refresh_ext_draw_size(ui->BenchMarking_M33.chart_bm);"
+        }
+      },
+      {
+        "id": "MO01NPG97UAE",
+        "name": "CpuInfo",
+        "type": "screen",
+        "style": {
+          "LV_PART_MAIN|LV_STATE_DEFAULT": {
+            "part": "LV_PART_MAIN",
+            "state": "LV_STATE_DEFAULT",
+            "bg_color": "#ffffff",
+            "bg_grad_color": "#0E1624"
+          }
+        },
+        "children": [
+          {
+            "id": "MO81CY1XTY3S",
+            "type": "table",
+            "name": "table_coreM33",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 525,
+            "x_unit": "px",
+            "y": 150,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "radius": 10,
+                "border_color": "#0098DB",
+                "border_width": 2,
+                "bg_opa": 0
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "bg_opa": 0,
+                "border_opa": 200,
+                "text_color": "#27364A",
+                "text_opa": 255,
+                "text_size": 15,
+                "border_color": "#27364A"
+              }
+            },
+            "table_content": [
+              [
+                "Frequency",
+                "250MHz"
+              ],
+              [
+                "System Cache",
+                "16kB"
+              ],
+              [
+                "Code Cache",
+                "16KB"
+              ],
+              [
+                "Boot ROM",
+                "256KB"
+              ],
+              [
+                "TCM",
+                "256KB"
+              ],
+              [
+                "NVIC",
+                "support"
+              ],
+              [
+                "Architecture",
+                "32-bit Arm®v8-M"
+              ]
+            ],
+            "column_width": 230,
+            "row_count": 7,
+            "column_count": 2,
+            "children": []
+          },
+          {
+            "id": "table_MO80CRMSUKK0",
+            "type": "table",
+            "name": "table_coreA1",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 30,
+            "x_unit": "px",
+            "y": 150,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "radius": 10,
+                "border_color": "#FBB102",
+                "border_width": 2,
+                "bg_opa": 0
+              },
+              "LV_PART_ITEMS|LV_STATE_DEFAULT": {
+                "part": "LV_PART_ITEMS",
+                "state": "LV_STATE_DEFAULT",
+                "bg_opa": 0,
+                "border_opa": 200,
+                "text_color": "#27364A",
+                "text_opa": 255,
+                "text_size": 15,
+                "border_color": "#27364A"
+              }
+            },
+            "table_content": [
+              [
+                "Frequency",
+                "1.7GHz"
+              ],
+              [
+                "L1-I Cache",
+                "32KB"
+              ],
+              [
+                "L1-D Cache",
+                "32KB"
+              ],
+              [
+                "L2 Cache",
+                "64KB per core"
+              ],
+              [
+                "L3 Cache",
+                "256kB (ECC)"
+              ],
+              [
+                "MPE with NEON",
+                "VFPv4-D16 architecture"
+              ],
+              [
+                "Architecture",
+                "64-bit Arm®v8-A"
+              ]
+            ],
+            "column_width": 230,
+            "row_count": 7,
+            "column_count": 2,
+            "children": []
+          },
+          {
+            "id": "MO01NPG9JFOX",
+            "type": "label",
+            "name": "title",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 0,
+            "x_unit": "px",
+            "y": 10,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_MID",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 30,
+                "text_color": "#27364A"
+              }
+            },
+            "text": "CPU Information",
+            "children": []
+          },
+          {
+            "id": "MO01NPG9DZJ2",
+            "type": "button",
+            "name": "button_back",
+            "width": 50,
+            "width_unit": "px",
+            "height": 50,
+            "height_unit": "px",
+            "x": 952,
+            "x_unit": "px",
+            "y": 4,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "bg_color": "#1A2435",
+                "bg_opa": 255,
+                "radius": 25,
+                "bg_grad_color": "#162033",
+                "border_color": "#3B82F6",
+                "text_color": "#E6EDF5"
+              },
+              "LV_PART_MAIN|LV_STATE_PRESSED": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_PRESSED",
+                "bg_color": "#162033",
+                "border_color": "#3B82F6"
+              }
+            },
+            "children": [
+              {
+                "id": "MO01NPG9B89I",
+                "type": "label",
+                "name": "button_1_label",
+                "width": 0,
+                "width_unit": "content",
+                "height": 0,
+                "height_unit": "content",
+                "x": 0,
+                "x_unit": "px",
+                "y": 0,
+                "y_unit": "px",
+                "align": "LV_ALIGN_CENTER",
+                "style": {
+                  "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                    "part": "LV_PART_MAIN",
+                    "state": "LV_STATE_DEFAULT",
+                    "text_size": 26,
+                    "text_family": "FontAwesome7.otf",
+                    "text_color": "#3B82F6"
+                  }
+                },
+                "text": "##LV_SYMBOL_HOME##",
+                "children": []
+              }
+            ]
+          },
+          {
+            "id": "MO81M0W4VK76",
+            "type": "label",
+            "name": "label_coreA1",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 49,
+            "x_unit": "px",
+            "y": 91,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 28,
+                "text_color": "#FBB102"
+              }
+            },
+            "text": "Cortex-A55-1",
+            "children": []
+          },
+          {
+            "id": "MO81M0W4M084",
+            "type": "image",
+            "name": "img_coreA1_icon",
+            "width": 44,
+            "width_unit": "px",
+            "height": 48,
+            "height_unit": "px",
+            "x": 240,
+            "x_unit": "px",
+            "y": 84,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "image_recolor": "#FBB102",
+                "image_recolor_opa": 255
+              }
+            },
+            "src": "resources/image/cortexA.png",
+            "src_config": {
+              "color_format": "ARGB8888"
+            },
+            "children": []
+          },
+          {
+            "id": "MO81MIL9MYPO",
+            "type": "image",
+            "name": "img_coreM33_icon",
+            "width": 44,
+            "width_unit": "px",
+            "height": 48,
+            "height_unit": "px",
+            "x": 714,
+            "x_unit": "px",
+            "y": 84,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "image_recolor": "#0098DB",
+                "image_recolor_opa": 255
+              }
+            },
+            "src": "resources/image/cortexM.png",
+            "src_config": {
+              "color_format": "ARGB8888"
+            },
+            "children": []
+          },
+          {
+            "id": "MO81MIL9NGFX",
+            "type": "label",
+            "name": "label_coreM33",
+            "width": 0,
+            "width_unit": "content",
+            "height": 0,
+            "height_unit": "content",
+            "x": 542,
+            "x_unit": "px",
+            "y": 91,
+            "y_unit": "px",
+            "align": "LV_ALIGN_TOP_LEFT",
+            "style": {
+              "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                "part": "LV_PART_MAIN",
+                "state": "LV_STATE_DEFAULT",
+                "text_size": 28,
+                "text_color": "#0098DB"
+              }
+            },
+            "text": "Cortex-M33",
+            "children": []
+          }
+        ]
+      }
+    ],
+    "event_list": {
+      "screen": {
+        "LV_EVENT_SCREEN_LOADED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "extern int cortexID;\r\nextern int applicationID;\r\n",
+            "code": ""
+          }
+        }
+      },
+      "dropdown_MNZN3G9RWWT0": {
+        "LV_EVENT_VALUE_CHANGED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "uint32_t id = lv_dropdown_get_selected(guider_ui.Home.ddlist_apps);\r\napplicationID = id;"
+          }
+        }
+      },
+      "image_MNZLNZ5EL4DK": {
+        "LV_EVENT_CLICKED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "static char selected_txt[48];",
+            "code": "update_operation_info(cortexID, applicationID, 1, 1);\r\nlv_dropdown_get_selected_str(guider_ui.Home.ddlist_apps, selected_txt, sizeof(selected_txt));"
+          },
+          "MNZVYWVXXLKV": {
+            "type": "if",
+            "id": "MNZVYWVXXLKV",
+            "condition": {
+              "MNZVYCKGS1PZ": {
+                "type": "condition",
+                "id": "MNZVYCKGS1PZ",
+                "action": {
+                  "custom_code": {
+                    "type": "custom_code",
+                    "name": "custom_code",
+                    "id": "custom_code",
+                    "include": "",
+                    "code": "lv_obj_set_style_image_recolor_opa(guider_ui.Home.container_cortexA1_coreA1_icon, 200, LV_PART_MAIN);\r\nlv_obj_set_style_text_color(guider_ui.Home.container_cortexA1_coreA1_status, lv_color_hex(0x22C55E), LV_PART_MAIN|LV_STATE_DEFAULT);\r\nlv_label_set_text(guider_ui.Home.container_cortexA1_coreA1_status, \"Running\");\r\nlv_label_set_text(guider_ui.Home.container_cortexA1_coreA1_app, selected_txt);\r\nif(applicationID > 1) {\r\n    lv_label_set_text(guider_ui.Home.container_cortexA1_coreA1_os, \"Zephyr\");\r\n}\r\nelse {\r\n    lv_label_set_text(guider_ui.Home.container_cortexA1_coreA1_os, \"FreeRTOS\");\r\n}\r\nif(applicationID == 1 || applicationID == 3) {\r\n    lv_obj_add_flag(guider_ui.Home.container_cortexA1_coreA1_LT, LV_OBJ_FLAG_HIDDEN);\r\n}\r\nelse {\r\n    lv_obj_remove_flag(guider_ui.Home.container_cortexA1_coreA1_LT, LV_OBJ_FLAG_HIDDEN);\r\n}"
+                  },
+                  "start_animation": {
+                    "type": "start_animation",
+                    "name": "start",
+                    "id": "start_animation",
+                    "anim": {
+                      "anim_MNZY6E1X4BG3": {
+                        "anim_t_MNZY758507YW": [
+                          "rotation"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "MNZVYE370JNQ": {
+                "type": "condition",
+                "id": "MNZVYE370JNQ",
+                "action": {
+                  "custom_code": {
+                    "type": "custom_code",
+                    "name": "custom_code",
+                    "id": "custom_code",
+                    "include": "",
+                    "code": "lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_status, \"Running\");\r\nlv_obj_set_style_text_color(guider_ui.Home.container_cortexM33_coreM33_status, lv_color_hex(0x22C55E), LV_PART_MAIN|LV_STATE_DEFAULT);\r\nlv_obj_set_style_image_recolor_opa(guider_ui.Home.container_cortexM33_coreM33_icon, 200, LV_PART_MAIN);\r\nlv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_app, selected_txt);\r\nif(applicationID > 1) {\r\n    lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_os, \"Zephyr\");\r\n}\r\nelse {\r\n    lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_os, \"FreeRTOS\");\r\n}\r\nif(applicationID == 1 || applicationID == 3) {\r\n    lv_obj_add_flag(guider_ui.Home.container_cortexM33_coreM33_LT, LV_OBJ_FLAG_HIDDEN);\r\n}\r\nelse {\r\n    lv_obj_remove_flag(guider_ui.Home.container_cortexM33_coreM33_LT, LV_OBJ_FLAG_HIDDEN);\r\n}"
+                  },
+                  "start_animation": {
+                    "type": "start_animation",
+                    "name": "start",
+                    "id": "start_animation",
+                    "anim": {
+                      "anim_MNZY6E1X4BG3": {
+                        "anim_t_MNZY73IERP5I": [
+                          "rotation"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "MO00NLWZCLJ4": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MO01BUR9HNIC": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MO01NPG9DZJ2": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MNZME5SZGXIF": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "MO01NPG97UAE",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 100,
+            "is_delete": false
+          }
+        }
+      },
+      "MNZOB2NWQ6ZK": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "MO00NLWZTW22",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 100,
+            "is_delete": false
+          }
+        }
+      },
+      "MNZT0KFTH552": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "MO01BUR9OABA",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MNZME3XQRS10": {
+        "LV_EVENT_CLICKED": {
+          "MNZVYWVXXLKV": {
+            "type": "if",
+            "id": "MNZVYWVXXLKV",
+            "condition": {
+              "MNZVYCKGS1PZ": {
+                "type": "condition",
+                "id": "MNZVYCKGS1PZ",
+                "action": {
+                  "MNZOAYX13KCX": {
+                    "type": "image",
+                    "name": "coreA1_icon",
+                    "id": "MNZOAYX13KCX",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "image_recolor_opa": 100
+                      }
+                    }
+                  },
+                  "MNZO3E17WK19": {
+                    "type": "label",
+                    "name": "coreA1_status",
+                    "id": "MNZO3E17WK19",
+                    "text": "Pending",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "text_color": "#F59E0B"
+                      }
+                    }
+                  },
+                  "pause_animation": {
+                    "type": "pause_animation",
+                    "name": "pause",
+                    "id": "pause_animation",
+                    "anim": {
+                      "anim_MNZY6E1X4BG3": {
+                        "anim_t_MNZY758507YW": [
+                          "rotation"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              "MNZVYE370JNQ": {
+                "type": "condition",
+                "id": "MNZVYE370JNQ",
+                "action": {
+                  "MNZT0KFTCIA8": {
+                    "type": "image",
+                    "name": "coreM33_icon",
+                    "id": "MNZT0KFTCIA8",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "image_recolor_opa": 100
+                      }
+                    }
+                  },
+                  "MNZT0KFT4PGE": {
+                    "type": "label",
+                    "name": "coreM33_status",
+                    "id": "MNZT0KFT4PGE",
+                    "text": "Pending",
+                    "style": {
+                      "LV_PART_MAIN|LV_STATE_DEFAULT": {
+                        "part": "LV_PART_MAIN",
+                        "state": "LV_STATE_DEFAULT",
+                        "text_color": "#F59E0B"
+                      }
+                    }
+                  },
+                  "pause_animation": {
+                    "type": "pause_animation",
+                    "name": "pause",
+                    "id": "pause_animation",
+                    "anim": {
+                      "anim_MNZY6E1X4BG3": {
+                        "anim_t_MNZY73IERP5I": [
+                          "rotation"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "update_operation_info(cortexID, applicationID, 0, 1);"
+          }
+        }
+      },
+      "textarea_MNZOC9FKJL0C": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen_717g8lq",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MNZT0KFTI5MJ": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "MO001YC0Q5CD",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "button_MO003Y38PLW0": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "MO0085T8I9BB": {
+        "LV_EVENT_CLICKED": {
+          "load_screen": {
+            "type": "load_screen",
+            "name": "load_screen",
+            "id": "load_screen",
+            "screen": "screen",
+            "animation": "LV_SCREEN_LOAD_ANIM_FADE_IN",
+            "time": 200,
+            "delay": 200,
+            "is_delete": false
+          }
+        }
+      },
+      "screen_717g8lq": {},
+      "MNZN6CLM9T1D": {
+        "LV_EVENT_CLICKED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "lv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x2563EB), LV_PART_MAIN|LV_STATE_DEFAULT);\r\nlv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);\r\ncortexID = 0;\r\nlv_obj_clear_state(guider_ui.Home.container_radio_cb_core_m33, LV_STATE_CHECKED);\r\nlv_obj_add_state(guider_ui.Home.container_radio_cb_core_A1, LV_STATE_CHECKED);"
+          }
+        }
+      },
+      "MNZT0KFTHMYF": {
+        "LV_EVENT_CLICKED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "lv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x2563EB),\r\n                                LV_PART_MAIN | LV_STATE_DEFAULT);\r\nlv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x27364A),\r\n                                LV_PART_MAIN | LV_STATE_DEFAULT);\r\ncortexID = 1;\r\nlv_obj_clear_state(guider_ui.Home.container_radio_cb_core_A1, LV_STATE_CHECKED);\r\nlv_obj_add_state(guider_ui.Home.container_radio_cb_core_m33, LV_STATE_CHECKED);"
+          }
+        }
+      },
+      "MNZNBQJI641J": {
+        "LV_EVENT_CLICKED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "lv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x2563EB),\r\n                                LV_PART_MAIN | LV_STATE_DEFAULT);\r\nlv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x27364A),\r\n                                LV_PART_MAIN | LV_STATE_DEFAULT);\r\ncortexID = 1;\r\nlv_obj_clear_state(guider_ui.Home.container_radio_cb_core_A1, LV_STATE_CHECKED);\r\nlv_obj_add_state(guider_ui.Home.container_radio_cb_core_m33, LV_STATE_CHECKED);"
+          }
+        }
+      },
+      "MNZNBDMWFRQI": {
+        "LV_EVENT_CLICKED": {
+          "custom_code": {
+            "type": "custom_code",
+            "name": "custom_code",
+            "id": "custom_code",
+            "include": "",
+            "code": "lv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x2563EB), LV_PART_MAIN|LV_STATE_DEFAULT);\r\nlv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);\r\ncortexID = 0;\r\nlv_obj_clear_state(guider_ui.Home.container_radio_cb_core_m33, LV_STATE_CHECKED);\r\nlv_obj_add_state(guider_ui.Home.container_radio_cb_core_A1, LV_STATE_CHECKED);"
+          }
+        }
+      }
+    },
+    "variable_setting": {
+      "condition": {
+        "MNZVYWVXXLKV": {
+          "id": "MNZVYWVXXLKV",
+          "type": "if",
+          "children": {
+            "MNZVYCKGS1PZ": {
+              "id": "MNZVYCKGS1PZ",
+              "express": "if(cortexID == 0)"
+            },
+            "MNZVYE370JNQ": {
+              "id": "MNZVYE370JNQ",
+              "express": "else if(cortexID == 1)"
+            }
+          },
+          "express": "if"
+        }
+      },
+      "lv_anim_t": {
+        "anim_MNZY6E1X4BG3": {
+          "id": "anim_MNZY6E1X4BG3",
+          "name": "image_rotate",
+          "path_cb": "linear",
+          "delay": 0,
+          "duration": 1000,
+          "repeat_delay": 0,
+          "repeat_count": -1,
+          "reverse_delay": 0,
+          "reverse_duration": 0,
+          "action": {},
+          "anim": {
+            "anim_t_MNZY73IERP5I": {
+              "id": "anim_t_MNZY73IERP5I",
+              "target": "MNZT0KFTTV37",
+              "target_type": "image",
+              "action": {
+                "rotation": {
+                  "start": 0,
+                  "end": 3600
+                }
+              }
+            },
+            "anim_t_MNZY758507YW": {
+              "id": "anim_t_MNZY758507YW",
+              "target": "image_MNZO9FJM5ZYK",
+              "target_type": "image",
+              "action": {
+                "rotation": {
+                  "start": 0,
+                  "end": 3600
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

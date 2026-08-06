@@ -1,0 +1,89 @@
+# Torizon deployment: Weston compositor + LVGL GUI-Guider app.
+# The GUI-Guider binary is a Wayland client (see app/platform/linux/lv_conf.h
+# LV_USE_WAYLAND=1); therefore a compositor must run alongside it.
+#
+# Bring up on the target with:
+#   docker compose -f docker/docker-compose.yml up
+#
+# Prerequisite: the aarch64 binary already built into
+# app/platform/linux/build-aarch64-docker/gui_guider (via docker/build-aarch64.sh).
+#
+# Platform note (important):
+#   The i.MX93 has no Vivante GPU. The correct compositor image is
+#   `torizon/weston-imx93` (G2D/PXP path). Do NOT use `torizon/weston-vivante`
+#   or the generic `torizon/weston` — they carry the Vivante userspace which
+#   crash-loops on i.MX93 trying to open /dev/galcore.
+#
+#   Torizon OS 6 → tag major 3, Torizon OS 7 → tag major 4. This device runs
+#   Torizon OS 7.7.0, hence :4.
+
+services:
+  weston:
+    image: torizon/weston-imx93:${TORIZON_TAG:-4}
+    environment:
+      - ACCEPT_FSL_EULA=1
+    network_mode: host
+    cap_add:
+      - CAP_SYS_TTY_CONFIG
+    volumes:
+      - /dev:/dev
+      - /tmp:/tmp
+      - /run/udev/:/run/udev/
+      # Kiosk config: no panel, black background, no shell chrome.
+      # Bind-mount the *directory*, not the file directly. The Torizon Weston
+      # entrypoint runs dos2unix on weston.ini and does a rename(2) over it;
+      # rename over a single bind-mounted file always fails with EBUSY,
+      # regardless of ro/rw, because the kernel mounted that inode as the
+      # mount point. A directory mount keeps the file as a regular dentry
+      # inside a normal directory, so rename works.
+      - ./weston-xdg:/etc/xdg/weston
+    device_cgroup_rules:
+      - "c 4:* rmw"     # /dev/tty*
+      - "c 13:* rmw"    # /dev/input/*
+      - "c 199:* rmw"   # /dev/watchdog*, misc
+      - "c 226:* rmw"   # /dev/dri/*
+      - "c 253:* rmw"   # dynamic misc majors (varies per kernel)
+      - "c 10:223 rmw"  # /dev/uinput
+    command: --developer
+    restart: unless-stopped
+
+  # One-shot service: loads rt_latency_cm33.elf into the Cortex-M33 via
+  # /sys/class/remoteproc/remoteproc0. Must complete before lvgl-app starts,
+  # otherwise the shared-memory ring stays empty and the perf charts show
+  # no data. `restart: no` because it exits with code 0 on success.
+  m33-loader:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.m33-loader
+    image: lino-imx93-m33-loader:latest
+    privileged: true
+    pid: host          # nsenter -t 1 -m to reach host mount namespace
+    volumes:
+      - /sys:/sys
+    restart: "no"
+
+  lvgl-app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.runtime
+    image: lino-imx93-lvgl-app:latest
+    depends_on:
+      weston:
+        condition: service_started
+      m33-loader:
+        condition: service_completed_successfully
+    environment:
+      - XDG_RUNTIME_DIR=/tmp/1000-runtime-dir
+      - WAYLAND_DISPLAY=wayland-0
+    volumes:
+      - /tmp:/tmp
+    # The GUI-Guider "Real-Time Edge" demo reads A55/M33 telemetry from
+    # physical shared memory via /dev/mem + mmap (see
+    # app/custom/real_time_edge/mem_mgr.c). Without this the CPU/latency
+    # charts stay empty. CAP_SYS_RAWIO authorizes the mmap; the device
+    # mapping exposes the node.
+    devices:
+      - /dev/mem:/dev/mem
+    cap_add:
+      - SYS_RAWIO
+    restart: unless-stopped
