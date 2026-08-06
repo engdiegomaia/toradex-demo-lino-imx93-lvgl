@@ -28,6 +28,7 @@
 #include "lvgl.h"
 #include "gui_guider.h"
 #include "custom.h"
+#include "home_status.h"
 #include <sys/time.h>
 #include "gg_utils.h"
 
@@ -101,6 +102,10 @@ static void hal_init(void)
 
 #if LV_USE_WAYLAND
     disp = lv_wayland_window_create(LV_HOR_RES_MAX, LV_VER_RES_MAX, "GUI Guider", NULL);
+    /* Kiosk mode: request a fullscreen xdg_toplevel so Weston skips the
+     * client-side title bar entirely. Combined with panel-position=none in
+     * weston.ini this yields an unbroken app surface. */
+    lv_wayland_window_set_fullscreen(disp, true);
     if(LV_COLOR_DEPTH == 32) {
         lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888);
     }
@@ -469,6 +474,8 @@ static void *lvgl_gui_thread(void *p)
 			gui_update_log_data();
 		else if (idx == 2)
 			gui_update_latency_data();
+		else if (idx == 4)
+			home_status_tick();
 
 		gui_rf_loop();
 
