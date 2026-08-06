@@ -5,6 +5,16 @@
 # Bring up on the target with:
 #   docker compose -f docker/docker-compose.yml up
 #
+# Rebuild only the app image after rebuilding the binary:
+#   ./docker/build-aarch64.sh
+#   docker compose -f docker/docker-compose.yml build lvgl-app     # cached layers reused
+#   docker compose -f docker/docker-compose.yml up -d lvgl-app
+#
+# NOTE: do NOT pass --no-cache unless you actually want to invalidate every
+# layer. Each service has a fixed `image:` tag (`:latest`) and a fixed
+# `container_name`, so the same tag is overwritten in place and the container
+# is recreated with the same identity — no image sprawl.
+#
 # Prerequisite: the aarch64 binary already built into
 # app/platform/linux/build-aarch64-docker/gui_guider (via docker/build-aarch64.sh).
 #
@@ -20,6 +30,7 @@
 services:
   weston:
     image: torizon/weston-imx93:${TORIZON_TAG:-4}
+    container_name: lino-weston
     environment:
       - ACCEPT_FSL_EULA=1
     network_mode: host
@@ -56,6 +67,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.m33-loader
     image: lino-imx93-m33-loader:latest
+    container_name: lino-m33-loader
     privileged: true
     pid: host          # nsenter -t 1 -m to reach host mount namespace
     volumes:
@@ -67,6 +79,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.runtime
     image: lino-imx93-lvgl-app:latest
+    container_name: lino-lvgl-app
     depends_on:
       weston:
         condition: service_started
