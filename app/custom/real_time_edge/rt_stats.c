@@ -120,6 +120,15 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 		printf("%s() am_idx:%d rd_idx:%d wr_idx:%d type:%d flag:%d fail:%d\n", __func__,\
 			am_idx, pshm->rd_idx, pshm->wr_idx, pshm->type, pshm->flag, ps->boot_fail);
 
+	/* Always log the handshake fields once per second so we can tell whether
+	 * the M33 side is advancing wr_idx. The `goto ret_tag` below silently
+	 * suppresses every latency print when rd_idx == wr_idx, which hides the
+	 * root cause. Remove after the handshake is confirmed working. */
+	printf("[shm-diag] am_idx:%u sec:%d flag:%u type:%u rd_idx:%u wr_idx:%u cpu_load:%.2f\n",
+		am_idx, ps->boot_sec, pshm->flag, pshm->type,
+		pshm->rd_idx, pshm->wr_idx, pshm->cpu_load);
+	fflush(stdout);
+
 	if (pshm->rd_idx == pshm->wr_idx)
 		goto ret_tag;
 
