@@ -31,6 +31,7 @@ typedef struct {
     lv_obj_t *icon;
     lv_obj_t *status_label;
     lv_obj_t *anim_target;
+    lv_obj_t *lt_container;   /* Latency Test button — hidden for hello_world */
     home_core_state_t last_state;
 } home_core_widgets_t;
 
@@ -42,11 +43,13 @@ static void bind_widgets(void)
     s_widgets[AC_IDX].icon         = guider_ui.Home.container_cortexA1_coreA1_icon;
     s_widgets[AC_IDX].status_label = guider_ui.Home.container_cortexA1_coreA1_status;
     s_widgets[AC_IDX].anim_target  = guider_ui.Home.container_cortexA1_coreA1_run;
+    s_widgets[AC_IDX].lt_container = guider_ui.Home.container_cortexA1_coreA1_LT;
     s_widgets[AC_IDX].last_state   = (home_core_state_t)-1;
 
     s_widgets[MC_IDX].icon         = guider_ui.Home.container_cortexM33_coreM33_icon;
     s_widgets[MC_IDX].status_label = guider_ui.Home.container_cortexM33_coreM33_status;
     s_widgets[MC_IDX].anim_target  = guider_ui.Home.container_cortexM33_coreM33_run;
+    s_widgets[MC_IDX].lt_container = guider_ui.Home.container_cortexM33_coreM33_LT;
     s_widgets[MC_IDX].last_state   = (home_core_state_t)-1;
 
     s_widgets_bound = 1;
@@ -89,6 +92,15 @@ static void paint_state(int am_idx, home_core_state_t state)
     lv_obj_set_style_image_recolor_opa(w->icon,
                                        state == HOME_STATE_RUNNING ? 255 : 100,
                                        LV_PART_MAIN);
+
+    /* Restore the Latency Test button whenever the core is not running.
+     * The Start-click handler hides LT for hello_world so the user can't reach
+     * a chart that will never have data; on Stop / failure the button must
+     * come back so the next Start (rt_latency) can navigate to BenchMarking. */
+    if (w->lt_container) {
+        if (state == HOME_STATE_IDLE || state == HOME_STATE_FAILED)
+            lv_obj_remove_flag(w->lt_container, LV_OBJ_FLAG_HIDDEN);
+    }
 
     /* Spin only while running; stop the animation for every other state.
      * Mirrors the anim setup in gg_event_Home.c click handler. */

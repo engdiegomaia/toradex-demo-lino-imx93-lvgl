@@ -21,10 +21,16 @@ RUN apt-get update \
         libxkbcommon0 \
         bash \
         util-linux \
+        binutils \
+        xxd \
     && rm -rf /var/lib/apt/lists/*
 # util-linux gives us nsenter(1) and mount(8) — start.sh uses them to bind
 # a tmpfs on the host's /lib/firmware and drop the selected ELF there so the
 # kernel's request_firmware_direct() can find it.
+# binutils gives us readelf(1) for inspecting M33 firmware ELF program headers
+# during boot-handshake debug (`docker exec lino-lvgl-app readelf -l ...`).
+# xxd is used to dump the shared-memory region at 0xA4000000 to compare what
+# the M33 firmware writes vs. what Linux sees.
 
 WORKDIR /app
 COPY app/platform/linux/build-aarch64-docker/gui_guider /app/gui_guider

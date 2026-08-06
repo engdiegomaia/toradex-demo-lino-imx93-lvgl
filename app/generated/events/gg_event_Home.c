@@ -231,6 +231,7 @@ static void btn_stop_event_handler(lv_event_t * e)
                 lv_obj_set_style_text_color(ui->Home.container_cortexA1_coreA1_status, lv_color_hex(0xF59E0B),
                                             LV_PART_MAIN | LV_STATE_DEFAULT);
                 gg_pause_anim(ui->Home.container_cortexA1_coreA1_run, anim_rotation_cb);
+                lv_obj_remove_flag(ui->Home.container_cortexA1_coreA1_LT, LV_OBJ_FLAG_HIDDEN);
             }
             else if(cortexID == 1) {
                 lv_obj_set_style_image_recolor_opa(ui->Home.container_cortexM33_coreM33_icon, 100, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -238,6 +239,7 @@ static void btn_stop_event_handler(lv_event_t * e)
                 lv_obj_set_style_text_color(ui->Home.container_cortexM33_coreM33_status, lv_color_hex(0xF59E0B),
                                             LV_PART_MAIN | LV_STATE_DEFAULT);
                 gg_pause_anim(ui->Home.container_cortexM33_coreM33_run, anim_rotation_cb);
+                lv_obj_remove_flag(ui->Home.container_cortexM33_coreM33_LT, LV_OBJ_FLAG_HIDDEN);
             }
             update_operation_info(cortexID, applicationID, 0, 1);
             break;
