@@ -377,6 +377,11 @@ int main(int argc, char **argv)
 	int run_flag = 0;
 	int ret = 0;
 
+	/* stdout is block-buffered when captured by docker logs; force unbuffered
+	 * so diagnostic prints in the polling loop reach the log immediately. */
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
 	signal(SIGTERM, signal_handler);
 	signal(SIGINT, signal_handler);
 
