@@ -19,6 +19,28 @@ echo "[sync] Target:      ${target}"
 echo "[sync] Source root: ${project_dir}"
 echo "[sync] Remote dir:  ${remote_dir}"
 
+# The runtime Dockerfile COPY-s a pre-built binary; if we skip the cross-build,
+# stale objects ship to the target and every downstream log is meaningless.
+# Detect source-newer-than-binary and rebuild automatically. Set SKIP_BUILD=1
+# to override (e.g. when only touching docker/ or scripts/).
+binary="${project_dir}/app/platform/linux/build-aarch64-docker/gui_guider"
+if [ "${SKIP_BUILD:-0}" != "1" ]; then
+    needs_build=0
+    if [ ! -f "${binary}" ]; then
+        needs_build=1
+    else
+        newer=$(find "${project_dir}/app" -name '*.c' -newer "${binary}" -print -quit 2>/dev/null || true)
+        if [ -n "${newer}" ]; then
+            echo "[sync] Source newer than binary: ${newer}"
+            needs_build=1
+        fi
+    fi
+    if [ "${needs_build}" = "1" ]; then
+        echo "[sync] Running cross-build before rsync..."
+        "${project_dir}/docker/build-aarch64.sh"
+    fi
+fi
+
 # Sync application code + cross-compiled binaries.
 # --delete is safe under app/ because everything there is either committed
 # source or generated build artifacts.
