@@ -166,6 +166,27 @@ int show_stat_shm_data(uint8_t am_idx, uint64_t addr)
 		ps->shm_len = shm_len;
 		ps->rt_shm = pshm;
 
+		if (pshm) {
+			/* Canary at a slot the handshake never touches. If Linux read-back
+			 * differs from what we just wrote, either the mmap silently fell
+			 * back to a copy-on-write page or the region isn't reaching DDR. */
+			volatile uint32_t *canary = (volatile uint32_t *)((uint8_t *)pshm + 0x100);
+			uint32_t before = *canary;
+			*canary = 0xDEADBEEF;
+			wr_flush_cache((uint8_t *)canary, sizeof(*canary));
+			rd_invalid_cache((uint8_t *)canary, sizeof(*canary));
+			uint32_t after = *canary;
+			printf("[shm-canary] addr:0x%lx before:0x%08x wrote:0xDEADBEEF read:0x%08x %s\n",
+				(unsigned long)addr + 0x100, before, after,
+				after == 0xDEADBEEFu ? "OK" : "FAIL");
+			fflush(stdout);
+		} else {
+			printf("[shm-canary] mem_map_page returned NULL for 0x%lx\n",
+				(unsigned long)addr);
+			fflush(stdout);
+			return -1;
+		}
+
 		pshm->rd_idx = 0;
 		pshm->wr_idx = 0;
 		wr_flush_cache((uint8_t*)pshm, shm_len);

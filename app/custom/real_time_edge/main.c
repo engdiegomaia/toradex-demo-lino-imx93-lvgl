@@ -429,10 +429,16 @@ int main(int argc, char **argv)
 			fail_cnt++;
 			if (boot_type == TYPE_M_RTOS_RTLAT) {
 				printf("Boot failed! reboot it! fail_cnt:%d\n", fail_cnt);
-				/* RT_NO_AUTORESTART=1 freezes state on first fail so shm
-				 * addresses and firmware stay observable for diagnosis. */
-				if (getenv("RT_NO_AUTORESTART")) {
-					printf("[diag] RT_NO_AUTORESTART set, holding state (no reboot)\n");
+				fflush(stdout);
+				/* Filesystem gate is more robust than env: env vars only
+				 * reach PID 1 via docker compose recreate, but a file at
+				 * /tmp/rt_no_autorestart can be toggled with `docker exec
+				 * touch` mid-run. Also survives the docker env quirks that
+				 * bit us with RT_NO_AUTORESTART=1. */
+				if (access("/tmp/rt_no_autorestart", F_OK) == 0 ||
+				    getenv("RT_NO_AUTORESTART")) {
+					printf("[diag] auto-restart disabled, holding state (no reboot)\n");
+					fflush(stdout);
 					continue;
 				}
 				start_multi_core_prog(boot_type, 1);

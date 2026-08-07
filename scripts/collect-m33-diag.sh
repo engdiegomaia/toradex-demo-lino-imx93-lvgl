@@ -111,6 +111,24 @@ fi'
 
     runsh firmware-elf-headers 'for f in /var/rootdirs/home/torizon/*/elf/*.elf /home/torizon/*/elf/*.elf; do [ -f "$f" ] || continue; echo "== $f =="; readelf -l "$f" 2>&1 | head -30; done'
 
+    # Confirm the firmware really references the shm base we expect. If the
+    # #define was changed to another address during a build, none of the
+    # Linux-side diagnosis matters — we would be probing dead RAM.
+    runsh firmware-shm-refs 'if command -v docker >/dev/null 2>&1; then
+        docker exec lino-lvgl-app sh -c "for f in /app/elf/rt_latency_cm33*.elf /app/elf/hello_world_cm33*.elf; do
+            [ -f \"\$f\" ] || continue
+            echo \"== \$f ==\"
+            echo \"-- readelf program headers --\"
+            readelf -l \"\$f\" 2>&1 | head -40
+            echo \"-- strings for 0xa4000000 / rpmsg / vring / rsc / shm --\"
+            strings \"\$f\" 2>&1 | grep -iE \"a4000000|0xa400|rpmsg|vring|rsc_table|shm\" | head -20
+            echo \"-- objdump little-endian .word 0xa4000000 (bytes 00 00 00 a4) --\"
+            objdump -s \"\$f\" 2>&1 | grep -iE \"a4000000|000000a4\" | head -10
+        done" 2>&1
+    else
+        echo \"no docker CLI on host\"
+    fi'
+
     runsh mem-total          'cat /proc/meminfo | head -6'
     runsh mount-firmware     'mount | grep -E "firmware|tmpfs" | head -20'
     runsh docker-ps          'docker ps 2>&1'
