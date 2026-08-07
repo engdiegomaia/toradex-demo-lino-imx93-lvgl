@@ -429,6 +429,12 @@ int main(int argc, char **argv)
 			fail_cnt++;
 			if (boot_type == TYPE_M_RTOS_RTLAT) {
 				printf("Boot failed! reboot it! fail_cnt:%d\n", fail_cnt);
+				/* RT_NO_AUTORESTART=1 freezes state on first fail so shm
+				 * addresses and firmware stay observable for diagnosis. */
+				if (getenv("RT_NO_AUTORESTART")) {
+					printf("[diag] RT_NO_AUTORESTART set, holding state (no reboot)\n");
+					continue;
+				}
 				start_multi_core_prog(boot_type, 1);
 			}
 		}

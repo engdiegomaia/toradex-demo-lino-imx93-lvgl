@@ -95,6 +95,9 @@ services:
     environment:
       - XDG_RUNTIME_DIR=/tmp/1000-runtime-dir
       - WAYLAND_DISPLAY=wayland-0
+      # Uncomment during handshake debugging to freeze state on first
+      # boot_fail (no stop/start_multi_core_prog reboot loop).
+      # - RT_NO_AUTORESTART=1
     # start.sh stages the selected firmware into the host's /lib/firmware
     # tmpfs via `nsenter -t 1 -m` — reaching the host mount namespace requires
     # pid: host. Without it, remoteproc's request_firmware_direct() can't find
