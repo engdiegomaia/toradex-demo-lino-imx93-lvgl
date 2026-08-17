@@ -1,4 +1,142 @@
-# M33 rt_latency handshake debug — state as of 2026-08-06
+# M33 rt_latency handshake debug — ROOT CAUSE FOUND 2026-08-17
+
+> **2026-08-17 — Root cause identified: shared-memory address mismatch.**
+> The Linux side polled `0xA4000000`, which the Verdin i.MX93 base device
+> tree assigns to **`vdev0vring0`** — virtio/RPMsg vring memory, not a free
+> carveout. The rt_latency demo does not use RPMsg; it maps a plain struct.
+> Meanwhile the shipped `rt_latency_cm33.elf` links `__noncachedata_start__`
+> to `0xA0000000`, which `/proc/iomem` shows as live **System RAM**
+> (`98000000-a3ffffff`). The two sides never referenced the same memory, so
+> the `flag=1 -> flag=2` handshake could not complete under any conditions.
+>
+> The D-cache hypothesis below is **falsified** — see "Corrections".
+> Sections below this banner are preserved as the historical record.
+
+## Corrections to earlier claims (2026-08-17)
+
+**Item 4 of "confirmed as fact" was wrong.** It claimed the rt_latency ELF
+references `0xA4000000` in its *literal pool*. It does contain the byte
+pattern 9 times, but every occurrence is at file offset `0xa845`–`0xcdad`,
+which falls inside **`.symtab`** (`0x00ac6c`–`0x1045c`). `.text` ends at
+`0x90b0` and `.symtab` is not loaded onto the M33. These are debug symbol
+values, not code literals. Verified with `readelf -S` + offset mapping.
+
+**The D-cache hypothesis is falsified.** `readelf -sW` shows the firmware
+has a dedicated non-cached section and calls `XCACHE_CleanCache`:
+
+```
+[13] .ncache   PROGBITS  a0000000  00a0fc  000000  W
+1133: a0000000  0 NOTYPE GLOBAL __noncachedata_start__
+1166: a0000000  0 NOTYPE GLOBAL __noncachedata_end__
+1033: 0ffe58ad 24 FUNC   GLOBAL XCACHE_CleanCache
+```
+
+Coherency was handled correctly by the firmware author. The addresses
+simply never matched.
+
+**The devmem probe in move #3 never ran.** `devmem-probe.out` in the
+2026-08-06 tarball is five lines of `devmem: applet not found`. It was
+filed as evidence but produced none. busybox in that container has no
+`devmem` applet.
+
+**`.resource_table` is empty.** 16 bytes: `01 00 00 00` then zeros —
+`ver=1, num=0`. Zero resource entries, so remoteproc is told nothing about
+carveouts. `state: running` therefore means only "reset released"; it
+carries no information about firmware memory setup.
+
+## Ground truth from the running device tree
+
+Decompiled from `m33-diag-20260806-234228/fdt.bin`:
+
+```
+vdev0vring0@a4000000   reg = <0x0 0xa4000000 0x0 0x8000>   no-map
+vdev0vring1@a4008000   reg = <0x0 0xa4008000 0x0 0x8000>   no-map
+vdev1vring0@a4010000   reg = <0x0 0xa4010000 0x0 0x8000>   no-map
+vdev1vring1@a4018000   reg = <0x0 0xa4018000 0x0 0x8000>   no-map
+vdevbuffer@a4020000    reg = <0x0 0xa4020000 0x0 0x100000> shared-dma-pool
+rsc-table@2021e000     reg = <0x0 0x2021e000 0x0 0x1000>   no-map
+
+remoteproc-cm33 {
+    compatible = "fsl,imx93-cm33";
+    memory-region = <0x09 0x0a 0x0b 0x0c 0x0d 0x0e>;  /* the 6 above */
+};
+```
+
+The M33 carveout ends at `0xA4120000`. `/proc/iomem` confirms
+`a4120000-ffffffff : System RAM`, so there was **no** free reserved region
+for a raw shared struct — one has to be created.
+
+## Upstream firmware source — located 2026-08-17
+
+The firmware is NXP's `heterogeneous-multicore` (matches this repo's
+`app/SCR.txt` and the `rt_latency_board.c` FILE symbol in the shipped ELF):
+
+- Repo: https://github.com/nxp-real-time-edge-sw/heterogeneous-multicore
+- App:  `apps/rt_latency/freertos/boards/mcimx93evk/cm33/`
+- **Linker script (the relevant file):**
+  `os/freertos/Core_M/boards/mcimx93evk/armgcc/MIMX9352_cm33_ram.ld:41`
+
+```
+m_data2  (RW) : ORIGIN = 0xa0000000, LENGTH = 0x01000000
+```
+
+`.ncache` and `.ncache.init` are both placed `> m_data2`, so that single
+`ORIGIN` is what puts the shared struct at `0xA0000000`. Changing it moves
+the shared memory — no source-code edit is required.
+
+## The fix (2026-08-17)
+
+Three addresses must agree. Chosen base: **`0xA5000000`, 16 MB** — inside
+`a4120000-ffffffff : System RAM`, clear of the M33 carveout ending at
+`0xA4120000`, and 16 MB-aligned for the ARMv8-M MPU. Length matches
+upstream's `m_data2`.
+
+1. **DONE — DT overlay** `device-tree/overlays/lino-imx93_cm33-shm_overlay.dts`
+   reserves 16 MB at `0xA5000000` per the Toradex Cortex-M Shared Memory
+   Guide. Compiles clean with `dtc -@`. Deliberately does *not* touch
+   `remoteproc-cm33`'s `memory-region` — a dtbo fragment replaces rather
+   than appends, which would drop the vdev phandles and break RPMsg.
+
+2. **DONE — Linux side** `FRDM_SHM_BASE` in
+   `app/custom/real_time_edge/main.h`: `0xA4000000` -> `0xA5000000`.
+   Cross-build clean.
+
+3. **READY TO RUN, NOT YET BUILT — firmware relink.**
+   `firmware/patches/0001-cm33-shm-base-verdin-imx93.patch` changes
+   `ORIGIN(m_data2)` to `0xa5000000`. Verified to apply clean against
+   pristine upstream, and idempotent on re-run.
+   `firmware/build-rt-latency-cm33.sh` fetches upstream, applies the patch,
+   builds, **refuses to install unless `__noncachedata_start__` really
+   reads `a5000000`**, and installs to `app/custom/elf/`.
+   Needs `west` + `ARMGCC_DIR` (MCUXpresso SDK tooling), which is not
+   present on this host — so the ELF in `app/custom/elf/` is **still the
+   EVK build**.
+
+**Until step 3 runs and the overlay is deployed, the handshake still fails
+with `wr_idx:0` / `Boot failed`.** Steps 1 and 2 alone are not sufficient.
+
+### Deployment order (all three needed)
+
+```bash
+# 1. HOST — rebuild firmware (needs MCUXpresso SDK + ARMGCC_DIR)
+./firmware/build-rt-latency-cm33.sh
+
+# 2. HOST — compile + apply overlay via TorizonCore Builder, then reboot
+dtc -@ -I dts -O dtb -o lino-imx93_cm33-shm_overlay.dtbo \
+    device-tree/overlays/lino-imx93_cm33-shm_overlay.dts
+
+# 3. TARGET — after reboot, verify the carveout left System RAM
+grep -E "a5000000|System RAM" /proc/iomem   # a5000000 must NOT be System RAM
+ls /proc/device-tree/reserved-memory/ | grep cm33
+
+# 4. HOST — ship app + new ELF
+./docker/sync-to-target.sh
+```
+
+Expected on success: `[shm-diag]` shows `flag:2` and `wr_idx` incrementing,
+and the BenchMarking charts populate.
+
+## The failure (historical, as of 2026-08-06)
 
 ## The failure
 

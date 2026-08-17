@@ -1,0 +1,89 @@
+// SPDX-License-Identifier: GPL-2.0-or-later OR MIT
+/*
+ * Reserve the Cortex-M33 non-cached shared-memory window (m_data2) for the
+ * rt_latency demo on Verdin i.MX93 (Lino SoM / Mallow carrier).
+ *
+ * Why this is needed
+ * ------------------
+ * The base device tree assigns the M33 remoteproc only the RPMsg/virtio
+ * regions:
+ *
+ *   vdev0vring0@a4000000  vdev0vring1@a4008000
+ *   vdev1vring0@a4010000  vdev1vring1@a4018000
+ *   vdevbuffer@a4020000   rsc-table@2021e000
+ *
+ * The rt_latency demo does NOT use RPMsg. It maps a plain rt_latency_shm_t
+ * struct and polls it. Pointing that at 0xA4000000 (the original
+ * FRDM_SHM_BASE) aimed it at vdev0vring0 — memory owned by the virtio
+ * transport — which is why the flag=1 -> flag=2 handshake never completed.
+ *
+ * Address and size
+ * ----------------
+ * Upstream NXP heterogeneous-multicore places .ncache/.ncache.init in a
+ * region named m_data2, declared in
+ *   os/freertos/Core_M/boards/mcimx93evk/armgcc/MIMX9352_cm33_ram.ld:41
+ *     m_data2 (RW) : ORIGIN = 0xa0000000, LENGTH = 0x01000000
+ * i.e. 16 MB. That EVK address is unusable here: /proc/iomem on this module
+ * reports "98000000-a3ffffff : System RAM", so 0xA0000000 is live kernel
+ * memory and an M33 write there would corrupt Linux.
+ *
+ * We therefore keep upstream's 16 MB length but relocate ORIGIN to
+ * 0xA5000000, which is:
+ *   - inside "a4120000-ffffffff : System RAM" (verified on target),
+ *   - clear of the M33 carveout that ends at 0xA4120000,
+ *   - aligned to a natural 16 MB boundary, which the ARMv8-M MPU wants for
+ *     a region of this size.
+ *
+ * The firmware MUST be rebuilt with ORIGIN(m_data2) = 0xA5000000 to match.
+ * The reserved-memory node alone does not move the firmware's view.
+ *
+ * no-map keeps Linux from creating a cached kernel mapping, so the app's
+ * /dev/mem view and the M33's non-cached view stay coherent.
+ *
+ * Build:
+ *   dtc -@ -I dts -O dtb -o lino-imx93_cm33-shm_overlay.dtbo \
+ *       lino-imx93_cm33-shm_overlay.dts
+ *
+ * Apply with TorizonCore Builder — see
+ * https://developer.toradex.com/software/cortex-m/cortex-m-shared-memory-guide/
+ */
+
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "toradex,lino-imx93-verdin-dev", "toradex,lino-imx93-verdin",
+		     "toradex,lino-imx93", "fsl,imx93";
+
+	fragment@0 {
+		target-path = "/reserved-memory";
+
+		__overlay__ {
+			#address-cells = <2>;
+			#size-cells = <2>;
+
+			cm33_shm: cm33-shm@a5000000 {
+				reg = <0x00 0xa5000000 0x00 0x01000000>;
+				no-map;
+			};
+		};
+	};
+
+	/*
+	 * Deliberately NOT adding this carveout to remoteproc-cm33's
+	 * memory-region property.
+	 *
+	 * A dtbo fragment REPLACES a property rather than appending to it, so
+	 * `memory-region = <&cm33_shm>` here would drop the five vdev phandles
+	 * and rsc-table the base DT assigns, breaking RPMsg and very likely M33
+	 * boot. Appending would require re-listing all six existing phandles,
+	 * which hardcodes base-DT internals that change across BSP releases.
+	 *
+	 * remoteproc only needs memory-region for regions IT maps on behalf of
+	 * the firmware (vrings, resource table). This carveout is mapped
+	 * directly by the app via /dev/mem and by the firmware via its own
+	 * linker script and MPU config, so the reserved-memory node alone is
+	 * sufficient: it keeps Linux out of the range, which is the only
+	 * guarantee required.
+	 */
+};
