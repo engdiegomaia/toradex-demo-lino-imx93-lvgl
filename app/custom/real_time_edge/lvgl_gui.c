@@ -106,9 +106,14 @@ static void hal_init(void)
      * client-side title bar entirely. Combined with panel-position=none in
      * weston.ini this yields an unbroken app surface. */
     lv_wayland_window_set_fullscreen(disp, true);
-    if(LV_COLOR_DEPTH == 32) {
-        lv_display_set_color_format(disp, LV_COLOR_FORMAT_ARGB8888);
-    }
+    /* Do NOT override the display color format here. lv_wl_shm.c already
+     * negotiates WL_SHM_FORMAT_ARGB8888 when LV_COLOR_DEPTH == 32 (see
+     * shm_format(): "Wayland compositors MUST support ARGB8888") and it
+     * handles alpha premultiplication internally at flush time. Forcing
+     * LV_COLOR_FORMAT_ARGB8888 after lv_wayland_window_create() has already
+     * bound its buffer pool desyncs the display's format from the shm
+     * buffer's, which is a candidate cause of the all-black surface on
+     * kiosk-shell. */
     lv_group_t * g = lv_group_create();
     lv_group_set_default(g);
 #if LV_USE_GESTURE_RECOGNITION
