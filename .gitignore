@@ -15,3 +15,7 @@ app/platform/linux/build/
 # OS
 .DS_Store
 Thumbs.db
+
+# Diagnostic bundles from scripts/collect-m33-diag.sh
+m33-diag-*.tar.gz
+m33-diag-*/
