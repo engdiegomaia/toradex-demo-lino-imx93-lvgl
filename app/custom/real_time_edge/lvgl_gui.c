@@ -343,7 +343,6 @@ static int update_gui_latency(uint8_t am_idx, rt_latency_shm_stat *p)
 	core_session_t *ps = get_core_session(am_idx);
 	int16_t *pdata[3];
 	int16_t data[3];
-	int idx = 0;
 	int i = 0;
 
 	data[0] = p->min;
@@ -362,16 +361,18 @@ static int update_gui_latency(uint8_t am_idx, rt_latency_shm_stat *p)
 	pdata[1] = ps->max_latency;
 	pdata[2] = ps->mean_latency;
 
-	for (i = 0; i < GUI_LATENCY_NUM; i++) {
-		pdata[0][i] = data[0];
-		pdata[1][i] = data[1];
-		pdata[2][i] = data[2];
-	}
+	/* One sample per stat per tick. GUI_LATENCY_NUM is the number of
+	 * statistics (min/max/mean), not a sample count — writing the same
+	 * value across the whole array and pushing all of it into the chart
+	 * consumed 3 of the widget's 10 points per second with duplicates,
+	 * leaving ~3s of visible history as a stair-step instead of a trend. */
+	pdata[0][0] = data[0];
+	pdata[1][0] = data[1];
+	pdata[2][0] = data[2];
 #ifdef DEBUG_TEST
 	if (get_debug_mode() & DEBUG_MODE(5)) {
-		for (i = 0; i < GUI_LATENCY_NUM; i++)
-			printf("%s() am_idx:%d data[0][%d]:%d data[1][%d]:%d data[2][%d]:%d\n",\
-				__func__, am_idx, i, pdata[0][i], i, pdata[1][i], i, pdata[2][i]);
+		printf("%s() am_idx:%d min:%d max:%d mean:%d\n",\
+			__func__, am_idx, pdata[0][0], pdata[1][0], pdata[2][0]);
 	}
 #endif
 	if (get_debug_mode() & DEBUG_MODE(1))
@@ -379,7 +380,7 @@ static int update_gui_latency(uint8_t am_idx, rt_latency_shm_stat *p)
 
 	for (i = 0; i < 3; i++) {
 		ps->int_array[i].array = pdata[i];
-		ps->int_array[i].length = GUI_LATENCY_NUM;
+		ps->int_array[i].length = 1;
 
 		if (am_idx)
 		{
