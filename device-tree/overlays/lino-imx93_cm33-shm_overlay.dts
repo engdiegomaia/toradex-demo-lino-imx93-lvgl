@@ -45,7 +45,7 @@
  *       lino-imx93_cm33-shm_overlay.dts
  *
  * Apply with TorizonCore Builder — see
- * https://developer.toradex.com/software/cortex-m/cortex-m-shared-memory-guide/
+ * https://developer.toradex.com/software/hmp/hmp-nxp/cortex-m-shared-memory-guide/
  */
 
 /dts-v1/;

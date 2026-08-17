@@ -1,0 +1,288 @@
+diff --git a/apps/rt_latency/freertos/boards/mcimx93evk/cm33/reconfig.cmake b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/reconfig.cmake
+index 3cb4757..8802209 100644
+--- a/apps/rt_latency/freertos/boards/mcimx93evk/cm33/reconfig.cmake
++++ b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/reconfig.cmake
+@@ -8,6 +8,8 @@ mcux_add_source(
+             clock_config.h
+             rt_latency_board.c
+             rt_latency_board.h
++            rt_latency_shm.c
++            rt_latency_shm.h
+             pin_mux.c
+             pin_mux.h
+             rsc_table.c
+@@ -50,7 +52,8 @@ mcux_add_armgcc_linker_script(
+ 
+ mcux_add_macro(
+   CC "-DFSL_RTOS_FREE_RTOS\
+-     -DPRINTF_ADVANCED_ENABLE=1"
++     -DPRINTF_ADVANCED_ENABLE=1\
++     -DCONFIG_RT_LATENCY_SHM_EXPORT=1"
+ )
+ 
+ mcux_convert_binary(BINARY ${APPLICATION_BINARY_DIR}/${MCUX_SDK_PROJECT_NAME}.bin)
+diff --git a/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.c b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.c
+new file mode 100644
+index 0000000..7f463db
+--- /dev/null
++++ b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.c
+@@ -0,0 +1,151 @@
++/*
++ * Copyright 2026 Toradex
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stddef.h>
++#include <stdint.h>
++#include <string.h>
++
++#include "FreeRTOS.h"
++#include "task.h"
++
++#include "fsl_device_registers.h"
++
++#include "stats/stats.h"
++
++#include "rt_latency.h"
++#include "rt_latency_shm.h"
++
++/*
++ * Linux maps the same reserved DDR address through /dev/mem.  Use the
++ * linker-provided start of m_data2 rather than allocating an object in the
++ * section: this follows Toradex's direct shared-address model while keeping
++ * the address in one linker-controlled place.
++ */
++extern uint8_t __noncachedata_start__[];
++
++#define RT_LATENCY_SHM_FLAG_REQUEST (1U)
++#define RT_LATENCY_SHM_FLAG_READY   (2U)
++
++typedef struct {
++	int32_t min;
++	int32_t max;
++	int32_t mean;
++	uint64_t rms;
++	uint64_t var;
++	int32_t abs_min;
++	int32_t abs_max;
++} rt_latency_shm_stat_t;
++
++typedef struct {
++	uint32_t flag;
++	uint32_t type;
++	uint32_t rd_idx;
++	uint32_t wr_idx;
++	rt_latency_shm_stat_t irq_delay;
++	rt_latency_shm_stat_t irq_sched;
++	double cpu_load;
++} rt_latency_shm_t;
++
++/* Keep the firmware ABI exactly aligned with basedef.h on Linux/AArch64. */
++_Static_assert(sizeof(rt_latency_shm_stat_t) == 40U, "shared stat ABI size");
++_Static_assert(offsetof(rt_latency_shm_t, irq_delay) == 16U, "irq_delay ABI offset");
++_Static_assert(offsetof(rt_latency_shm_t, irq_sched) == 56U, "irq_sched ABI offset");
++_Static_assert(offsetof(rt_latency_shm_t, cpu_load) == 96U, "cpu_load ABI offset");
++_Static_assert(sizeof(rt_latency_shm_t) == 104U, "shared-memory ABI size");
++
++static volatile rt_latency_shm_t *const shm =
++	(volatile rt_latency_shm_t *)(uintptr_t)__noncachedata_start__;
++
++static void copy_stat(volatile rt_latency_shm_stat_t *dst,
++		      const struct stats *src)
++{
++	dst->min = src->min;
++	dst->max = src->max;
++	dst->mean = src->mean;
++	dst->rms = src->ms;
++	dst->var = src->variance;
++	dst->abs_min = src->abs_min;
++	dst->abs_max = src->abs_max;
++}
++
++void rt_latency_shm_reset(void)
++{
++	/*
++	 * The i.MX93 board MPU maps DDR as outer-shareable, non-cacheable.
++	 * Clear stale state from a previous remoteproc run before Linux starts
++	 * the flag=1 -> flag=2 handshake.
++	 */
++	memset((void *)shm, 0, sizeof(*shm));
++	__DMB();
++}
++
++bool rt_latency_shm_start_requested(int *test_case_id)
++{
++	uint32_t type;
++
++	__DMB();
++	if (shm->flag != RT_LATENCY_SHM_FLAG_REQUEST)
++		return false;
++
++	type = shm->type;
++	if ((type < RT_LATENCY_TEST_CASE_1) ||
++	    (type >= RT_LATENCY_TEST_CASE_MAX))
++		return false;
++
++	*test_case_id = (int)type;
++	return true;
++}
++
++void rt_latency_shm_ack_started(void)
++{
++	/* Publish READY only after the benchmark tasks have been created. */
++	__DMB();
++	shm->flag = RT_LATENCY_SHM_FLAG_READY;
++	__DMB();
++}
++
++void rt_latency_shm_publish(struct rt_latency_ctx *ctx)
++{
++	struct stats irq_delay;
++	struct stats irq_sched;
++	uint32_t wr_idx;
++
++	__DMB();
++	if (shm->flag != RT_LATENCY_SHM_FLAG_READY)
++		return;
++
++	/* The ABI has one payload slot. Do not overwrite an unread sample. */
++	wr_idx = shm->wr_idx;
++	if (shm->rd_idx != wr_idx)
++		return;
++
++	/*
++	 * Take a short, consistent copy while the high-priority benchmark task
++	 * may be updating the live accumulators. Compute outside the critical
++	 * section so interrupt latency is not distorted by division.
++	 */
++	taskENTER_CRITICAL();
++	irq_delay = ctx->stats.irq_delay;
++	irq_sched = ctx->stats.irq_to_sched;
++	taskEXIT_CRITICAL();
++
++	if (!irq_delay.current_count || !irq_sched.current_count)
++		return;
++
++	stats_compute(&irq_delay);
++	stats_compute(&irq_sched);
++
++	copy_stat(&shm->irq_delay, &irq_delay);
++	copy_stat(&shm->irq_sched, &irq_sched);
++
++	/* CPU-load accounting is not enabled for the upstream CM33 target. */
++	shm->cpu_load = 0.0;
++
++	/* Commit marker: Linux reads the payload only after wr_idx changes. */
++	__DMB();
++	shm->wr_idx = wr_idx + 1U;
++	__DMB();
++}
+diff --git a/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.h b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.h
+new file mode 100644
+index 0000000..8dade3d
+--- /dev/null
++++ b/apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.h
+@@ -0,0 +1,19 @@
++/*
++ * Copyright 2026 Toradex
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef _RT_LATENCY_SHM_H_
++#define _RT_LATENCY_SHM_H_
++
++#include <stdbool.h>
++
++struct rt_latency_ctx;
++
++void rt_latency_shm_reset(void);
++bool rt_latency_shm_start_requested(int *test_case_id);
++void rt_latency_shm_ack_started(void);
++void rt_latency_shm_publish(struct rt_latency_ctx *ctx);
++
++#endif /* _RT_LATENCY_SHM_H_ */
+diff --git a/apps/rt_latency/freertos/main.c b/apps/rt_latency/freertos/main.c
+index 41ece3c..0e4fd3a 100644
+--- a/apps/rt_latency/freertos/main.c
++++ b/apps/rt_latency/freertos/main.c
+@@ -25,6 +25,9 @@
+ 
+ #include "rt_latency.h"
+ #include "rt_latency_board.h"
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++#include "rt_latency_shm.h"
++#endif
+ 
+ 
+ /*******************************************************************************
+@@ -68,6 +71,9 @@ void cpu_load_task(void *pvParameters);
+ void cache_inval_task(void *pvParameters);
+ void log_task(void *pvParameters);
+ void benchmark_task(void *pvParameters);
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++void shm_control_task(void *pvParameters);
++#endif
+ int start_test_case(void *context, int test_case_id);
+ int command_handler(void *ctx);
+ void main_task(void *pvParameters);
+@@ -105,10 +111,30 @@ void log_task(void *pvParameters)
+ 	do {
+ 		vTaskDelay(pdMS_TO_TICKS(STATS_PERIOD_SEC * 1000));
+ 
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++		rt_latency_shm_publish(ctx);
++#endif
+ 		print_stats(ctx);
+ 	} while(1);
+ }
+ 
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++void shm_control_task(void *pvParameters)
++{
++	struct main_ctx *ctx = pvParameters;
++	int test_case_id;
++
++	do {
++		if (!ctx->started &&
++		    rt_latency_shm_start_requested(&test_case_id) &&
++		    !start_test_case(ctx, test_case_id))
++			rt_latency_shm_ack_started();
++
++		vTaskDelay(pdMS_TO_TICKS(10));
++	} while (1);
++}
++#endif
++
+ void benchmark_task(void *pvParameters)
+ {
+ 	int ret;
+@@ -398,11 +424,22 @@ int main(void)
+ 
+ 	rt_latency_board_init();
+ 
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++	rt_latency_shm_reset();
++#endif
++
+ 	/* Test cases scheduler task */
+ 	xResult = xTaskCreate(main_task, "main_task", MAIN_STACK_SIZE,
+ 			&main_ctx, LOWEST_TASK_PRIORITY, NULL);
+ 	assert(xResult == pdPASS);
+ 
++#ifdef CONFIG_RT_LATENCY_SHM_EXPORT
++	/* Linux drives this target through the shared-memory handshake. */
++	xResult = xTaskCreate(shm_control_task, "shm_control_task", STACK_SIZE,
++			&main_ctx, LOWEST_TASK_PRIORITY + 3, NULL);
++	assert(xResult == pdPASS);
++#endif
++
+ 	/* Start scheduler */
+ 	vTaskStartScheduler();
+ 
+@@ -411,4 +448,3 @@ int main(void)
+ 
+ 	return xResult;
+ }
+-

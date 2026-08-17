@@ -1,19 +1,21 @@
 #!/usr/bin/env bash
 #
-# Rebuild rt_latency_cm33.elf with the shared-memory window repointed for
-# Verdin i.MX93. See README.md for why this is necessary.
+# Rebuild rt_latency_cm33.elf with a shared-memory producer and the DDR window
+# repointed for Verdin i.MX93. See README.md for the protocol and memory map.
 #
 # The upstream default (ORIGIN(m_data2) = 0xa0000000) lands in live Linux
-# System RAM on this module. This script applies a one-line linker patch
-# moving it to the reserved 0xA5000000 carveout.
+# System RAM on this module. This script relocates it to the reserved
+# 0xA5000000 carveout and adds the producer missing from upstream.
 #
-# Requires: west, cmake, ninja, arm-none-eabi-gcc (ARMGCC_DIR set).
+# Requires: west, cmake, ninja, arm-none-eabi-gcc (ARMGCC_DIR or one
+# auto-detectable toolchain under ~/toolchains).
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 WORKSPACE="${WORKSPACE:-${SCRIPT_DIR}/workspace}"
-PATCH="${SCRIPT_DIR}/patches/0001-cm33-shm-base-verdin-imx93.patch"
+LINKER_PATCH="${SCRIPT_DIR}/patches/0001-cm33-shm-base-verdin-imx93.patch"
+PRODUCER_PATCH="${SCRIPT_DIR}/patches/0002-cm33-rt-latency-shm-producer.patch"
 
 # Expected shared-memory base. Must match FRDM_SHM_BASE in
 # app/custom/real_time_edge/main.h and cm33-shm@ in the DT overlay.
@@ -25,7 +27,8 @@ APP_REL="apps/rt_latency/freertos/boards/mcimx93evk/cm33/armgcc"
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 
 command -v west >/dev/null || die "west not found. Install the MCUXpresso SDK tooling first."
-[ -f "${PATCH}" ] || die "patch not found: ${PATCH}"
+[ -f "${LINKER_PATCH}" ] || die "patch not found: ${LINKER_PATCH}"
+[ -f "${PRODUCER_PATCH}" ] || die "patch not found: ${PRODUCER_PATCH}"
 
 # --- resolve and validate the Arm toolchain ------------------------------
 # The SDK derives its compiler paths from ARMGCC_DIR. If ARMGCC_DIR points
@@ -38,7 +41,7 @@ command -v west >/dev/null || die "west not found. Install the MCUXpresso SDK to
 if [ -z "${ARMGCC_DIR:-}" ]; then
     # Auto-detect a single arm-none-eabi toolchain under ~/toolchains.
     mapfile -t _candidates < <(
-        find "${HOME}/toolchains" -maxdepth 2 -type f -name arm-none-eabi-gcc \
+        find "${HOME}/toolchains" -maxdepth 3 -type f -name arm-none-eabi-gcc \
              -printf '%h\n' 2>/dev/null | sed 's:/bin$::' | sort -u
     )
     case "${#_candidates[@]}" in
@@ -85,19 +88,33 @@ fi
 HMC="${WORKSPACE}/heterogeneous-multicore"
 [ -f "${HMC}/${LD_REL}" ] || die "linker script missing at ${HMC}/${LD_REL} — upstream layout changed."
 
-# --- apply the patch (idempotent) ----------------------------------------
+# --- apply the patches (idempotent) --------------------------------------
 cd "${HMC}"
 if grep -q "ORIGIN = 0x${EXPECTED_BASE}" "${LD_REL}"; then
     echo "==> linker script already repointed to 0x${EXPECTED_BASE}"
-elif patch -p1 --dry-run --silent < "${PATCH}"; then
-    echo "==> applying ${PATCH##*/}"
-    patch -p1 < "${PATCH}"
+elif patch -p1 --dry-run --silent --forward --batch < "${LINKER_PATCH}"; then
+    echo "==> applying ${LINKER_PATCH##*/}"
+    patch -p1 --forward --batch < "${LINKER_PATCH}"
 else
     die "patch does not apply to this upstream revision. Re-diff it against ${LD_REL}."
 fi
 
 grep -q "ORIGIN = 0x${EXPECTED_BASE}" "${LD_REL}" \
     || die "linker script does not contain 0x${EXPECTED_BASE} after patching."
+
+PRODUCER_SRC="apps/rt_latency/freertos/boards/mcimx93evk/cm33/rt_latency_shm.c"
+if [ -f "${PRODUCER_SRC}" ] && grep -q "CONFIG_RT_LATENCY_SHM_EXPORT" \
+        apps/rt_latency/freertos/main.c; then
+    echo "==> shared-memory producer patch already applied"
+elif patch -p1 --dry-run --silent --forward --batch < "${PRODUCER_PATCH}"; then
+    echo "==> applying ${PRODUCER_PATCH##*/}"
+    patch -p1 --forward --batch < "${PRODUCER_PATCH}"
+else
+    die "producer patch does not apply to this upstream revision. Rebase ${PRODUCER_PATCH##*/}."
+fi
+
+[ -f "${PRODUCER_SRC}" ] \
+    || die "shared-memory producer source is missing after patching."
 
 # --- build ---------------------------------------------------------------
 # Invocation copied from upstream apps/.../cm33/armgcc/build_release.sh
@@ -138,11 +155,20 @@ if [ "${actual_sec}" != "${EXPECTED_BASE}" ]; then
 fi
 echo "    .ncache section        = 0x${actual_sec} OK"
 
+# A relink without the producer recreates the original silent firmware, so
+# refuse to install unless both the control task and payload publisher exist.
+for required_symbol in shm_control_task rt_latency_shm_publish; do
+    readelf -sW "${ELF}" | awk -v symbol="${required_symbol}" \
+        '$NF == symbol { found = 1 } END { exit !found }' \
+        || die "${required_symbol} is missing from ${ELF}. Refusing to install."
+    echo "    ${required_symbol} present"
+done
+
 # --- install -------------------------------------------------------------
 DEST="${REPO_ROOT}/app/custom/elf/rt_latency_cm33.elf"
-if [ -f "${DEST}" ]; then
+if [ -f "${DEST}" ] && [ ! -f "${DEST}.evk-backup" ]; then
     cp -a "${DEST}" "${DEST}.evk-backup"
-    echo "==> previous ELF saved to ${DEST}.evk-backup"
+    echo "==> original ELF saved to ${DEST}.evk-backup"
 fi
 cp "${ELF}" "${DEST}"
 echo "==> installed ${DEST}"

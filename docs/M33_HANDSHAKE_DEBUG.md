@@ -1,16 +1,17 @@
-# M33 rt_latency handshake debug — ROOT CAUSE FOUND 2026-08-17
+# M33 rt_latency handshake debug — producer implemented 2026-08-17
 
-> **2026-08-17 — Root cause identified: shared-memory address mismatch.**
-> The Linux side polled `0xA4000000`, which the Verdin i.MX93 base device
-> tree assigns to **`vdev0vring0`** — virtio/RPMsg vring memory, not a free
-> carveout. The rt_latency demo does not use RPMsg; it maps a plain struct.
-> Meanwhile the shipped `rt_latency_cm33.elf` links `__noncachedata_start__`
-> to `0xA0000000`, which `/proc/iomem` shows as live **System RAM**
-> (`98000000-a3ffffff`). The two sides never referenced the same memory, so
-> the `flag=1 -> flag=2` handshake could not complete under any conditions.
+> **Current status.** The operative root cause was a missing producer: the
+> upstream/shipped CM33 latency benchmark only logged to UART and never
+> implemented the `rt_latency_shm_t` ABI polled by Linux. A separate address
+> error also had to be fixed: Linux used the `vdev0vring0` address while the
+> EVK linker put `m_data2` in live Linux RAM on this module.
 >
-> The D-cache hypothesis below is **falsified** — see "Corrections".
-> Sections below this banner are preserved as the historical record.
+> Both gaps are now implemented in the tracked build: a dedicated
+> `0xA5000000` carveout and a FreeRTOS producer that performs the handshake
+> and publishes latency once per second. The ELF builds and passes static
+> verification. The carveout is deployed and verified on the target; runtime
+> validation of the producer/consumer handshake still remains.
+> Sections labeled historical below are retained as the investigation record.
 
 ## Corrections to earlier claims (2026-08-17)
 
@@ -21,18 +22,18 @@ which falls inside **`.symtab`** (`0x00ac6c`–`0x1045c`). `.text` ends at
 `0x90b0` and `.symtab` is not loaded onto the M33. These are debug symbol
 values, not code literals. Verified with `readelf -S` + offset mapping.
 
-**The D-cache hypothesis is falsified.** `readelf -sW` shows the firmware
-has a dedicated non-cached section and calls `XCACHE_CleanCache`:
+**The D-cache hypothesis is falsified.** The mcimx93evk board initialization
+maps the entire relevant DDR range as outer-shareable, non-cacheable. The
+old ELF's `.ncache` section was zero-sized because it had no producer data:
 
 ```
 [13] .ncache   PROGBITS  a0000000  00a0fc  000000  W
 1133: a0000000  0 NOTYPE GLOBAL __noncachedata_start__
 1166: a0000000  0 NOTYPE GLOBAL __noncachedata_end__
-1033: 0ffe58ad 24 FUNC   GLOBAL XCACHE_CleanCache
 ```
 
-Coherency was handled correctly by the firmware author. The addresses
-simply never matched.
+The new producer uses that non-cacheable mapping plus explicit memory
+barriers. Cache maintenance was not the missing operation.
 
 **The devmem probe in move #3 never ran.** `devmem-probe.out` in the
 2026-08-06 tarball is five lines of `devmem: applet not found`. It was
@@ -102,12 +103,12 @@ relink are all still **correct and worth keeping**: they make the memory map
 coherent and are prerequisites for any firmware that *does* implement the
 protocol. They are not sufficient.
 
-### The actual gap
+### The actual gap at that point
 
-This demo needs an M33 firmware that implements the `rt_latency_shm_t`
+This demo needed an M33 firmware that implements the `rt_latency_shm_t`
 producer. The GUI-Guider demo was ported from a Real-Time Edge package whose
 M33 binary had that protocol; the ELFs in `app/custom/elf/` do not. Options,
-in order of cost:
+in order of cost at the time, were:
 
 1. **Get the matching firmware** from the NXP Real-Time Edge release the
    GUI-Guider demo came from (not the `heterogeneous-multicore` upstream —
@@ -128,6 +129,33 @@ in order of cost:
   the firmware has no handshake code at all.
 - The relink alone was described as sufficient once applied. It is not.
 
+## Producer implemented 2026-08-17
+
+The missing FreeRTOS CM33 producer is now carried as
+`firmware/patches/0002-cm33-rt-latency-shm-producer.patch` and applied by
+`firmware/build-rt-latency-cm33.sh` after the linker relocation.
+
+The implementation was adapted to Toradex's documented raw shared-memory
+model rather than inventing an RPMsg dependency: Linux reserves the DDR range
+with `no-map`, both cores use the same physical address, and the firmware
+accesses it through an explicit volatile pointer. NXP's mcimx93evk CM33 board
+setup already configures `0x80000000-0xDfffffff` as outer-shareable,
+non-cacheable DDR.
+
+Additional protocol safety for this multi-field structure:
+
+- compile-time ABI size and offset checks on both cores;
+- data-memory barriers around handshake and publication;
+- start test case `type` when Linux sets `flag=1`, then acknowledge with
+  `flag=2` only after the benchmark tasks exist;
+- copy a consistent latency snapshot under a short FreeRTOS critical section;
+- write payload first and increment `wr_idx` last as the commit marker;
+- preserve unread data while `rd_idx != wr_idx`.
+
+The producer publishes the upstream latency accumulators once per second.
+CPU-load tracking is not enabled in this upstream CM33 configuration, so that
+field is explicitly `0.0`.
+
 ## Upstream firmware source — located 2026-08-17
 
 The firmware is NXP's `heterogeneous-multicore` (matches this repo's
@@ -142,9 +170,9 @@ The firmware is NXP's `heterogeneous-multicore` (matches this repo's
 m_data2  (RW) : ORIGIN = 0xa0000000, LENGTH = 0x01000000
 ```
 
-`.ncache` and `.ncache.init` are both placed `> m_data2`, so that single
-`ORIGIN` is what puts the shared struct at `0xA0000000`. Changing it moves
-the shared memory — no source-code edit is required.
+`.ncache` and `.ncache.init` are both placed `> m_data2`. The new producer
+uses `__noncachedata_start__` as its explicit pointer, so changing `ORIGIN`
+moves that pointer. The relocation alone never supplied the missing protocol.
 
 ## The fix (2026-08-17)
 
@@ -163,24 +191,43 @@ upstream's `m_data2`.
    `app/custom/real_time_edge/main.h`: `0xA4000000` -> `0xA5000000`.
    Cross-build clean.
 
-3. **READY TO RUN, NOT YET BUILT — firmware relink.**
+3. **DONE — firmware producer and relink.**
    `firmware/patches/0001-cm33-shm-base-verdin-imx93.patch` changes
-   `ORIGIN(m_data2)` to `0xa5000000`. Verified to apply clean against
-   pristine upstream, and idempotent on re-run.
-   `firmware/build-rt-latency-cm33.sh` fetches upstream, applies the patch,
-   builds, **refuses to install unless `__noncachedata_start__` really
-   reads `a5000000`**, and installs to `app/custom/elf/`.
-   Needs `west` + `ARMGCC_DIR` (MCUXpresso SDK tooling), which is not
-   present on this host — so the ELF in `app/custom/elf/` is **still the
-   EVK build**.
+   `ORIGIN(m_data2)` to `0xa5000000`; patch 0002 adds the producer. The
+   build completed with Arm GCC 13.2.1 and installed the verified ELF to
+   `app/custom/elf/rt_latency_cm33.elf`. The script refuses installation
+   unless the base is `a5000000` and both producer symbols are present.
 
-**Until step 3 runs and the overlay is deployed, the handshake still fails
-with `wr_idx:0` / `Boot failed`.** Steps 1 and 2 alone are not sufficient.
+## Target validation status — 2026-08-17
+
+Completed on `<target-host>` with Torizon OS 7.7.0 build 40:
+
+- TorizonCore Builder deployed both
+  `lino-imx93_panel-cap-touch-10inch-dsi_overlay.dtbo` and
+  `lino-imx93_cm33-shm_overlay.dtbo` successfully;
+- `/proc/device-tree/reserved-memory/cm33-shm@a5000000` exists;
+- `/proc/iomem` reports `a5000000-a5ffffff : reserved`, splitting System RAM
+  into `a4120000-a4ffffff` and `a6000000-ffffffff` around the carveout;
+- the 10.1-inch display and the online LVGL application remained functional
+  after reboot.
+
+Still pending before the shared-memory fix can be considered runtime-validated:
+
+1. cross-build and synchronize the updated Linux application and producer ELF;
+2. rebuild `m33-loader` and `lvgl-app` on the target;
+3. confirm remoteproc reaches `running` with `rt_latency_cm33.elf`;
+4. run the Benchmarking screen and observe `flag=2`;
+5. confirm `wr_idx` advances and the latency charts receive samples without
+   `Boot failed` messages.
+
+The overlay validation proves that Linux no longer owns the shared DDR range.
+It does **not** yet prove that the CM33 producer boots or that the end-to-end
+protocol works.
 
 ### Deployment order (all three needed)
 
 ```bash
-# 1. HOST — rebuild firmware (needs MCUXpresso SDK + ARMGCC_DIR)
+# 1. HOST — rebuild firmware when source/SDK inputs change
 ./firmware/build-rt-latency-cm33.sh
 
 # 2. HOST — compile + apply overlay via TorizonCore Builder, then reboot
@@ -195,8 +242,9 @@ ls /proc/device-tree/reserved-memory/ | grep cm33
 ./docker/sync-to-target.sh
 ```
 
-Expected on success: `[shm-diag]` shows `flag:2` and `wr_idx` incrementing,
-and the BenchMarking charts populate.
+Expected on success (not yet observed on the target): `[shm-diag]` shows
+`flag:2` and `wr_idx` incrementing, with no `Boot failed` messages, and the
+BenchMarking charts populate.
 
 ## The failure (historical, as of 2026-08-06)
 

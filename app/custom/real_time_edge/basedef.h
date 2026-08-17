@@ -144,6 +144,14 @@ typedef struct {
 	double cpu_load;
 } rt_latency_shm_t;
 
+/* This struct is also compiled for the 32-bit Cortex-M33. Fail the build if
+ * either ABI changes its padding or field alignment independently. */
+_Static_assert(sizeof(rt_latency_shm_stat) == 40, "shared stat ABI size");
+_Static_assert(offsetof(rt_latency_shm_t, irq_delay) == 16, "irq_delay ABI offset");
+_Static_assert(offsetof(rt_latency_shm_t, irq_sched) == 56, "irq_sched ABI offset");
+_Static_assert(offsetof(rt_latency_shm_t, cpu_load) == 96, "cpu_load ABI offset");
+_Static_assert(sizeof(rt_latency_shm_t) == 104, "shared-memory ABI size");
+
 typedef struct _core_session_t
 {
 	uint8_t boot_type;
