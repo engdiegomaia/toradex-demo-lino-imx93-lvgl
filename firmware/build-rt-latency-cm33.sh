@@ -25,8 +25,49 @@ APP_REL="apps/rt_latency/freertos/boards/mcimx93evk/cm33/armgcc"
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
 
 command -v west >/dev/null || die "west not found. Install the MCUXpresso SDK tooling first."
-[ -n "${ARMGCC_DIR:-}" ] || die "ARMGCC_DIR is not set — the SDK build needs it to locate arm-none-eabi-gcc."
 [ -f "${PATCH}" ] || die "patch not found: ${PATCH}"
+
+# --- resolve and validate the Arm toolchain ------------------------------
+# The SDK derives its compiler paths from ARMGCC_DIR. If ARMGCC_DIR points
+# somewhere that does not exist, the build does NOT fail early — it silently
+# falls back to guessing "aarch64-none-elf-gcc", which is the 64-bit
+# A-profile toolchain and cannot build Cortex-M33 code. Validate up front.
+#
+# Note the Arm tarball unpacks to a directory containing "Rel1" (capital R)
+# while the compiler reports "rel1" — an easy path typo to make.
+if [ -z "${ARMGCC_DIR:-}" ]; then
+    # Auto-detect a single arm-none-eabi toolchain under ~/toolchains.
+    mapfile -t _candidates < <(
+        find "${HOME}/toolchains" -maxdepth 2 -type f -name arm-none-eabi-gcc \
+             -printf '%h\n' 2>/dev/null | sed 's:/bin$::' | sort -u
+    )
+    case "${#_candidates[@]}" in
+        0) die "ARMGCC_DIR is not set and no arm-none-eabi-gcc found under ~/toolchains.
+       Install the Arm GNU toolchain, then: export ARMGCC_DIR=<toolchain-root>" ;;
+        1) ARMGCC_DIR="${_candidates[0]}"
+           echo "==> auto-detected ARMGCC_DIR=${ARMGCC_DIR}" ;;
+        *) printf 'error: multiple toolchains found; set ARMGCC_DIR to one of:\n' >&2
+           printf '       %s\n' "${_candidates[@]}" >&2
+           exit 1 ;;
+    esac
+    export ARMGCC_DIR
+fi
+
+ARM_CC="${ARMGCC_DIR}/bin/arm-none-eabi-gcc"
+[ -d "${ARMGCC_DIR}" ] || die "ARMGCC_DIR does not exist: ${ARMGCC_DIR}
+       Check the path casing — the Arm tarball uses 'Rel1', not 'rel1'."
+[ -x "${ARM_CC}" ] || die "no arm-none-eabi-gcc at ${ARM_CC}
+       ARMGCC_DIR must be the toolchain ROOT (the dir containing bin/).
+       A 64-bit aarch64-none-elf toolchain will NOT work — the M33 needs
+       32-bit arm-none-eabi."
+"${ARM_CC}" -mcpu=cortex-m33 -mthumb -x c -c /dev/null -o /dev/null 2>/dev/null \
+    || die "${ARM_CC} cannot target cortex-m33."
+echo "==> toolchain: $("${ARM_CC}" -dumpmachine) $("${ARM_CC}" -dumpversion)"
+
+# The SDK's tool.yml validation imports jsonschema; without it the build
+# falls back to default version checks and prints a confusing warning.
+python3 -c 'import jsonschema' 2>/dev/null \
+    || echo "warning: python module 'jsonschema' missing — SDK tool validation will be skipped." >&2
 
 # --- fetch upstream -------------------------------------------------------
 if [ ! -d "${WORKSPACE}/heterogeneous-multicore" ]; then
@@ -71,11 +112,31 @@ ELF="$(find "${HMC}/${APP_REL}/release" -name '*.elf' -print -quit)"
 
 # --- verify the ELF actually moved --------------------------------------
 echo "==> verifying shared-memory base in $(basename "${ELF}")"
-if ! readelf -sW "${ELF}" | grep -qi "^ *[0-9]*: *${EXPECTED_BASE} .*__noncachedata_start__"; then
-    readelf -sW "${ELF}" | grep -i noncachedata || true
-    die "__noncachedata_start__ is not at 0x${EXPECTED_BASE}. Refusing to install."
+# Match on the awk-parsed symbol value rather than a whole-line regex:
+# readelf pads the index field ("   929: a5000000 ..."), so anchoring the
+# pattern to the line start is brittle. Field 2 is the value, last field is
+# the symbol name.
+actual_base="$(readelf -sW "${ELF}" \
+    | awk '$NF == "__noncachedata_start__" { print $2; exit }')"
+
+if [ -z "${actual_base}" ]; then
+    die "__noncachedata_start__ not found in ${ELF}. Refusing to install."
 fi
-echo "    __noncachedata_start__ = 0x${EXPECTED_BASE} OK"
+if [ "${actual_base}" != "${EXPECTED_BASE}" ]; then
+    readelf -sW "${ELF}" | grep -i noncachedata || true
+    die "__noncachedata_start__ is at 0x${actual_base}, expected 0x${EXPECTED_BASE}.
+       The linker patch did not take effect. Remove firmware/workspace and retry.
+       Refusing to install."
+fi
+echo "    __noncachedata_start__ = 0x${actual_base} OK"
+
+# The .ncache section itself must land there too, not just the symbol.
+actual_sec="$(readelf -SW "${ELF}" \
+    | awk '$2 == ".ncache" { print $4; exit }')"
+if [ "${actual_sec}" != "${EXPECTED_BASE}" ]; then
+    die ".ncache section is at 0x${actual_sec:-?}, expected 0x${EXPECTED_BASE}. Refusing to install."
+fi
+echo "    .ncache section        = 0x${actual_sec} OK"
 
 # --- install -------------------------------------------------------------
 DEST="${REPO_ROOT}/app/custom/elf/rt_latency_cm33.elf"

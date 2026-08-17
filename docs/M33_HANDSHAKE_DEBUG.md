@@ -66,6 +66,68 @@ The M33 carveout ends at `0xA4120000`. `/proc/iomem` confirms
 `a4120000-ffffffff : System RAM`, so there was **no** free reserved region
 for a raw shared struct — one has to be created.
 
+## CORRECTION 2026-08-17 (later) — the address mismatch is NOT the root cause
+
+After rebuilding the firmware and inspecting upstream, the diagnosis above
+is **incomplete and its conclusion is wrong**. Corrected finding:
+
+**The shipped `rt_latency_cm33.elf` does not implement the shared-memory
+protocol at all.**
+
+Evidence:
+
+1. Upstream `apps/rt_latency/` contains **no** `rt_latency_shm_t`, `wr_idx`,
+   `rd_idx`, or flag handshake. `grep -rn "rt_latency_shm\|wr_idx"` over the
+   whole `heterogeneous-multicore` tree returns nothing. It reports results
+   via `log_info()` — i.e. the **UART console**.
+2. The originally shipped `rt_latency_cm33.elf` has **0** symbols matching
+   `shm|wr_idx|rd_idx`. Same for all 8 ELFs in `app/custom/elf/`, except
+   `rt_latency_ca55_0xd0100000_zephyr.elf`, which has only `rd_idx_inc`
+   (a *consumer*, not the M33 producer).
+3. `.ncache` is zero-length and `m_data2` reports 0.00% used in **both** the
+   original EVK build and the relinked one — nothing is allocated there.
+4. Neither ELF contains its shm base as an aligned literal in loaded code.
+
+So `wr_idx` stays 0 because **no shipped firmware ever increments it**.
+There is no producer. The Linux side in `rt_stats.c` polls a protocol that
+the M33 binary does not speak.
+
+### What this means for the address work
+
+The address mismatch documented below is **real** — `0xA4000000` is
+`vdev0vring0`, and upstream's `0xA0000000` is System RAM here — but fixing
+it cannot make the handshake work, because the firmware never writes to
+either address. The overlay, the `FRDM_SHM_BASE` change, and the linker
+relink are all still **correct and worth keeping**: they make the memory map
+coherent and are prerequisites for any firmware that *does* implement the
+protocol. They are not sufficient.
+
+### The actual gap
+
+This demo needs an M33 firmware that implements the `rt_latency_shm_t`
+producer. The GUI-Guider demo was ported from a Real-Time Edge package whose
+M33 binary had that protocol; the ELFs in `app/custom/elf/` do not. Options,
+in order of cost:
+
+1. **Get the matching firmware** from the NXP Real-Time Edge release the
+   GUI-Guider demo came from (not the `heterogeneous-multicore` upstream —
+   that variant logs to UART instead).
+2. **Write the producer** against `rt_latency_shm_t` in `basedef.h`:
+   place the struct at `ORIGIN(m_data2)`, set `flag=2` on seeing `flag=1`,
+   fill `irq_delay`/`irq_sched`, increment `wr_idx` once per second. The
+   upstream `rt_latency` stats are already computed in
+   `apps/rt_latency/common/rt_latency.c` — only the shm export is missing.
+3. **Re-target the Linux side to the console path** — read latency from the
+   M33 UART instead of shared memory, matching what upstream actually does.
+   Needs the M33 console, which is the still-outstanding hardware blocker.
+
+### Falsified by this correction
+
+- "The two sides never referenced the same memory, so the handshake could
+  not complete" — true about addresses, but the operative reason is that
+  the firmware has no handshake code at all.
+- The relink alone was described as sufficient once applied. It is not.
+
 ## Upstream firmware source — located 2026-08-17
 
 The firmware is NXP's `heterogeneous-multicore` (matches this repo's

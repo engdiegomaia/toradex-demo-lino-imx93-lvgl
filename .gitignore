@@ -19,3 +19,8 @@ Thumbs.db
 # Diagnostic bundles from scripts/collect-m33-diag.sh
 m33-diag-*.tar.gz
 m33-diag-*/
+
+# MCUXpresso west workspace (multi-GB, fetched by firmware/build-*.sh)
+firmware/workspace/
+# Backup of the original NXP EVK firmware
+*.evk-backup
