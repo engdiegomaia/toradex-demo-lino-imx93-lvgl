@@ -27,10 +27,13 @@
  *====================*/
 
  /*Maximal horizontal resolution*/
-#define LV_HOR_RES_MAX 1024
+/* Native resolution of the 10.1-inch RVT101HVDWC00-B panel. Keeping the
+ * initial Wayland surface at the output size also avoids an unnecessary
+ * 1024x600-to-1280x800 resize during fullscreen negotiation. */
+#define LV_HOR_RES_MAX 1280
 
 /*Maximal vertical resolution*/
-#define LV_VER_RES_MAX 600
+#define LV_VER_RES_MAX 800
 
 /** Color depth: 1 (I1), 8 (L8), 16 (RGB565), 24 (RGB888), 32 (XRGB8888) */
 #define LV_COLOR_DEPTH 32

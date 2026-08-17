@@ -41,11 +41,11 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
 
     // Create chart: ui->BenchMarking_M33.chart_bm
     ui->BenchMarking_M33.chart_bm = lv_chart_create(ui->BenchMarking_M33.screen);
-    lv_obj_set_width(ui->BenchMarking_M33.chart_bm, 882);
-    lv_obj_set_height(ui->BenchMarking_M33.chart_bm, 420);
+    lv_obj_set_width(ui->BenchMarking_M33.chart_bm, 1103);
+    lv_obj_set_height(ui->BenchMarking_M33.chart_bm, 560);
     lv_obj_set_align(ui->BenchMarking_M33.chart_bm, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.chart_bm, 79);
-    lv_obj_set_y(ui->BenchMarking_M33.chart_bm, 144);
+    lv_obj_set_x(ui->BenchMarking_M33.chart_bm, 99);
+    lv_obj_set_y(ui->BenchMarking_M33.chart_bm, 192);
     lv_chart_set_div_line_count(ui->BenchMarking_M33.chart_bm, 8, 10);
     lv_chart_set_range(ui->BenchMarking_M33.chart_bm, LV_CHART_AXIS_PRIMARY_Y, 0, 6000);
     lv_chart_set_range(ui->BenchMarking_M33.chart_bm, LV_CHART_AXIS_SECONDARY_Y, 0, 6000);
@@ -80,11 +80,11 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     ui->BenchMarking_M33.scale_y = lv_scale_create(ui->BenchMarking_M33.screen);
     lv_obj_set_style_bg_opa(ui->BenchMarking_M33.scale_y, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->BenchMarking_M33.scale_y, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->BenchMarking_M33.scale_y, 877);
-    lv_obj_set_height(ui->BenchMarking_M33.scale_y, 29);
+    lv_obj_set_width(ui->BenchMarking_M33.scale_y, 1096);
+    lv_obj_set_height(ui->BenchMarking_M33.scale_y, 39);
     lv_obj_set_align(ui->BenchMarking_M33.scale_y, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.scale_y, 79);
-    lv_obj_set_y(ui->BenchMarking_M33.scale_y, 571);
+    lv_obj_set_x(ui->BenchMarking_M33.scale_y, 99);
+    lv_obj_set_y(ui->BenchMarking_M33.scale_y, 761);
     lv_scale_set_mode(ui->BenchMarking_M33.scale_y, LV_SCALE_MODE_HORIZONTAL_BOTTOM);
     lv_scale_set_total_tick_count(ui->BenchMarking_M33.scale_y, 10);
     lv_scale_set_major_tick_every(ui->BenchMarking_M33.scale_y, 1);
@@ -113,11 +113,11 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     ui->BenchMarking_M33.scale_x = lv_scale_create(ui->BenchMarking_M33.screen);
     lv_obj_set_style_bg_opa(ui->BenchMarking_M33.scale_x, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui->BenchMarking_M33.scale_x, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_width(ui->BenchMarking_M33.scale_x, 52);
-    lv_obj_set_height(ui->BenchMarking_M33.scale_x, 416);
+    lv_obj_set_width(ui->BenchMarking_M33.scale_x, 65);
+    lv_obj_set_height(ui->BenchMarking_M33.scale_x, 555);
     lv_obj_set_align(ui->BenchMarking_M33.scale_x, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.scale_x, 23);
-    lv_obj_set_y(ui->BenchMarking_M33.scale_x, 148);
+    lv_obj_set_x(ui->BenchMarking_M33.scale_x, 29);
+    lv_obj_set_y(ui->BenchMarking_M33.scale_x, 197);
     lv_scale_set_mode(ui->BenchMarking_M33.scale_x, LV_SCALE_MODE_VERTICAL_LEFT);
     lv_scale_set_total_tick_count(ui->BenchMarking_M33.scale_x, 41);
     lv_scale_set_major_tick_every(ui->BenchMarking_M33.scale_x, 8);
@@ -145,11 +145,11 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
 
     // Create image: ui->BenchMarking_M33.bm_core_icon
     ui->BenchMarking_M33.bm_core_icon = lv_image_create(ui->BenchMarking_M33.screen);
-    lv_obj_set_width(ui->BenchMarking_M33.bm_core_icon, 44);
-    lv_obj_set_height(ui->BenchMarking_M33.bm_core_icon, 48);
+    lv_obj_set_width(ui->BenchMarking_M33.bm_core_icon, 55);
+    lv_obj_set_height(ui->BenchMarking_M33.bm_core_icon, 64);
     lv_obj_set_align(ui->BenchMarking_M33.bm_core_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.bm_core_icon, 213);
-    lv_obj_set_y(ui->BenchMarking_M33.bm_core_icon, 60);
+    lv_obj_set_x(ui->BenchMarking_M33.bm_core_icon, 266);
+    lv_obj_set_y(ui->BenchMarking_M33.bm_core_icon, 80);
     lv_image_set_src(ui->BenchMarking_M33.bm_core_icon, &cortexM_44x48_ARGB8888);
 
     // Style: ui->BenchMarking_M33.bm_core_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -162,8 +162,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.line_Max, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.line_Max, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.line_Max, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.line_Max, 793);
-    lv_obj_set_y(ui->BenchMarking_M33.line_Max, 66);
+    lv_obj_set_x(ui->BenchMarking_M33.line_Max, 991);
+    lv_obj_set_y(ui->BenchMarking_M33.line_Max, 88);
     static const lv_point_precise_t MO01BUR9S49B_pts[] = {{0, 0}, {150, 0}};
     lv_line_set_points(ui->BenchMarking_M33.line_Max, MO01BUR9S49B_pts, 2);
 
@@ -177,8 +177,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.label_min, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.label_min, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.label_min, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.label_min, 751);
-    lv_obj_set_y(ui->BenchMarking_M33.label_min, 83);
+    lv_obj_set_x(ui->BenchMarking_M33.label_min, 939);
+    lv_obj_set_y(ui->BenchMarking_M33.label_min, 111);
     lv_label_set_text(ui->BenchMarking_M33.label_min, "Min");
 
     // Style: ui->BenchMarking_M33.label_min [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -189,8 +189,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.line_Avg, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.line_Avg, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.line_Avg, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.line_Avg, 793);
-    lv_obj_set_y(ui->BenchMarking_M33.line_Avg, 115);
+    lv_obj_set_x(ui->BenchMarking_M33.line_Avg, 991);
+    lv_obj_set_y(ui->BenchMarking_M33.line_Avg, 153);
     static const lv_point_precise_t MO01BUR96X7Q_pts[] = {{0, 0}, {150, 0}};
     lv_line_set_points(ui->BenchMarking_M33.line_Avg, MO01BUR96X7Q_pts, 2);
 
@@ -204,8 +204,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.label_avg, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.label_avg, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.label_avg, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.label_avg, 751);
-    lv_obj_set_y(ui->BenchMarking_M33.label_avg, 107);
+    lv_obj_set_x(ui->BenchMarking_M33.label_avg, 939);
+    lv_obj_set_y(ui->BenchMarking_M33.label_avg, 143);
     lv_label_set_text(ui->BenchMarking_M33.label_avg, "Avg");
 
     // Style: ui->BenchMarking_M33.label_avg [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -213,11 +213,11 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
 
     // Create button: ui->BenchMarking_M33.button_back
     ui->BenchMarking_M33.button_back = lv_button_create(ui->BenchMarking_M33.screen);
-    lv_obj_set_width(ui->BenchMarking_M33.button_back, 50);
-    lv_obj_set_height(ui->BenchMarking_M33.button_back, 50);
+    lv_obj_set_width(ui->BenchMarking_M33.button_back, 63);
+    lv_obj_set_height(ui->BenchMarking_M33.button_back, 67);
     lv_obj_set_align(ui->BenchMarking_M33.button_back, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.button_back, 952);
-    lv_obj_set_y(ui->BenchMarking_M33.button_back, 4);
+    lv_obj_set_x(ui->BenchMarking_M33.button_back, 1190);
+    lv_obj_set_y(ui->BenchMarking_M33.button_back, 5);
 
     // Style: ui->BenchMarking_M33.button_back [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_color(ui->BenchMarking_M33.button_back, lv_color_hex(0x1A2435), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -255,7 +255,7 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_height(ui->BenchMarking_M33.label_title, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.label_title, LV_ALIGN_TOP_MID);
     lv_obj_set_x(ui->BenchMarking_M33.label_title, 0);
-    lv_obj_set_y(ui->BenchMarking_M33.label_title, 10);
+    lv_obj_set_y(ui->BenchMarking_M33.label_title, 13);
     lv_label_set_text(ui->BenchMarking_M33.label_title, " Benchmarking");
 
     // Style: ui->BenchMarking_M33.label_title [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -268,8 +268,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.label_max, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.label_max, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.label_max, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.label_max, 751);
-    lv_obj_set_y(ui->BenchMarking_M33.label_max, 59);
+    lv_obj_set_x(ui->BenchMarking_M33.label_max, 939);
+    lv_obj_set_y(ui->BenchMarking_M33.label_max, 79);
     lv_label_set_text(ui->BenchMarking_M33.label_max, "Max");
 
     // Style: ui->BenchMarking_M33.label_max [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -280,8 +280,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.line_Min, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.line_Min, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.line_Min, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.line_Min, 793);
-    lv_obj_set_y(ui->BenchMarking_M33.line_Min, 91);
+    lv_obj_set_x(ui->BenchMarking_M33.line_Min, 991);
+    lv_obj_set_y(ui->BenchMarking_M33.line_Min, 121);
     static const lv_point_precise_t MO01BUR9IJPY_pts[] = {{0, 0}, {150, 0}};
     lv_line_set_points(ui->BenchMarking_M33.line_Min, MO01BUR9IJPY_pts, 2);
 
@@ -295,8 +295,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.bm_core, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.bm_core, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.bm_core, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.bm_core, 23);
-    lv_obj_set_y(ui->BenchMarking_M33.bm_core, 67);
+    lv_obj_set_x(ui->BenchMarking_M33.bm_core, 29);
+    lv_obj_set_y(ui->BenchMarking_M33.bm_core, 89);
     lv_label_set_text(ui->BenchMarking_M33.bm_core, "Cortex-M33");
 
     // Style: ui->BenchMarking_M33.bm_core [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -308,8 +308,8 @@ void setup_BenchMarking_M33(gg_ui_t * ui)
     lv_obj_set_width(ui->BenchMarking_M33.label_unit, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->BenchMarking_M33.label_unit, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->BenchMarking_M33.label_unit, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->BenchMarking_M33.label_unit, 58);
-    lv_obj_set_y(ui->BenchMarking_M33.label_unit, 116);
+    lv_obj_set_x(ui->BenchMarking_M33.label_unit, 73);
+    lv_obj_set_y(ui->BenchMarking_M33.label_unit, 155);
     lv_label_set_text(ui->BenchMarking_M33.label_unit, "(ns)");
 
     // Style: ui->BenchMarking_M33.label_unit [LV_PART_MAIN|LV_STATE_DEFAULT]

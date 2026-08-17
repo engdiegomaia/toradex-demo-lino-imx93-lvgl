@@ -38,11 +38,11 @@ void setup_Console_M33(gg_ui_t * ui)
 
     // Create button: ui->Console_M33.button_back
     ui->Console_M33.button_back = lv_button_create(ui->Console_M33.screen);
-    lv_obj_set_width(ui->Console_M33.button_back, 50);
-    lv_obj_set_height(ui->Console_M33.button_back, 50);
+    lv_obj_set_width(ui->Console_M33.button_back, 63);
+    lv_obj_set_height(ui->Console_M33.button_back, 67);
     lv_obj_set_align(ui->Console_M33.button_back, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Console_M33.button_back, 952);
-    lv_obj_set_y(ui->Console_M33.button_back, 4);
+    lv_obj_set_x(ui->Console_M33.button_back, 1190);
+    lv_obj_set_y(ui->Console_M33.button_back, 5);
 
     // Style: ui->Console_M33.button_back [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_color(ui->Console_M33.button_back, lv_color_hex(0x1A2435), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -73,11 +73,11 @@ void setup_Console_M33(gg_ui_t * ui)
 
     // Create textarea: ui->Console_M33.ta_log
     ui->Console_M33.ta_log = lv_textarea_create(ui->Console_M33.screen);
-    lv_obj_set_width(ui->Console_M33.ta_log, 1024);
-    lv_obj_set_height(ui->Console_M33.ta_log, 534);
+    lv_obj_set_width(ui->Console_M33.ta_log, 1280);
+    lv_obj_set_height(ui->Console_M33.ta_log, 712);
     lv_obj_set_align(ui->Console_M33.ta_log, LV_ALIGN_TOP_LEFT);
     lv_obj_set_x(ui->Console_M33.ta_log, 0);
-    lv_obj_set_y(ui->Console_M33.ta_log, 65);
+    lv_obj_set_y(ui->Console_M33.ta_log, 87);
     lv_obj_add_flag(ui->Console_M33.ta_log, LV_OBJ_FLAG_CLICKABLE);
 
     lv_textarea_set_text(ui->Console_M33.ta_log, "Cortex-M33: ");
@@ -99,7 +99,7 @@ void setup_Console_M33(gg_ui_t * ui)
     lv_obj_set_height(ui->Console_M33.label_title, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Console_M33.label_title, LV_ALIGN_TOP_MID);
     lv_obj_set_x(ui->Console_M33.label_title, 0);
-    lv_obj_set_y(ui->Console_M33.label_title, 10);
+    lv_obj_set_y(ui->Console_M33.label_title, 13);
     lv_label_set_text(ui->Console_M33.label_title, "M-Core Runtime Logs");
 
     // Style: ui->Console_M33.label_title [LV_PART_MAIN|LV_STATE_DEFAULT]

@@ -49,8 +49,8 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_width(ui->CpuInfo.label_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->CpuInfo.label_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->CpuInfo.label_coreM33, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.label_coreM33, 542);
-    lv_obj_set_y(ui->CpuInfo.label_coreM33, 91);
+    lv_obj_set_x(ui->CpuInfo.label_coreM33, 678);
+    lv_obj_set_y(ui->CpuInfo.label_coreM33, 121);
     lv_label_set_text(ui->CpuInfo.label_coreM33, "Cortex-M33");
 
     // Style: ui->CpuInfo.label_coreM33 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -59,11 +59,11 @@ void setup_CpuInfo(gg_ui_t * ui)
 
     // Create image: ui->CpuInfo.img_coreM33_icon
     ui->CpuInfo.img_coreM33_icon = lv_image_create(ui->CpuInfo.screen);
-    lv_obj_set_width(ui->CpuInfo.img_coreM33_icon, 44);
-    lv_obj_set_height(ui->CpuInfo.img_coreM33_icon, 48);
+    lv_obj_set_width(ui->CpuInfo.img_coreM33_icon, 55);
+    lv_obj_set_height(ui->CpuInfo.img_coreM33_icon, 64);
     lv_obj_set_align(ui->CpuInfo.img_coreM33_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.img_coreM33_icon, 714);
-    lv_obj_set_y(ui->CpuInfo.img_coreM33_icon, 84);
+    lv_obj_set_x(ui->CpuInfo.img_coreM33_icon, 893);
+    lv_obj_set_y(ui->CpuInfo.img_coreM33_icon, 112);
     lv_image_set_src(ui->CpuInfo.img_coreM33_icon, &cortexM_44x48_ARGB8888);
 
     // Style: ui->CpuInfo.img_coreM33_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -72,11 +72,11 @@ void setup_CpuInfo(gg_ui_t * ui)
 
     // Create image: ui->CpuInfo.img_coreA1_icon
     ui->CpuInfo.img_coreA1_icon = lv_image_create(ui->CpuInfo.screen);
-    lv_obj_set_width(ui->CpuInfo.img_coreA1_icon, 44);
-    lv_obj_set_height(ui->CpuInfo.img_coreA1_icon, 48);
+    lv_obj_set_width(ui->CpuInfo.img_coreA1_icon, 55);
+    lv_obj_set_height(ui->CpuInfo.img_coreA1_icon, 64);
     lv_obj_set_align(ui->CpuInfo.img_coreA1_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.img_coreA1_icon, 240);
-    lv_obj_set_y(ui->CpuInfo.img_coreA1_icon, 84);
+    lv_obj_set_x(ui->CpuInfo.img_coreA1_icon, 300);
+    lv_obj_set_y(ui->CpuInfo.img_coreA1_icon, 112);
     lv_image_set_src(ui->CpuInfo.img_coreA1_icon, &cortexA_44x48_ARGB8888);
 
     // Style: ui->CpuInfo.img_coreA1_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -88,8 +88,8 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_width(ui->CpuInfo.label_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->CpuInfo.label_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->CpuInfo.label_coreA1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.label_coreA1, 49);
-    lv_obj_set_y(ui->CpuInfo.label_coreA1, 91);
+    lv_obj_set_x(ui->CpuInfo.label_coreA1, 61);
+    lv_obj_set_y(ui->CpuInfo.label_coreA1, 121);
     lv_label_set_text(ui->CpuInfo.label_coreA1, "Cortex-A55-1");
 
     // Style: ui->CpuInfo.label_coreA1 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -98,11 +98,11 @@ void setup_CpuInfo(gg_ui_t * ui)
 
     // Create button: ui->CpuInfo.button_back
     ui->CpuInfo.button_back = lv_button_create(ui->CpuInfo.screen);
-    lv_obj_set_width(ui->CpuInfo.button_back, 50);
-    lv_obj_set_height(ui->CpuInfo.button_back, 50);
+    lv_obj_set_width(ui->CpuInfo.button_back, 63);
+    lv_obj_set_height(ui->CpuInfo.button_back, 67);
     lv_obj_set_align(ui->CpuInfo.button_back, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.button_back, 952);
-    lv_obj_set_y(ui->CpuInfo.button_back, 4);
+    lv_obj_set_x(ui->CpuInfo.button_back, 1190);
+    lv_obj_set_y(ui->CpuInfo.button_back, 5);
 
     // Style: ui->CpuInfo.button_back [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_color(ui->CpuInfo.button_back, lv_color_hex(0x1A2435), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -137,7 +137,7 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_height(ui->CpuInfo.title, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->CpuInfo.title, LV_ALIGN_TOP_MID);
     lv_obj_set_x(ui->CpuInfo.title, 0);
-    lv_obj_set_y(ui->CpuInfo.title, 10);
+    lv_obj_set_y(ui->CpuInfo.title, 13);
     lv_label_set_text(ui->CpuInfo.title, "CPU Information");
 
     // Style: ui->CpuInfo.title [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -149,8 +149,8 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_width(ui->CpuInfo.table_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->CpuInfo.table_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->CpuInfo.table_coreA1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.table_coreA1, 30);
-    lv_obj_set_y(ui->CpuInfo.table_coreA1, 150);
+    lv_obj_set_x(ui->CpuInfo.table_coreA1, 38);
+    lv_obj_set_y(ui->CpuInfo.table_coreA1, 200);
     lv_table_set_row_count(ui->CpuInfo.table_coreA1, 7);
     lv_table_set_column_count(ui->CpuInfo.table_coreA1, 2);
     lv_table_set_column_width(ui->CpuInfo.table_coreA1, 0, 230);
@@ -189,8 +189,8 @@ void setup_CpuInfo(gg_ui_t * ui)
     lv_obj_set_width(ui->CpuInfo.table_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->CpuInfo.table_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->CpuInfo.table_coreM33, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->CpuInfo.table_coreM33, 525);
-    lv_obj_set_y(ui->CpuInfo.table_coreM33, 150);
+    lv_obj_set_x(ui->CpuInfo.table_coreM33, 656);
+    lv_obj_set_y(ui->CpuInfo.table_coreM33, 200);
     lv_table_set_row_count(ui->CpuInfo.table_coreM33, 7);
     lv_table_set_column_count(ui->CpuInfo.table_coreM33, 2);
     lv_table_set_column_width(ui->CpuInfo.table_coreM33, 0, 230);

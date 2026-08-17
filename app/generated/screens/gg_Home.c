@@ -42,26 +42,13 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_style_text_color(ui->Home.screen, lv_color_hex(0x0E1624), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui->Home.screen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // GUI-Guider v2 exported this screen at 1280x800. The Lino panel is
-    // 1024x600. Force the root screen to the export canvas size and scale
-    // each axis independently to fill the panel:
-    //   X: 1024/1280 = 0.80 = 205/256
-    //   Y: 600/800  = 0.75 = 192/256
-    // Non-uniform scaling distorts aspect ratio slightly; acceptable trade
-    // to avoid regenerating the whole UI at native resolution.
-    lv_obj_set_size(ui->Home.screen, 1280, 800);
-    lv_obj_set_style_transform_pivot_x(ui->Home.screen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_transform_pivot_y(ui->Home.screen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    // lv_obj_set_style_transform_scale_x(ui->Home.screen, 205, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_transform_scale_y(ui->Home.screen, 242, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     // Create container: ui->Home.container_cortexM33
     ui->Home.container_cortexM33 = lv_obj_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.container_cortexM33, 383);
-    lv_obj_set_height(ui->Home.container_cortexM33, 370);
+    lv_obj_set_width(ui->Home.container_cortexM33, 479);
+    lv_obj_set_height(ui->Home.container_cortexM33, 493);
     lv_obj_set_align(ui->Home.container_cortexM33, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33, 629);
-    lv_obj_set_y(ui->Home.container_cortexM33, 223);
+    lv_obj_set_x(ui->Home.container_cortexM33, 786);
+    lv_obj_set_y(ui->Home.container_cortexM33, 297);
 
     lv_obj_remove_flag(ui->Home.container_cortexM33,
                        LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_PRESS_LOCK);
@@ -78,11 +65,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create button: ui->Home.container_cortexM33_coreM33_LT
     ui->Home.container_cortexM33_coreM33_LT = lv_button_create(ui->Home.container_cortexM33);
-    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_LT, 48);
-    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_LT, 48);
+    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_LT, 60);
+    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_LT, 64);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_LT, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_LT, 165);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_LT, 29);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_LT, 206);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_LT, 39);
 
     // Style: ui->Home.container_cortexM33_coreM33_LT [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_image_src(ui->Home.container_cortexM33_coreM33_LT, &performance_48x48_ARGB8888,
@@ -94,11 +81,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexM33_coreM33_icon
     ui->Home.container_cortexM33_coreM33_icon = lv_image_create(ui->Home.container_cortexM33);
-    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_icon, 48);
-    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_icon, 48);
+    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_icon, 60);
+    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_icon, 64);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_icon, 231);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_icon, 29);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_icon, 289);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_icon, 39);
     lv_image_set_src(ui->Home.container_cortexM33_coreM33_icon, &cortexM_48x48_ARGB8888);
 
     // Style: ui->Home.container_cortexM33_coreM33_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -111,8 +98,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_coreM33_os, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_coreM33_os, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_os, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_os, 47);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_os, 45);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_os, 59);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_os, 60);
     lv_label_set_text(ui->Home.container_cortexM33_coreM33_os, "RTOS");
 
     // Style: ui->Home.container_cortexM33_coreM33_os [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -124,8 +111,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_label_coreM33_os, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_label_coreM33_os, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_label_coreM33_os, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_label_coreM33_os, 9);
-    lv_obj_set_y(ui->Home.container_cortexM33_label_coreM33_os, 45);
+    lv_obj_set_x(ui->Home.container_cortexM33_label_coreM33_os, 11);
+    lv_obj_set_y(ui->Home.container_cortexM33_label_coreM33_os, 60);
     lv_label_set_text(ui->Home.container_cortexM33_label_coreM33_os, "OS:");
 
     // Style: ui->Home.container_cortexM33_label_coreM33_os [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -137,8 +124,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_coreM33_status, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_coreM33_status, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_status, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_status, 66);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_status, 69);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_status, 83);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_status, 92);
     lv_label_set_text(ui->Home.container_cortexM33_coreM33_status, "Pending");
 
     // Style: ui->Home.container_cortexM33_coreM33_status [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -150,8 +137,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_title_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_title_coreM33, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_title_coreM33, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_title_coreM33, 5);
-    lv_obj_set_y(ui->Home.container_cortexM33_title_coreM33, 12);
+    lv_obj_set_x(ui->Home.container_cortexM33_title_coreM33, 6);
+    lv_obj_set_y(ui->Home.container_cortexM33_title_coreM33, 16);
     lv_label_set_text(ui->Home.container_cortexM33_title_coreM33, "Cortex M33");
 
     // Style: ui->Home.container_cortexM33_title_coreM33 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -165,8 +152,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_label_coreM33_status, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_label_coreM33_status, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_label_coreM33_status, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_label_coreM33_status, 9);
-    lv_obj_set_y(ui->Home.container_cortexM33_label_coreM33_status, 69);
+    lv_obj_set_x(ui->Home.container_cortexM33_label_coreM33_status, 11);
+    lv_obj_set_y(ui->Home.container_cortexM33_label_coreM33_status, 92);
     lv_label_set_text(ui->Home.container_cortexM33_label_coreM33_status, "Status:");
 
     // Style: ui->Home.container_cortexM33_label_coreM33_status [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -178,8 +165,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexM33_coreM33_app, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexM33_coreM33_app, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_app, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_app, 9);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_app, 97);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_app, 11);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_app, 129);
     lv_label_set_text(ui->Home.container_cortexM33_coreM33_app, "RT-Latency of Zephyr");
 
     // Style: ui->Home.container_cortexM33_coreM33_app [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -188,11 +175,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexM33_coreM33_run
     ui->Home.container_cortexM33_coreM33_run = lv_image_create(ui->Home.container_cortexM33);
-    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_run, 48);
-    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_run, 48);
+    lv_obj_set_width(ui->Home.container_cortexM33_coreM33_run, 60);
+    lv_obj_set_height(ui->Home.container_cortexM33_coreM33_run, 64);
     lv_obj_set_align(ui->Home.container_cortexM33_coreM33_run, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_run, 301);
-    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_run, 29);
+    lv_obj_set_x(ui->Home.container_cortexM33_coreM33_run, 376);
+    lv_obj_set_y(ui->Home.container_cortexM33_coreM33_run, 39);
     lv_image_set_src(ui->Home.container_cortexM33_coreM33_run, &refresh_48x48_ARGB8888);
     lv_image_set_pivot_x(ui->Home.container_cortexM33_coreM33_run, 24);
     lv_image_set_pivot_y(ui->Home.container_cortexM33_coreM33_run, 24);
@@ -204,11 +191,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create textarea: ui->Home.container_cortexM33_ta_coreM33_log
     ui->Home.container_cortexM33_ta_coreM33_log = lv_textarea_create(ui->Home.container_cortexM33);
-    lv_obj_set_width(ui->Home.container_cortexM33_ta_coreM33_log, 368);
-    lv_obj_set_height(ui->Home.container_cortexM33_ta_coreM33_log, 232);
+    lv_obj_set_width(ui->Home.container_cortexM33_ta_coreM33_log, 460);
+    lv_obj_set_height(ui->Home.container_cortexM33_ta_coreM33_log, 309);
     lv_obj_set_align(ui->Home.container_cortexM33_ta_coreM33_log, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexM33_ta_coreM33_log, 5);
-    lv_obj_set_y(ui->Home.container_cortexM33_ta_coreM33_log, 127);
+    lv_obj_set_x(ui->Home.container_cortexM33_ta_coreM33_log, 6);
+    lv_obj_set_y(ui->Home.container_cortexM33_ta_coreM33_log, 169);
 
     lv_obj_remove_flag(ui->Home.container_cortexM33_ta_coreM33_log, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_textarea_set_text(ui->Home.container_cortexM33_ta_coreM33_log, "Cortex-M33: ");
@@ -225,11 +212,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create container: ui->Home.container_cortexA1
     ui->Home.container_cortexA1 = lv_obj_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.container_cortexA1, 383);
-    lv_obj_set_height(ui->Home.container_cortexA1, 370);
+    lv_obj_set_width(ui->Home.container_cortexA1, 479);
+    lv_obj_set_height(ui->Home.container_cortexA1, 493);
     lv_obj_set_align(ui->Home.container_cortexA1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1, 230);
-    lv_obj_set_y(ui->Home.container_cortexA1, 223);
+    lv_obj_set_x(ui->Home.container_cortexA1, 288);
+    lv_obj_set_y(ui->Home.container_cortexA1, 297);
     lv_obj_add_flag(ui->Home.container_cortexA1, LV_OBJ_FLAG_CLICKABLE);
 
     // Style: ui->Home.container_cortexA1 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -244,11 +231,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create button: ui->Home.container_cortexA1_coreA1_LT
     ui->Home.container_cortexA1_coreA1_LT = lv_button_create(ui->Home.container_cortexA1);
-    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_LT, 48);
-    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_LT, 48);
+    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_LT, 60);
+    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_LT, 64);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_LT, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_LT, 178);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_LT, 28);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_LT, 223);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_LT, 37);
 
     // Style: ui->Home.container_cortexA1_coreA1_LT [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_image_src(ui->Home.container_cortexA1_coreA1_LT, &performance_48x48_ARGB8888,
@@ -260,11 +247,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexA1_coreA1_icon
     ui->Home.container_cortexA1_coreA1_icon = lv_image_create(ui->Home.container_cortexA1);
-    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_icon, 48);
-    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_icon, 48);
+    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_icon, 60);
+    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_icon, 64);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_icon, 243);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_icon, 28);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_icon, 304);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_icon, 37);
     lv_image_set_src(ui->Home.container_cortexA1_coreA1_icon, &cortexA_48x48_ARGB8888);
 
     // Style: ui->Home.container_cortexA1_coreA1_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -277,8 +264,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_coreA1_os, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_coreA1_os, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_os, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_os, 47);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_os, 45);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_os, 59);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_os, 60);
     lv_label_set_text(ui->Home.container_cortexA1_coreA1_os, "RTOS");
 
     // Style: ui->Home.container_cortexA1_coreA1_os [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -290,8 +277,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_label_coreA1_os, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_label_coreA1_os, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_label_coreA1_os, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_label_coreA1_os, 9);
-    lv_obj_set_y(ui->Home.container_cortexA1_label_coreA1_os, 45);
+    lv_obj_set_x(ui->Home.container_cortexA1_label_coreA1_os, 11);
+    lv_obj_set_y(ui->Home.container_cortexA1_label_coreA1_os, 60);
     lv_label_set_text(ui->Home.container_cortexA1_label_coreA1_os, "OS:");
 
     // Style: ui->Home.container_cortexA1_label_coreA1_os [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -303,8 +290,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_coreA1_status, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_coreA1_status, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_status, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_status, 66);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_status, 69);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_status, 83);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_status, 92);
     lv_label_set_text(ui->Home.container_cortexA1_coreA1_status, "Pending");
 
     // Style: ui->Home.container_cortexA1_coreA1_status [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -316,8 +303,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_title_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_title_coreA1, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_title_coreA1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_title_coreA1, 5);
-    lv_obj_set_y(ui->Home.container_cortexA1_title_coreA1, 12);
+    lv_obj_set_x(ui->Home.container_cortexA1_title_coreA1, 6);
+    lv_obj_set_y(ui->Home.container_cortexA1_title_coreA1, 16);
     lv_label_set_text(ui->Home.container_cortexA1_title_coreA1, "Cortex-A55-1");
 
     // Style: ui->Home.container_cortexA1_title_coreA1 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -331,8 +318,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_label_coreA1_status, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_label_coreA1_status, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_label_coreA1_status, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_label_coreA1_status, 9);
-    lv_obj_set_y(ui->Home.container_cortexA1_label_coreA1_status, 69);
+    lv_obj_set_x(ui->Home.container_cortexA1_label_coreA1_status, 11);
+    lv_obj_set_y(ui->Home.container_cortexA1_label_coreA1_status, 92);
     lv_label_set_text(ui->Home.container_cortexA1_label_coreA1_status, "Status:");
 
     // Style: ui->Home.container_cortexA1_label_coreA1_status [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -344,8 +331,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA1_coreA1_app, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA1_coreA1_app, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_app, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_app, 9);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_app, 97);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_app, 11);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_app, 129);
     lv_label_set_text(ui->Home.container_cortexA1_coreA1_app, "RT-Latency of Zephyr");
 
     // Style: ui->Home.container_cortexA1_coreA1_app [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -354,11 +341,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexA1_coreA1_run
     ui->Home.container_cortexA1_coreA1_run = lv_image_create(ui->Home.container_cortexA1);
-    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_run, 48);
-    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_run, 48);
+    lv_obj_set_width(ui->Home.container_cortexA1_coreA1_run, 60);
+    lv_obj_set_height(ui->Home.container_cortexA1_coreA1_run, 64);
     lv_obj_set_align(ui->Home.container_cortexA1_coreA1_run, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_run, 307);
-    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_run, 28);
+    lv_obj_set_x(ui->Home.container_cortexA1_coreA1_run, 384);
+    lv_obj_set_y(ui->Home.container_cortexA1_coreA1_run, 37);
     lv_image_set_src(ui->Home.container_cortexA1_coreA1_run, &refresh_48x48_ARGB8888);
     lv_image_set_pivot_x(ui->Home.container_cortexA1_coreA1_run, 24);
     lv_image_set_pivot_y(ui->Home.container_cortexA1_coreA1_run, 24);
@@ -370,11 +357,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create textarea: ui->Home.container_cortexA1_ta_coreA1_log
     ui->Home.container_cortexA1_ta_coreA1_log = lv_textarea_create(ui->Home.container_cortexA1);
-    lv_obj_set_width(ui->Home.container_cortexA1_ta_coreA1_log, 368);
-    lv_obj_set_height(ui->Home.container_cortexA1_ta_coreA1_log, 232);
+    lv_obj_set_width(ui->Home.container_cortexA1_ta_coreA1_log, 460);
+    lv_obj_set_height(ui->Home.container_cortexA1_ta_coreA1_log, 309);
     lv_obj_set_align(ui->Home.container_cortexA1_ta_coreA1_log, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA1_ta_coreA1_log, 3);
-    lv_obj_set_y(ui->Home.container_cortexA1_ta_coreA1_log, 125);
+    lv_obj_set_x(ui->Home.container_cortexA1_ta_coreA1_log, 4);
+    lv_obj_set_y(ui->Home.container_cortexA1_ta_coreA1_log, 167);
 
     lv_obj_remove_flag(ui->Home.container_cortexA1_ta_coreA1_log, LV_OBJ_FLAG_CLICK_FOCUSABLE);
     lv_textarea_set_text(ui->Home.container_cortexA1_ta_coreA1_log, "Cortex-A55-1:  ");
@@ -391,11 +378,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create container: ui->Home.container_cortexA0
     ui->Home.container_cortexA0 = lv_obj_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.container_cortexA0, 211);
-    lv_obj_set_height(ui->Home.container_cortexA0, 370);
+    lv_obj_set_width(ui->Home.container_cortexA0, 264);
+    lv_obj_set_height(ui->Home.container_cortexA0, 493);
     lv_obj_set_align(ui->Home.container_cortexA0, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0, 4);
-    lv_obj_set_y(ui->Home.container_cortexA0, 223);
+    lv_obj_set_x(ui->Home.container_cortexA0, 5);
+    lv_obj_set_y(ui->Home.container_cortexA0, 297);
 
     // Style: ui->Home.container_cortexA0 [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_pad_top(ui->Home.container_cortexA0, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -410,8 +397,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_MPE, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_MPE, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_MPE, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_MPE, 7);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_MPE, 137);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_MPE, 9);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_MPE, 183);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_MPE, "MPE with NEON: support");
 
     // Style: ui->Home.container_cortexA0_coreA0_MPE [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -423,8 +410,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_Architecture, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_Architecture, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_Architecture, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_Architecture, 8);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_Architecture, 229);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_Architecture, 10);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_Architecture, 305);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_Architecture, "Architecture: Arm 64bit");
 
     // Style: ui->Home.container_cortexA0_coreA0_Architecture [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -436,8 +423,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_FPU, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_FPU, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_FPU, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_FPU, 7);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_FPU, 198);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_FPU, 9);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_FPU, 264);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_FPU, "FPU: VFPv4-D16");
 
     // Style: ui->Home.container_cortexA0_coreA0_FPU [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -449,8 +436,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_os, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_os, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_os, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_os, 8);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_os, 50);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_os, 10);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_os, 67);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_os, "OS:  TorizonOS ");
 
     // Style: ui->Home.container_cortexA0_coreA0_os [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -462,8 +449,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_status_value, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_status_value, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_status_value, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_status_value, 64);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_status_value, 79);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_status_value, 80);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_status_value, 105);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_status_value, "Running");
 
     // Style: ui->Home.container_cortexA0_coreA0_status_value [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -472,11 +459,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexA0_img_Logo
     ui->Home.container_cortexA0_img_Logo = lv_image_create(ui->Home.container_cortexA0);
-    lv_obj_set_width(ui->Home.container_cortexA0_img_Logo, 52);
-    lv_obj_set_height(ui->Home.container_cortexA0_img_Logo, 53);
+    lv_obj_set_width(ui->Home.container_cortexA0_img_Logo, 65);
+    lv_obj_set_height(ui->Home.container_cortexA0_img_Logo, 71);
     lv_obj_set_align(ui->Home.container_cortexA0_img_Logo, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_img_Logo, 145);
-    lv_obj_set_y(ui->Home.container_cortexA0_img_Logo, 30);
+    lv_obj_set_x(ui->Home.container_cortexA0_img_Logo, 181);
+    lv_obj_set_y(ui->Home.container_cortexA0_img_Logo, 40);
     lv_image_set_src(ui->Home.container_cortexA0_img_Logo, &cortexA_52x53_ARGB8888);
 
     // Style: ui->Home.container_cortexA0_img_Logo [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -490,8 +477,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_title_coreA0, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_title_coreA0, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_title_coreA0, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_title_coreA0, 2);
-    lv_obj_set_y(ui->Home.container_cortexA0_title_coreA0, 12);
+    lv_obj_set_x(ui->Home.container_cortexA0_title_coreA0, 3);
+    lv_obj_set_y(ui->Home.container_cortexA0_title_coreA0, 16);
     lv_label_set_text(ui->Home.container_cortexA0_title_coreA0, "Cortex-A55-0");
 
     // Style: ui->Home.container_cortexA0_title_coreA0 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -505,8 +492,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_Frequency, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_Frequency, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_Frequency, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_Frequency, 9);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_Frequency, 107);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_Frequency, 11);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_Frequency, 143);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_Frequency, "Frequency: 1.7GHz  ");
 
     // Style: ui->Home.container_cortexA0_coreA0_Frequency [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -518,8 +505,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_status, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_status, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_status, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_status, 8);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_status, 78);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_status, 10);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_status, 104);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_status, "Status:");
 
     // Style: ui->Home.container_cortexA0_coreA0_status [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -531,8 +518,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_cortexA0_coreA0_L1, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_cortexA0_coreA0_L1, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_cortexA0_coreA0_L1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_L1, 7);
-    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_L1, 168);
+    lv_obj_set_x(ui->Home.container_cortexA0_coreA0_L1, 9);
+    lv_obj_set_y(ui->Home.container_cortexA0_coreA0_L1, 224);
     lv_label_set_text(ui->Home.container_cortexA0_coreA0_L1, "L1-I Cache: 32KB");
 
     // Style: ui->Home.container_cortexA0_coreA0_L1 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -541,11 +528,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_cortexA0_image_1
     ui->Home.container_cortexA0_image_1 = lv_image_create(ui->Home.container_cortexA0);
-    lv_obj_set_width(ui->Home.container_cortexA0_image_1, 188);
-    lv_obj_set_height(ui->Home.container_cortexA0_image_1, 72);
+    lv_obj_set_width(ui->Home.container_cortexA0_image_1, 235);
+    lv_obj_set_height(ui->Home.container_cortexA0_image_1, 96);
     lv_obj_set_align(ui->Home.container_cortexA0_image_1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_cortexA0_image_1, -4);
-    lv_obj_set_y(ui->Home.container_cortexA0_image_1, 245);
+    lv_obj_set_x(ui->Home.container_cortexA0_image_1, -5);
+    lv_obj_set_y(ui->Home.container_cortexA0_image_1, 327);
     lv_image_set_src(ui->Home.container_cortexA0_image_1, &TorizonOS_Regular_188x72_RGB565A8);
 
     // Create label: ui->Home.app_name
@@ -553,8 +540,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.app_name, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.app_name, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.app_name, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.app_name, 15);
-    lv_obj_set_y(ui->Home.app_name, 186);
+    lv_obj_set_x(ui->Home.app_name, 19);
+    lv_obj_set_y(ui->Home.app_name, 248);
     lv_label_set_text(ui->Home.app_name, "Real-Time Application");
 
     // Style: ui->Home.app_name [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -565,17 +552,17 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.label_cpu_info, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.label_cpu_info, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.label_cpu_info, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.label_cpu_info, 659);
-    lv_obj_set_y(ui->Home.label_cpu_info, 164);
+    lv_obj_set_x(ui->Home.label_cpu_info, 824);
+    lv_obj_set_y(ui->Home.label_cpu_info, 219);
     lv_label_set_text(ui->Home.label_cpu_info, "CPU info");
 
     // Create button: ui->Home.btn_cpu_info
     ui->Home.btn_cpu_info = lv_button_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.btn_cpu_info, 87);
-    lv_obj_set_height(ui->Home.btn_cpu_info, 57);
+    lv_obj_set_width(ui->Home.btn_cpu_info, 109);
+    lv_obj_set_height(ui->Home.btn_cpu_info, 76);
     lv_obj_set_align(ui->Home.btn_cpu_info, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.btn_cpu_info, 650);
-    lv_obj_set_y(ui->Home.btn_cpu_info, 95);
+    lv_obj_set_x(ui->Home.btn_cpu_info, 813);
+    lv_obj_set_y(ui->Home.btn_cpu_info, 127);
     lv_obj_add_flag(ui->Home.btn_cpu_info, LV_OBJ_FLAG_CLICKABLE);
 
     // Style: ui->Home.btn_cpu_info [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -584,8 +571,8 @@ void setup_Home(gg_ui_t * ui)
 
     // Create label: ui->Home.btn_cpu_info_label_cpu_info_icon
     ui->Home.btn_cpu_info_label_cpu_info_icon = lv_label_create(ui->Home.btn_cpu_info);
-    lv_obj_set_width(ui->Home.btn_cpu_info_label_cpu_info_icon, 51);
-    lv_obj_set_height(ui->Home.btn_cpu_info_label_cpu_info_icon, 30);
+    lv_obj_set_width(ui->Home.btn_cpu_info_label_cpu_info_icon, 64);
+    lv_obj_set_height(ui->Home.btn_cpu_info_label_cpu_info_icon, 40);
     lv_obj_set_align(ui->Home.btn_cpu_info_label_cpu_info_icon, LV_ALIGN_CENTER);
     lv_obj_set_x(ui->Home.btn_cpu_info_label_cpu_info_icon, 0);
     lv_obj_set_y(ui->Home.btn_cpu_info_label_cpu_info_icon, 0);
@@ -600,17 +587,17 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.label_stop, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.label_stop, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.label_stop, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.label_stop, 923);
-    lv_obj_set_y(ui->Home.label_stop, 164);
+    lv_obj_set_x(ui->Home.label_stop, 1154);
+    lv_obj_set_y(ui->Home.label_stop, 219);
     lv_label_set_text(ui->Home.label_stop, "STOP");
 
     // Create button: ui->Home.btn_stop
     ui->Home.btn_stop = lv_button_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.btn_stop, 77);
-    lv_obj_set_height(ui->Home.btn_stop, 57);
+    lv_obj_set_width(ui->Home.btn_stop, 96);
+    lv_obj_set_height(ui->Home.btn_stop, 76);
     lv_obj_set_align(ui->Home.btn_stop, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.btn_stop, 903);
-    lv_obj_set_y(ui->Home.btn_stop, 95);
+    lv_obj_set_x(ui->Home.btn_stop, 1129);
+    lv_obj_set_y(ui->Home.btn_stop, 127);
     lv_obj_add_flag(ui->Home.btn_stop, LV_OBJ_FLAG_CLICKABLE);
 
     // Style: ui->Home.btn_stop [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -619,8 +606,8 @@ void setup_Home(gg_ui_t * ui)
 
     // Create label: ui->Home.btn_stop_label_stop_icon
     ui->Home.btn_stop_label_stop_icon = lv_label_create(ui->Home.btn_stop);
-    lv_obj_set_width(ui->Home.btn_stop_label_stop_icon, 42);
-    lv_obj_set_height(ui->Home.btn_stop_label_stop_icon, 42);
+    lv_obj_set_width(ui->Home.btn_stop_label_stop_icon, 53);
+    lv_obj_set_height(ui->Home.btn_stop_label_stop_icon, 56);
     lv_obj_set_align(ui->Home.btn_stop_label_stop_icon, LV_ALIGN_CENTER);
     lv_obj_set_x(ui->Home.btn_stop_label_stop_icon, 0);
     lv_obj_set_y(ui->Home.btn_stop_label_stop_icon, 0);
@@ -636,7 +623,7 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_height(ui->Home.title_name, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.title_name, LV_ALIGN_TOP_MID);
     lv_obj_set_x(ui->Home.title_name, 0);
-    lv_obj_set_y(ui->Home.title_name, 10);
+    lv_obj_set_y(ui->Home.title_name, 13);
     lv_label_set_text(ui->Home.title_name, "Heterogeneous Multicore Control and Monitor");
 
     // Style: ui->Home.title_name [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -648,8 +635,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.board_name, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.board_name, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.board_name, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.board_name, 13);
-    lv_obj_set_y(ui->Home.board_name, 88);
+    lv_obj_set_x(ui->Home.board_name, 16);
+    lv_obj_set_y(ui->Home.board_name, 117);
     lv_label_set_text(ui->Home.board_name, "i.MX93-FRDM");
 
     // Style: ui->Home.board_name [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -657,11 +644,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create container: ui->Home.container_1
     ui->Home.container_1 = lv_obj_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.container_1, 487);
-    lv_obj_set_height(ui->Home.container_1, 110);
+    lv_obj_set_width(ui->Home.container_1, 609);
+    lv_obj_set_height(ui->Home.container_1, 147);
     lv_obj_set_align(ui->Home.container_1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1, 119);
-    lv_obj_set_y(ui->Home.container_1, 47);
+    lv_obj_set_x(ui->Home.container_1, 149);
+    lv_obj_set_y(ui->Home.container_1, 63);
 
     // Style: ui->Home.container_1 [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_pad_top(ui->Home.container_1, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -676,8 +663,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_1_label_core_A0, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_1_label_core_A0, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_1_label_core_A0, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1_label_core_A0, 29);
-    lv_obj_set_y(ui->Home.container_1_label_core_A0, 84);
+    lv_obj_set_x(ui->Home.container_1_label_core_A0, 36);
+    lv_obj_set_y(ui->Home.container_1_label_core_A0, 112);
     lv_label_set_text(ui->Home.container_1_label_core_A0, "Cortex-A55-0");
 
     // Style: ui->Home.container_1_label_core_A0 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -686,11 +673,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_1_core_m33_icon
     ui->Home.container_1_core_m33_icon = lv_image_create(ui->Home.container_1);
-    lv_obj_set_width(ui->Home.container_1_core_m33_icon, 64);
-    lv_obj_set_height(ui->Home.container_1_core_m33_icon, 63);
+    lv_obj_set_width(ui->Home.container_1_core_m33_icon, 80);
+    lv_obj_set_height(ui->Home.container_1_core_m33_icon, 84);
     lv_obj_set_align(ui->Home.container_1_core_m33_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1_core_m33_icon, 359);
-    lv_obj_set_y(ui->Home.container_1_core_m33_icon, 13);
+    lv_obj_set_x(ui->Home.container_1_core_m33_icon, 449);
+    lv_obj_set_y(ui->Home.container_1_core_m33_icon, 17);
     lv_obj_add_flag(ui->Home.container_1_core_m33_icon, LV_OBJ_FLAG_CLICKABLE);
 
     lv_image_set_src(ui->Home.container_1_core_m33_icon, &cortexM_64x63_ARGB8888);
@@ -702,11 +689,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_1_core_A0_icon
     ui->Home.container_1_core_A0_icon = lv_image_create(ui->Home.container_1);
-    lv_obj_set_width(ui->Home.container_1_core_A0_icon, 64);
-    lv_obj_set_height(ui->Home.container_1_core_A0_icon, 63);
+    lv_obj_set_width(ui->Home.container_1_core_A0_icon, 80);
+    lv_obj_set_height(ui->Home.container_1_core_A0_icon, 84);
     lv_obj_set_align(ui->Home.container_1_core_A0_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1_core_A0_icon, 52);
-    lv_obj_set_y(ui->Home.container_1_core_A0_icon, 13);
+    lv_obj_set_x(ui->Home.container_1_core_A0_icon, 65);
+    lv_obj_set_y(ui->Home.container_1_core_A0_icon, 17);
     lv_image_set_src(ui->Home.container_1_core_A0_icon, &cortexA_64x63_ARGB8888);
 
     // Style: ui->Home.container_1_core_A0_icon [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -717,11 +704,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create image: ui->Home.container_1_core_A1_icon
     ui->Home.container_1_core_A1_icon = lv_image_create(ui->Home.container_1);
-    lv_obj_set_width(ui->Home.container_1_core_A1_icon, 64);
-    lv_obj_set_height(ui->Home.container_1_core_A1_icon, 63);
+    lv_obj_set_width(ui->Home.container_1_core_A1_icon, 80);
+    lv_obj_set_height(ui->Home.container_1_core_A1_icon, 84);
     lv_obj_set_align(ui->Home.container_1_core_A1_icon, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1_core_A1_icon, 205);
-    lv_obj_set_y(ui->Home.container_1_core_A1_icon, 12);
+    lv_obj_set_x(ui->Home.container_1_core_A1_icon, 256);
+    lv_obj_set_y(ui->Home.container_1_core_A1_icon, 16);
     lv_obj_add_flag(ui->Home.container_1_core_A1_icon, LV_OBJ_FLAG_CLICKABLE);
 
     lv_image_set_src(ui->Home.container_1_core_A1_icon, &cortexA_64x63_ARGB8888);
@@ -733,11 +720,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create container: ui->Home.container_1_container_radio
     ui->Home.container_1_container_radio = lv_obj_create(ui->Home.container_1);
-    lv_obj_set_width(ui->Home.container_1_container_radio, 294);
-    lv_obj_set_height(ui->Home.container_1_container_radio, 40);
+    lv_obj_set_width(ui->Home.container_1_container_radio, 368);
+    lv_obj_set_height(ui->Home.container_1_container_radio, 53);
     lv_obj_set_align(ui->Home.container_1_container_radio, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_1_container_radio, 167);
-    lv_obj_set_y(ui->Home.container_1_container_radio, 61);
+    lv_obj_set_x(ui->Home.container_1_container_radio, 209);
+    lv_obj_set_y(ui->Home.container_1_container_radio, 81);
 
     // Style: ui->Home.container_1_container_radio [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_opa(ui->Home.container_1_container_radio, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -758,8 +745,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_radio_cb_core_A1, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_radio_cb_core_A1, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_radio_cb_core_A1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_radio_cb_core_A1, 17);
-    lv_obj_set_y(ui->Home.container_radio_cb_core_A1, 19);
+    lv_obj_set_x(ui->Home.container_radio_cb_core_A1, 21);
+    lv_obj_set_y(ui->Home.container_radio_cb_core_A1, 25);
     lv_checkbox_set_text(ui->Home.container_radio_cb_core_A1, "Cortex-A55-1");
 
     // Style: ui->Home.container_radio_cb_core_A1 [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -776,8 +763,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.container_radio_cb_core_m33, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.container_radio_cb_core_m33, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.container_radio_cb_core_m33, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.container_radio_cb_core_m33, 168);
-    lv_obj_set_y(ui->Home.container_radio_cb_core_m33, 19);
+    lv_obj_set_x(ui->Home.container_radio_cb_core_m33, 210);
+    lv_obj_set_y(ui->Home.container_radio_cb_core_m33, 25);
     lv_obj_add_flag(ui->Home.container_radio_cb_core_m33, LV_OBJ_FLAG_CLICKABLE);
 
     lv_checkbox_set_text(ui->Home.container_radio_cb_core_m33, "Cortex-M33");
@@ -793,11 +780,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Create button: ui->Home.btn_start
     ui->Home.btn_start = lv_button_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.btn_start, 87);
-    lv_obj_set_height(ui->Home.btn_start, 57);
+    lv_obj_set_width(ui->Home.btn_start, 109);
+    lv_obj_set_height(ui->Home.btn_start, 76);
     lv_obj_set_align(ui->Home.btn_start, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.btn_start, 779);
-    lv_obj_set_y(ui->Home.btn_start, 94);
+    lv_obj_set_x(ui->Home.btn_start, 974);
+    lv_obj_set_y(ui->Home.btn_start, 125);
 
     // Style: ui->Home.btn_start [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_color(ui->Home.btn_start, lv_color_hex(0x97C838), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -805,8 +792,8 @@ void setup_Home(gg_ui_t * ui)
 
     // Create label: ui->Home.btn_start_label_start_icon
     ui->Home.btn_start_label_start_icon = lv_label_create(ui->Home.btn_start);
-    lv_obj_set_width(ui->Home.btn_start_label_start_icon, 39);
-    lv_obj_set_height(ui->Home.btn_start_label_start_icon, 43);
+    lv_obj_set_width(ui->Home.btn_start_label_start_icon, 49);
+    lv_obj_set_height(ui->Home.btn_start_label_start_icon, 57);
     lv_obj_set_align(ui->Home.btn_start_label_start_icon, LV_ALIGN_CENTER);
     lv_obj_set_x(ui->Home.btn_start_label_start_icon, 0);
     lv_obj_set_y(ui->Home.btn_start_label_start_icon, 0);
@@ -821,17 +808,17 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_width(ui->Home.label_start, LV_SIZE_CONTENT);
     lv_obj_set_height(ui->Home.label_start, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.label_start, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.label_start, 797);
-    lv_obj_set_y(ui->Home.label_start, 163);
+    lv_obj_set_x(ui->Home.label_start, 996);
+    lv_obj_set_y(ui->Home.label_start, 217);
     lv_label_set_text(ui->Home.label_start, "START");
 
     // Create dropdown: ui->Home.ddlist_apps
     ui->Home.ddlist_apps = lv_dropdown_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.ddlist_apps, 422);
+    lv_obj_set_width(ui->Home.ddlist_apps, 528);
     lv_obj_set_height(ui->Home.ddlist_apps, LV_SIZE_CONTENT);
     lv_obj_set_align(ui->Home.ddlist_apps, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.ddlist_apps, 181);
-    lv_obj_set_y(ui->Home.ddlist_apps, 173);
+    lv_obj_set_x(ui->Home.ddlist_apps, 226);
+    lv_obj_set_y(ui->Home.ddlist_apps, 231);
     lv_dropdown_set_options(ui->Home.ddlist_apps, "RT Latency of Zephyr\nRT Latency of FreeRTOS\nApplication on Zephyr");
 
     // Style: ui->Home.ddlist_apps [LV_PART_MAIN|LV_STATE_DEFAULT]
@@ -849,11 +836,11 @@ void setup_Home(gg_ui_t * ui)
 
     // Toradex logo (bottom-left).
     ui->Home.image_1 = lv_image_create(ui->Home.screen);
-    lv_obj_set_width(ui->Home.image_1, 164);
-    lv_obj_set_height(ui->Home.image_1, 45);
+    lv_obj_set_width(ui->Home.image_1, 205);
+    lv_obj_set_height(ui->Home.image_1, 60);
     lv_obj_set_align(ui->Home.image_1, LV_ALIGN_TOP_LEFT);
-    lv_obj_set_x(ui->Home.image_1, 13);
-    lv_obj_set_y(ui->Home.image_1, 541);
+    lv_obj_set_x(ui->Home.image_1, 16);
+    lv_obj_set_y(ui->Home.image_1, 721);
     lv_image_set_src(ui->Home.image_1, &toradex_164x45);
 
     // Home custom code
