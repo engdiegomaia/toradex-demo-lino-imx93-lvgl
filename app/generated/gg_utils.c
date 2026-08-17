@@ -23,6 +23,11 @@
 
 #include "gg_utils.h"
 
+/* Hand-added: sizes each root screen to the panel resolution. Implementation
+ * lives in app/custom/screen_geometry.c — re-add this include and both
+ * screen_geometry_apply() calls after a GUI-Guider regeneration. */
+#include "screen_geometry.h"
+
 void setup_ui(gg_ui_t * ui)
 {
     // Setup layers and default screen
@@ -30,6 +35,7 @@ void setup_ui(gg_ui_t * ui)
     setup_layer_top(ui);
     setup_layer_bottom(ui);
     setup_Home(ui);
+    screen_geometry_apply(ui->Home.screen);
 
     // Load active screen
     lv_screen_load(ui->Home.screen);
@@ -49,6 +55,7 @@ void gg_load_screen_animation(gg_ui_t * ui, const gg_screen_load_cfg_t * cfg)
             return;
         }
     }
+    screen_geometry_apply(*cfg->scr);
     if(cfg->auto_del) {
         lv_obj_t * old_scr = lv_screen_active();
         lv_obj_t ** old_scr_ptr = lv_obj_get_user_data(old_scr);
