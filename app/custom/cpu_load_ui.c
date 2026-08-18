@@ -6,6 +6,7 @@
 
 #include "cpu_load_ui.h"
 
+#include "branding.h"
 #include "cpu_info.h"
 #include "cpu_load.h"
 
@@ -29,17 +30,20 @@ extern int cortexID;
 #define COLOR_RUNNING   0x22C55E
 #define COLOR_SELECTED  0x2563EB
 
-/* Home layout: container_cortexA0 (x=5 w=264) is hidden and the live panel takes
- * over its slot, stopping short of container_cortexM33 at x=786. */
-#define PANEL_X 5
-#define PANEL_W 762
+/* The panel keeps the 479 x 493 slot at (288, 297) GUI-Guider gave it:
+ * container_cortexA0 on its left is now the branding quadrant (branding.c) and
+ * container_cortexM33 on its right starts at x=786. With no free column left,
+ * the readouts go in a strip across the panel between the header and the log
+ * terminal, and the terminal moves down to make room for it. */
+#define READOUT_Y_CAPTION 170
+#define READOUT_Y_VALUE   191
+#define READOUT_X_TOTAL    12
+#define READOUT_X_APP     168
+#define READOUT_X_CLOCK   324
 
-/* The readout column sits right of ta_coreA1_log, which ends at x=464. */
-#define READOUT_X       484
-#define READOUT_Y_TOTAL 175
-#define READOUT_Y_APP   252
-#define READOUT_Y_CLOCK 329
-#define READOUT_DY      21   /* caption baseline to value baseline */
+/* ta_coreA1_log was 309 px tall at y=167; keep its bottom edge at 476. */
+#define LOG_Y 240
+#define LOG_H 236
 
 /* BenchMarking_A1 was a 0..6000 ns latency plot; it becomes 0..100 %.
  * 21 ticks over 0..100 puts a tick every 5, and a major every 4 ticks labels
@@ -93,10 +97,6 @@ static void update_clock_label(void)
 
 static void retire_a55_1_lane(gg_Home_t * home)
 {
-    /* The static spec panel is redundant once the live panel below carries the
-     * A55-0 identity. */
-    lv_obj_add_flag(home->container_cortexA0, LV_OBJ_FLAG_HIDDEN);
-
     /* Drop the A-core from the core selector: hidden checkbox, hidden duplicate
      * Cortex-A icon. Hiding does not renumber siblings, so radio_event_handler()
      * still maps the M33 checkbox (child index 1) to cortexID = 1. */
@@ -120,9 +120,6 @@ static void retire_a55_1_lane(gg_Home_t * home)
 
 static void build_a55_0_panel(gg_Home_t * home)
 {
-    lv_obj_set_x(home->container_cortexA1, PANEL_X);
-    lv_obj_set_width(home->container_cortexA1, PANEL_W);
-
     lv_label_set_text(home->container_cortexA1_title_coreA1, "Cortex-A55-0");
     lv_label_set_text(home->container_cortexA1_coreA1_os, "Torizon OS");
     lv_label_set_text(home->container_cortexA1_coreA1_app, "Linux + LVGL HMI");
@@ -145,19 +142,22 @@ static void build_a55_0_panel(gg_Home_t * home)
      * state left an animation attached. */
     gg_pause_anim(home->container_cortexA1_coreA1_run, anim_rotation_cb);
 
-    make_label(home->container_cortexA1, READOUT_X, READOUT_Y_TOTAL,
-               &lv_font_montserratMedium_15, COLOR_CAPTION, "A55-0 total load");
-    s_val_total = make_label(home->container_cortexA1, READOUT_X, READOUT_Y_TOTAL + READOUT_DY,
+    lv_obj_set_y(home->container_cortexA1_ta_coreA1_log, LOG_Y);
+    lv_obj_set_height(home->container_cortexA1_ta_coreA1_log, LOG_H);
+
+    make_label(home->container_cortexA1, READOUT_X_TOTAL, READOUT_Y_CAPTION,
+               &lv_font_montserratMedium_15, COLOR_CAPTION, "Total load");
+    s_val_total = make_label(home->container_cortexA1, READOUT_X_TOTAL, READOUT_Y_VALUE,
                              &lv_font_montserratMedium_30, COLOR_VALUE, "-- %");
 
-    make_label(home->container_cortexA1, READOUT_X, READOUT_Y_APP,
+    make_label(home->container_cortexA1, READOUT_X_APP, READOUT_Y_CAPTION,
                &lv_font_montserratMedium_15, COLOR_CAPTION, "This app (HMI)");
-    s_val_app = make_label(home->container_cortexA1, READOUT_X, READOUT_Y_APP + READOUT_DY,
+    s_val_app = make_label(home->container_cortexA1, READOUT_X_APP, READOUT_Y_VALUE,
                            &lv_font_montserratMedium_30, COLOR_VALUE, "-- %");
 
-    make_label(home->container_cortexA1, READOUT_X, READOUT_Y_CLOCK,
+    make_label(home->container_cortexA1, READOUT_X_CLOCK, READOUT_Y_CAPTION,
                &lv_font_montserratMedium_15, COLOR_CAPTION, "Core clock");
-    s_val_clock = make_label(home->container_cortexA1, READOUT_X, READOUT_Y_CLOCK + READOUT_DY,
+    s_val_clock = make_label(home->container_cortexA1, READOUT_X_CLOCK, READOUT_Y_VALUE + 6,
                              &lv_font_montserratMedium_20, COLOR_VALUE, "n/a");
 
     update_clock_label();
@@ -170,6 +170,7 @@ void cpu_load_ui_init(gg_ui_t * ui)
 
     retire_a55_1_lane(&ui->Home);
     build_a55_0_panel(&ui->Home);
+    branding_build_home(ui);
 
     s_home_ready = 1;
 }
