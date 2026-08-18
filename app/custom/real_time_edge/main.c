@@ -371,6 +371,54 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 	return 0;
 }
 
+/*
+ * Wait for the compositor socket before touching LVGL.
+ *
+ * lv_wayland_window_create() connects once and does not retry, so if Weston
+ * has not created its socket yet the app blocks forever with no display and
+ * no diagnostic -- the container reports "Up" while only the startup banner
+ * ever reaches the log.
+ *
+ * This is not hypothetical. When the i.MX93 MediaMix probe times out
+ * ("imx93-blk-ctrl ... probe ... failed with error -110") the display-init
+ * helper has to rebind the controller, which pushes Weston's socket past this
+ * container's start. Compose gating on weston being "healthy" does not help:
+ * the healthcheck passes before the socket is usable.
+ *
+ * On timeout we continue rather than exit. Exiting would just restart into
+ * the same race, and continuing preserves the previous behaviour -- but now
+ * the reason is in the log instead of being invisible.
+ */
+static int wait_for_wayland_display(int timeout_sec)
+{
+	const char *runtime_dir = getenv("XDG_RUNTIME_DIR");
+	const char *display = getenv("WAYLAND_DISPLAY");
+	char path[512];
+	int waited = 0;
+
+	if (!runtime_dir || !display) {
+		printf("[wayland-wait] XDG_RUNTIME_DIR or WAYLAND_DISPLAY unset; not waiting\n");
+		return 0;
+	}
+
+	snprintf(path, sizeof(path), "%s/%s", runtime_dir, display);
+
+	while (access(path, F_OK) != 0) {
+		if (waited >= timeout_sec) {
+			printf("[wayland-wait] %s absent after %ds; starting anyway\n",
+			       path, waited);
+			return -1;
+		}
+		if (!waited)
+			printf("[wayland-wait] waiting for %s\n", path);
+		sleep(1);
+		waited++;
+	}
+
+	printf("[wayland-wait] %s ready after %ds\n", path, waited);
+	return 0;
+}
+
 int main(int argc, char **argv)
 {
 	core_session_t *ps = NULL;
@@ -400,6 +448,9 @@ int main(int argc, char **argv)
 	init_mem_mgr();
 
 	init_boot_type();
+
+	/* Weston may still be starting; see wait_for_wayland_display(). */
+	wait_for_wayland_display(60);
 	start_lvgl_gui();
 
 	while (is_running()) {
