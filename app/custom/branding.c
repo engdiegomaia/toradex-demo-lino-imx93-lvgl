@@ -8,24 +8,28 @@
 
 #include "lvgl.h"
 
-/* Emitted by scripts/png-to-lvgl-image.py from app/resources/image/lvgl_logo.png.
- * The Torizon and Toradex lockups already ship in the GUI-Guider asset set
- * (gg_image.h), so only this one had to be produced by hand. */
+/* All three emitted by scripts/png-to-lvgl-image.py; see CLAUDE.md for the
+ * commands. GUI-Guider does ship Torizon and Toradex lockups in gg_image.h, but
+ * only at 188x72 and 164x42 -- these are the same artwork 15% larger, redrawn
+ * from the high-res originals so the extra size buys sharpness rather than
+ * upsampling blur. The LVGL lockup has no generated counterpart at all. */
+LV_IMAGE_DECLARE(torizon_os_216x83_RGB565A8);
 LV_IMAGE_DECLARE(lvgl_logo_188x72_RGB565A8);
+LV_IMAGE_DECLARE(toradex_189x48_RGB565A8);
 
 /* Same caption blue the readouts use, so the quadrant title matches its
  * neighbours rather than introducing a third heading colour. */
 #define COLOR_TITLE 0x014B88
 
 /* container_cortexA0 is 264 x 493 at (5, 297) with zero padding. The three
- * lockups are 72 + 72 + 42 px tall; spreading the remaining space over four
- * equal gaps below the title puts them here. Positions are TOP_MID-relative so
- * a width change re-centres them instead of shifting them off the panel. */
+ * lockups are 83 + 72 + 48 px tall; spreading the 447 px below the title over
+ * four equal 61 px gaps puts them here. Positions are TOP_MID-relative so a
+ * width change re-centres them instead of shifting them off the panel. */
 #define BRAND_TITLE_X 3
 #define BRAND_TITLE_Y 16
-#define BRAND_Y_TORIZON 111
-#define BRAND_Y_LVGL    248
-#define BRAND_Y_TORADEX 385
+#define BRAND_Y_TORIZON 107
+#define BRAND_Y_LVGL    251
+#define BRAND_Y_TORADEX 384
 
 static lv_obj_t * add_logo(lv_obj_t * parent, const lv_image_dsc_t * src, int y)
 {
@@ -72,9 +76,9 @@ void branding_build_home(gg_ui_t * ui)
     lv_obj_set_style_text_color(title, lv_color_hex(COLOR_TITLE),
                                 LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    add_logo(panel, &TorizonOS_Regular_188x72_RGB565A8, BRAND_Y_TORIZON);
+    add_logo(panel, &torizon_os_216x83_RGB565A8, BRAND_Y_TORIZON);
     add_logo(panel, &lvgl_logo_188x72_RGB565A8, BRAND_Y_LVGL);
-    add_logo(panel, &toradex_164x45, BRAND_Y_TORADEX);
+    add_logo(panel, &toradex_189x48_RGB565A8, BRAND_Y_TORADEX);
 
     /* Home also drops a loose Toradex lockup on the screen at (16, 721), which
      * lands inside this panel and would double up with the one above. The
