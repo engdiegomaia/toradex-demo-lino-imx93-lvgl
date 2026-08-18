@@ -89,9 +89,20 @@ Evidence:
    whole `heterogeneous-multicore` tree returns nothing. It reports results
    via `log_info()` — i.e. the **UART console**.
 2. The originally shipped `rt_latency_cm33.elf` has **0** symbols matching
-   `shm|wr_idx|rd_idx`. Same for all 8 ELFs in `app/custom/elf/`, except
-   `rt_latency_ca55_0xd0100000_zephyr.elf`, which has only `rd_idx_inc`
-   (a *consumer*, not the M33 producer).
+   `shm|wr_idx|rd_idx`, and the same holds for the other **M33** ELFs in
+   `app/custom/elf/`.
+
+   Corrected 2026-08-18: an earlier revision of this document claimed the
+   A55 ELFs were consumers too. That was wrong, and it was wrong for the
+   same reason several other claims here were - it read `strings` and symbol
+   names instead of disassembling. Both `rt_latency_ca55_*` images are
+   complete **producers**: each has an `sp_shm` OBJECT in `.data`, carries
+   the `"sec:%d shm_addr:0x%llx size:%d"` format string in a *loaded*
+   section (`.text` for FreeRTOS, `rodata` for Zephyr), and in `print_stats`
+   loads a shm pointer, increments `wr_idx` (`add w0, w0, #1`;
+   `str w0, [x20, #12]`) and stores stats at offsets 32/48/64/96 - an exact
+   match for the 104-byte `rt_latency_shm_t`. The A55 firmware therefore
+   needs no rebuild; see [`CA55_AMP_SPIKE.md`](CA55_AMP_SPIKE.md).
 3. `.ncache` is zero-length and `m_data2` reports 0.00% used in **both** the
    original EVK build and the relinked one — nothing is allocated there.
 4. Neither ELF contains its shm base as an aligned literal in loaded code.
