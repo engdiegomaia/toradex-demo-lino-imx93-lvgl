@@ -40,12 +40,9 @@ static int s_widgets_bound = 0;
 
 static void bind_widgets(void)
 {
-    s_widgets[AC_IDX].icon         = guider_ui.Home.container_cortexA1_coreA1_icon;
-    s_widgets[AC_IDX].status_label = guider_ui.Home.container_cortexA1_coreA1_status;
-    s_widgets[AC_IDX].anim_target  = guider_ui.Home.container_cortexA1_coreA1_run;
-    s_widgets[AC_IDX].lt_container = guider_ui.Home.container_cortexA1_coreA1_LT;
-    s_widgets[AC_IDX].last_state   = (home_core_state_t)-1;
-
+    /* AC_IDX is deliberately left unbound: the A1 panel now reports Cortex-A55-0
+     * and belongs to cpu_load_ui.c. Painting it from a remoteproc session would
+     * pin it to "Pending", because no A-core session can ever be created. */
     s_widgets[MC_IDX].icon         = guider_ui.Home.container_cortexM33_coreM33_icon;
     s_widgets[MC_IDX].status_label = guider_ui.Home.container_cortexM33_coreM33_status;
     s_widgets[MC_IDX].anim_target  = guider_ui.Home.container_cortexM33_coreM33_run;
@@ -135,7 +132,7 @@ void home_status_tick(void)
     OperationInfo op = {0};
     int have_op = (copy_operation_info(&op) == 0);
 
-    for (uint8_t am_idx = 0; am_idx < AM_MAX; am_idx++) {
+    for (uint8_t am_idx = MC_IDX; am_idx < AM_MAX; am_idx++) {
         int op_starting = 0;
         if (have_op && op.status == 1 && op.coreId == am_idx)
             op_starting = 1;

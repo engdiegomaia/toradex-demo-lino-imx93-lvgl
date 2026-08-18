@@ -17,6 +17,7 @@
 #include "lvgl.h"
 #include "custom.h"
 #include "gg_event.h"
+#include "cpu_load_ui.h"
 
 
 /*********************
@@ -57,6 +58,10 @@ static pthread_mutex_t g_operation_info_mutex = PTHREAD_MUTEX_INITIALIZER;
 void custom_init(gg_ui_t *ui)
 {
     init_operation_info();
+
+    /* Home exists by now (setup_ui() built it), so the A1 lane can be swapped
+     * over to Cortex-A55-0 before the first frame is drawn. */
+    cpu_load_ui_init(ui);
 }
 
 /**
@@ -96,11 +101,10 @@ void radio_event_handler(lv_event_t * e)
 
 void stop_refresh_anim(int cortexID)
 {
-    if (cortexID == 0) {
-        lv_obj_set_style_img_recolor_opa(guider_ui.Home.container_cortexA1_coreA1_icon, 100, LV_PART_MAIN);
-        lv_label_set_text(guider_ui.Home.container_cortexA1_coreA1_status, "Pending");
-        gg_pause_anim(guider_ui.Home.container_cortexA1_coreA1_run, anim_rotation_cb);
-    } else if (cortexID == 1) {
+    /* cortexID 0 used to reset the A55-1 remoteproc panel to "Pending". That
+     * panel now reports Cortex-A55-0, which is never pending, so only the M33
+     * lane has an idle state to fall back to. */
+    if (cortexID == 1) {
         lv_obj_set_style_img_recolor_opa(guider_ui.Home.container_cortexM33_coreM33_icon, 100, LV_PART_MAIN);
         lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_status, "Pending");
         gg_pause_anim(guider_ui.Home.container_cortexM33_coreM33_run, anim_rotation_cb);
@@ -199,6 +203,11 @@ void chart_event_cb(lv_event_t * e)
 
         static char buf_pool[MAX_SERIES][LABEL_BUF_SIZE];
 
+        /* One callback serves both benchmarking charts: BenchMarking_A1 plots
+         * A55-0 utilisation in percent, BenchMarking_M33 still plots interrupt
+         * latency in nanoseconds. */
+        const char * unit = (chart == guider_ui.BenchMarking_A1.chart_bm) ? "%" : "ns";
+
         lv_chart_series_t * ser = lv_chart_get_series_next(chart, NULL);
         int series_index = 0;
 
@@ -209,7 +218,7 @@ void chart_event_cb(lv_event_t * e)
             int32_t * y_array = lv_chart_get_y_array(chart, ser);
             int32_t value = y_array[id];
 
-            lv_snprintf(buf_pool[series_index], LABEL_BUF_SIZE, LV_SYMBOL_DUMMY"%d ns", value);
+            lv_snprintf(buf_pool[series_index], LABEL_BUF_SIZE, LV_SYMBOL_DUMMY"%d %s", value, unit);
 
             lv_draw_rect_dsc_t draw_rect_dsc;
             lv_draw_rect_dsc_init(&draw_rect_dsc);

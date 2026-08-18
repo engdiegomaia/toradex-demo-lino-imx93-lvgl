@@ -21,9 +21,9 @@
 #define WIDGET_TYPE_DROPDOWN         1
 #define WIDGET_TYPE_TERMINAL_A1      2
 #define WIDGET_TYPE_TERMINAL_M33     3
-#define WIDGET_TYPE_CHART_A1_SERIES0 4
-#define WIDGET_TYPE_CHART_A1_SERIES1 5
-#define WIDGET_TYPE_CHART_A1_SERIES2 6
+/* 4-6 were the BenchMarking_A1 latency series. That chart now plots
+ * Cortex-A55-0 utilisation and is written directly by cpu_load_ui.c, so the ids
+ * are retired rather than reused — the remaining values stay stable. */
 #define WIDGET_TYPE_CHART_M33_SERIES0 7
 #define WIDGET_TYPE_CHART_M33_SERIES1 8
 #define WIDGET_TYPE_CHART_M33_SERIES2 9

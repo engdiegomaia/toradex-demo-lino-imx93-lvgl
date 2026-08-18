@@ -13,6 +13,7 @@
 #include "rt_stats.h"
 #include "mem_mgr.h"
 #include "main.h"
+#include "cpu_load.h"
 
 
 static uint32_t scur_sec = 0;
@@ -456,6 +457,18 @@ int main(int argc, char **argv)
 		fflush(stdout);
 
 		output_shm_data();  /* Show latency data in share memory */
+
+		/* Cortex-A55-0 utilisation. Sampling only reads /proc, so it stays on this
+		 * thread; cpu_load_ui_render() does the widget work on the LVGL thread.
+		 * The console line reuses the A-core GUI log ring, which the Home terminal
+		 * and Console_A1 already display. */
+		if (cpu_load_sample()) {
+			cpu_load_t load;
+
+			if (cpu_load_peek(&load))
+				log_printf(AC_IDX, "A55-0  total:%3d%%  app:%3d%%  idle:%3d%%\n",
+					   load.total, load.app, load.idle);
+		}
 #ifdef DEBUG_TEST
 		if (!(scur_sec % 10)) {
 			if (get_debug_mode() & DEBUG_MODE(3))

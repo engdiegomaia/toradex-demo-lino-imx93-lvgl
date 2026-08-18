@@ -29,6 +29,7 @@
 #include "gui_guider.h"
 #include "custom.h"
 #include "home_status.h"
+#include "cpu_load_ui.h"
 #include <sys/time.h>
 #include "gg_utils.h"
 
@@ -213,36 +214,6 @@ static int sync_widget_value(lv_obj_t *widget, void *new_data, int widget_type)
     case WIDGET_TYPE_TERMINAL_M33:
         terminal_add(txt_log_m33, 0, widget, new_data);
         break;
-    case WIDGET_TYPE_CHART_A1_SERIES0:
-        {
-            IntArray *data = (IntArray *)new_data;
-            size_t len = data->length;
-            for (size_t i = 0; i < len; i++) {
-                lv_chart_set_next_value(widget, guider_ui.BenchMarking_A1.chart_bm_ser_1, data->array[i]);
-            }
-            lv_chart_refresh(widget);
-        }
-        break;
-    case WIDGET_TYPE_CHART_A1_SERIES1:
-        {
-            IntArray *data = (IntArray *)new_data;
-            size_t len = data->length;
-            for (size_t i = 0; i < len; i++) {
-                lv_chart_set_next_value(widget, guider_ui.BenchMarking_A1.chart_bm_ser_2, data->array[i]);
-            }
-            lv_chart_refresh(widget);
-        }
-        break;
-    case WIDGET_TYPE_CHART_A1_SERIES2:
-        {
-            IntArray *data = (IntArray *)new_data;
-            size_t len = data->length;
-            for (size_t i = 0; i < len; i++) {
-                lv_chart_set_next_value(widget, guider_ui.BenchMarking_A1.chart_bm_ser_3, data->array[i]);
-            }
-            lv_chart_refresh(widget);
-        }
-        break;
     case WIDGET_TYPE_CHART_M33_SERIES0:
         {
             IntArray *data = (IntArray *)new_data;
@@ -314,7 +285,12 @@ static int gui_update_log_data(void)
 		ps = get_core_session(am_idx);
 
 		boot_type = ps->boot_type;
-		if (!boot_type)
+
+		/* AC_IDX no longer tracks a remoteproc session; it carries the
+		 * Cortex-A55-0 utilisation line that main() emits every second, which is
+		 * valid with no firmware loaded. Gating it on boot_type would leave the
+		 * ring to fill up and the terminal permanently blank. */
+		if (am_idx != AC_IDX && !boot_type)
 			continue;
 
 		len = pop_gui_buf_try(am_idx, ps->gui_log, size);
@@ -344,6 +320,13 @@ static int update_gui_latency(uint8_t am_idx, rt_latency_shm_stat *p)
 	int16_t *pdata[3];
 	int16_t data[3];
 	int i = 0;
+
+	/* Only the M33 lane still has a latency chart. BenchMarking_A1 now plots
+	 * Cortex-A55-0 utilisation and is owned by cpu_load_ui.c, so A-core latency
+	 * samples have nowhere to go. Reaching here with AC_IDX would need a ca55
+	 * remoteproc node, which Torizon does not expose. */
+	if (am_idx != MC_IDX)
+		return 0;
 
 	data[0] = p->min;
 	data[1] = p->max;
@@ -382,27 +365,13 @@ static int update_gui_latency(uint8_t am_idx, rt_latency_shm_stat *p)
 		ps->int_array[i].array = pdata[i];
 		ps->int_array[i].length = 1;
 
-		if (am_idx)
-		{
-			if(i == 0) {
-				gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES0);
-			} else if(i == 1) {
-				gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES1);
-			} else if(i == 2) {
-				gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES2);
-			}
+		if(i == 0) {
+			gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES0);
+		} else if(i == 1) {
+			gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES1);
+		} else if(i == 2) {
+			gui_sync_widget_value(guider_ui.BenchMarking_M33.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_M33_SERIES2);
 		}
-		else
-		{
-			if(i == 0) {
-				gui_sync_widget_value(guider_ui.BenchMarking_A1.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_A1_SERIES0);
-			} else if(i == 1) {
-				gui_sync_widget_value(guider_ui.BenchMarking_A1.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_A1_SERIES1);
-			} else if(i == 2) {
-				gui_sync_widget_value(guider_ui.BenchMarking_A1.chart_bm, &ps->int_array[i], WIDGET_TYPE_CHART_A1_SERIES2);
-			}
-		}
-
 	}
 
 	return 0;
@@ -482,6 +451,8 @@ static void *lvgl_gui_thread(void *p)
 			gui_update_latency_data();
 		else if (idx == 4)
 			home_status_tick();
+		else if (idx == 6)
+			cpu_load_ui_render();
 
 		gui_rf_loop();
 
