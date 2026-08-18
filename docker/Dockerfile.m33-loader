@@ -1,8 +1,9 @@
-# One-shot container that loads the FreeRTOS rt_latency firmware into the
+# Resident container that loads the FreeRTOS rt_latency firmware into the
 # Cortex-M33 of the i.MX93 via /sys/class/remoteproc/remoteproc0.
 #
 # This is the Torizon HMP pattern: the OSTree rootfs is read-only, so we ship
-# the firmware inside a dedicated container that writes to sysfs and exits.
+# the firmware inside a dedicated container that writes to sysfs. It remains
+# alive so Docker restarts it automatically after every host reboot.
 #
 # See:
 #   https://developer.toradex.com/software/hmp/hmp-nxp/how-to-load-firmwares-nxp/

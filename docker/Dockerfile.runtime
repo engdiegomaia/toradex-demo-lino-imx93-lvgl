@@ -29,8 +29,8 @@ RUN apt-get update \
 # kernel's request_firmware_direct() can find it.
 # binutils gives us readelf(1) for inspecting M33 firmware ELF program headers
 # during boot-handshake debug (`docker exec lino-lvgl-app readelf -l ...`).
-# xxd is used to dump the shared-memory region at 0xA4000000 to compare what
-# the M33 firmware writes vs. what Linux sees.
+# xxd is used to dump the shared-memory regions (A500 for rebuilt FreeRTOS,
+# A400 for prebuilt Zephyr/legacy) to compare what M33 writes vs. Linux sees.
 
 WORKDIR /app
 COPY app/platform/linux/build-aarch64-docker/gui_guider /app/gui_guider

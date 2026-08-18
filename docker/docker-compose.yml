@@ -28,6 +28,26 @@
 #   Torizon OS 7.7.0, hence :4.
 
 services:
+  # Torizon 7.7 can time out the first MediaMix block-controller probe before
+  # its boot dependencies settle. A safe sysfs rebind creates /dev/dri/card0;
+  # keeping this helper resident makes the recovery automatic after reboot.
+  display-init:
+    image: debian:bookworm-slim
+    container_name: lino-display-init
+    privileged: true
+    volumes:
+      - /sys:/sys
+      - /dev:/dev
+      - ./display-init.sh:/usr/local/bin/display-init.sh:ro
+    command: /usr/local/bin/display-init.sh
+    healthcheck:
+      test: ["CMD-SHELL", "test -c /dev/dri/card0"]
+      interval: 2s
+      timeout: 1s
+      retries: 45
+      start_period: 2s
+    restart: unless-stopped
+
   weston:
     image: torizon/weston-imx93:${TORIZON_TAG:-4}
     container_name: lino-weston
@@ -65,12 +85,15 @@ services:
     # weston.ini). The bind-mount to /etc/xdg/weston-dev covers the case where
     # the entrypoint forces --developer anyway.
     command: ""
+    depends_on:
+      display-init:
+        condition: service_healthy
     restart: unless-stopped
 
-  # One-shot service: loads rt_latency_cm33.elf into the Cortex-M33 via
+  # Resident service: loads rt_latency_cm33.elf into the Cortex-M33 via
   # /sys/class/remoteproc/remoteproc0. Must complete before lvgl-app starts,
   # otherwise the shared-memory ring stays empty and the perf charts show
-  # no data. `restart: no` because it exits with code 0 on success.
+  # no data. It remains alive so Docker automatically runs it after reboot.
   m33-loader:
     build:
       context: ..
@@ -81,7 +104,13 @@ services:
     pid: host          # nsenter -t 1 -m to reach host mount namespace
     volumes:
       - /sys:/sys
-    restart: "no"
+    healthcheck:
+      test: ["CMD-SHELL", "test \"$$(cat /sys/class/remoteproc/remoteproc0/state 2>/dev/null)\" = running"]
+      interval: 2s
+      timeout: 1s
+      retries: 30
+      start_period: 2s
+    restart: unless-stopped
 
   lvgl-app:
     build:
@@ -91,7 +120,9 @@ services:
     container_name: lino-lvgl-app
     depends_on:
       weston:
-        condition: service_started
+        condition: service_healthy
+      m33-loader:
+        condition: service_healthy
     environment:
       - XDG_RUNTIME_DIR=/tmp/1000-runtime-dir
       - WAYLAND_DISPLAY=wayland-0

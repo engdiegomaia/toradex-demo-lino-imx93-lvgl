@@ -819,7 +819,8 @@ void setup_Home(gg_ui_t * ui)
     lv_obj_set_align(ui->Home.ddlist_apps, LV_ALIGN_TOP_LEFT);
     lv_obj_set_x(ui->Home.ddlist_apps, 226);
     lv_obj_set_y(ui->Home.ddlist_apps, 231);
-    lv_dropdown_set_options(ui->Home.ddlist_apps, "RT Latency of Zephyr\nRT Latency of FreeRTOS\nApplication on Zephyr");
+    lv_dropdown_set_options(ui->Home.ddlist_apps,
+                            "RT Latency of FreeRTOS\nApplication on FreeRTOS\nRT Latency of Zephyr\nApplication on Zephyr");
 
     // Style: ui->Home.ddlist_apps [LV_PART_MAIN|LV_STATE_DEFAULT]
     lv_obj_set_style_bg_color(ui->Home.ddlist_apps, lv_color_hex(0xffffff), LV_PART_MAIN | LV_STATE_DEFAULT);

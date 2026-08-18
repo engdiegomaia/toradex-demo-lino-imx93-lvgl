@@ -14,16 +14,24 @@ This directory carries two downstream patches and a reproducible build:
 See [`../docs/M33_HANDSHAKE_DEBUG.md`](../docs/M33_HANDSHAKE_DEBUG.md) for
 the investigation history.
 
-## The three addresses that must agree
+## Shared-memory addresses
 
 | Where | Setting | Value |
 |---|---|---|
-| Linux app | `FRDM_SHM_BASE` in `app/custom/real_time_edge/main.h` | `0xA5000000` |
+| Linux app, rebuilt FreeRTOS | `M33_RTLAT_SHM_BASE` in `app/custom/real_time_edge/main.h` | `0xA5000000` |
 | Device tree | `cm33-shm@a5000000` in `device-tree/overlays/lino-imx93_cm33-shm_overlay.dts` | `0xA5000000`, 16 MB |
 | Firmware | `__noncachedata_start__` from `ORIGIN(m_data2)` | `0xA5000000`, 16 MB |
+| Linux app, prebuilt Zephyr/legacy images | `M33_LEGACY_SHM_BASE` | `0xA4000000` |
 
 The firmware uses that linker symbol as an explicit `volatile` pointer; it
 does not rely on a C object being allocated in `.ncache`.
+
+The prebuilt Zephyr image contains a literal `0xA4000000` and its source/build
+inputs are not present in this repository, so the Linux app must select the
+address per firmware. Its resource table advertises no virtio device; the
+base-DT vring carveout can therefore carry the legacy raw protocol while that
+image is running. The rebuilt FreeRTOS producer stays in the dedicated A500
+carveout.
 
 ## Producer protocol
 
@@ -55,8 +63,8 @@ version/magic, integrity checking, and explicit recovery from a stalled peer.
 
 - Upstream uses `0xA0000000` (16 MB) for `m_data2` on `mcimx93evk`. That is
   System RAM here.
-- `0xA4000000` — the demo's original `FRDM_SHM_BASE` — is `vdev0vring0`,
-  owned by the RPMsg/virtio transport.
+- `0xA4000000` — the demo's original shared address — is retained only for
+  the prebuilt, non-virtio Zephyr/legacy images.
 - `0xA5000000` sits inside `a4120000-ffffffff : System RAM`, clear of the
   M33 carveout that ends at `0xA4120000`, and is 16 MB-aligned, which the
   ARMv8-M MPU wants for a region of that size.
@@ -95,7 +103,10 @@ still be present.
 
 ## Deploying
 
-The overlay needs TorizonCore Builder and a reboot:
+The overlay needs TorizonCore Builder and a reboot. It reserves A500 and
+disables Linux ownership of LPUART2 and TPM2/3/4, which are initialized by the
+M33 latency firmwares. It also keeps the LPUART2 clock gate initialized, as in
+the original NXP multicore board DTS:
 
 ```bash
 # Compile the overlay
@@ -106,6 +117,12 @@ dtc -@ -I dts -O dtb \
 
 Then apply per the
 [Toradex Device Tree Overlays guide](https://developer.toradex.com/torizon/os-customization/use-cases/device-tree-overlays-on-torizon/).
+For the exact storage/deploy flow used on this target, copy
+`device-tree/deploy-m33-overlay.sh` into the self-contained TorizonCore Builder
+workspace (beside `storage/`, `device-trees/`, the base DTB and overlay DTS)
+and run it there. The helper explicitly mounts that workspace's `storage/`,
+avoiding the unrelated global Docker volume with the same name.
+
 After reboot, confirm the carveout is reserved and out of System RAM:
 
 ```bash
@@ -115,13 +132,32 @@ ls /proc/device-tree/reserved-memory/ | grep cm33
 
 `0xA5000000` must NOT appear inside a `System RAM` span.
 
-### Current target status (2026-08-17)
+### Current target status (2026-08-18)
 
 The overlay is deployed on Torizon OS 7.7.0 build 40. The target reports
 `a5000000-a5ffffff : reserved`, both the panel and SHM overlays applied
 successfully, and the display/LVGL application still operate normally.
 
-End-to-end validation is still pending: deploy the updated ELF and Linux
-binary, rebuild `m33-loader` and `lvgl-app`, then confirm remoteproc is
-`running`, the handshake reaches `flag=2`, `wr_idx` advances, and the latency
-charts populate without `Boot failed` messages.
+The updated ELF booted and remoteproc reached `running`. An initial test still
+remained at `flag=1`, `wr_idx=0`; inspection then found one address error and
+one resource-ownership violation:
+
+- the prebuilt Zephyr image still accesses `0xA4000000`, while the Linux app
+  had been changed globally to A500;
+- Linux still owned LPUART2/TPM4 (and the timer handoff was incomplete), even
+  though both M33 latency firmwares initialize those peripherals before
+  acknowledging the start request.
+
+The deployed app now selects A500 only for rebuilt FreeRTOS and A400 for
+prebuilt Zephyr/legacy images. The deployed overlay disables LPUART2 and
+TPM2/3/4 on Linux. Direct backend validation after reboot produced:
+
+- FreeRTOS: `flag:1` → `flag:2`, `wr_idx:0` → `wr_idx:16`, with IRQ latency
+  statistics consumed from A500;
+- Zephyr: `flag:1` → `flag:2`, `wr_idx:0` → `wr_idx:3`, with CPU/IRQ statistics
+  consumed from A400;
+- no `Boot failed` message in either run.
+
+The Compose stack also recovers the Torizon 7.7 MediaMix deferred-probe race
+and reloads the M33 firmware automatically. A host reboot confirmed DRM,
+Weston, remoteproc and the LVGL application return without manual commands.

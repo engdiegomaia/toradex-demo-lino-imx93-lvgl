@@ -293,7 +293,7 @@ static int stop_multi_core_prog(uint8_t boot_type, int op_flag)
 static int start_multi_core_prog(uint8_t boot_type, int reboot)
 {
 	uint8_t am_idx = BOOT_TYPE_AM_IDX(boot_type);
-	off_t shm_addr = FRDM_SHM_BASE;
+	off_t shm_addr = M33_LEGACY_SHM_BASE;
 	core_session_t *ps = NULL;
 	off_t ram_addr = 0;
 	cmd_type_t op_cmd;
@@ -324,6 +324,8 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 		break;
 
 	case TYPE_M_RTOS_RTLAT:
+		/* This is the rebuilt producer linked against the dedicated SHM. */
+		shm_addr = M33_RTLAT_SHM_BASE;
 		run_system_cmd("./start.sh m r r");
 		break;
 
@@ -361,6 +363,8 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 		set_ram_console_addr(am_idx, ram_addr);
 		start_ram_console_thread(am_idx);
 	} else {
+		printf("[shm-config] boot_type:%d addr:0x%llx\n", boot_type,
+		       (unsigned long long)shm_addr);
 		set_ram_shm_addr(am_idx, shm_addr);
 	}
 

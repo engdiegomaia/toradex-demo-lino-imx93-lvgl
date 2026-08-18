@@ -1,16 +1,23 @@
-# M33 rt_latency handshake debug — producer implemented 2026-08-17
+# M33 rt_latency handshake debug — integration fixes 2026-08-18
 
-> **Current status.** The operative root cause was a missing producer: the
-> upstream/shipped CM33 latency benchmark only logged to UART and never
-> implemented the `rt_latency_shm_t` ABI polled by Linux. A separate address
-> error also had to be fixed: Linux used the `vdev0vring0` address while the
-> EVK linker put `m_data2` in live Linux RAM on this module.
+> **Current status.** The original FreeRTOS failure included a missing
+> producer: the upstream/shipped CM33 latency benchmark only logged to UART
+> and never implemented the `rt_latency_shm_t` ABI polled by Linux. A separate
+> address error also had to be fixed: the EVK linker put `m_data2` in live
+> Linux RAM on this module.
 >
-> Both gaps are now implemented in the tracked build: a dedicated
-> `0xA5000000` carveout and a FreeRTOS producer that performs the handshake
-> and publishes latency once per second. The ELF builds and passes static
-> verification. The carveout is deployed and verified on the target; runtime
-> validation of the producer/consumer handshake still remains.
+> The rebuilt producer and dedicated `0xA5000000` carveout are in place, but
+> the first runtime test still stopped at `flag=1`. The follow-up found that
+> the app incorrectly polled A500 for the prebuilt Zephyr binary (which embeds
+> A400), and that Linux still owned peripherals used by both M33 latency
+> firmwares. Address selection is now firmware-specific and the overlay hands
+> LPUART2/TPM2–4 to the M33 while keeping the UART clock gate initialized. The
+> revised overlay and application are deployed. A post-deployment boot exposed
+> a separate MediaMix deferred-probe race; `display-init` now recovers DRM and
+> the resident `m33-loader` starts remoteproc automatically after reboot.
+> Infrastructure and handshake validation now pass. Direct diagnostic runs of
+> both Benchmarking backends reached `flag=2`, advanced `wr_idx`, and delivered
+> latency samples to Linux at their firmware-specific SHM addresses.
 > Sections labeled historical below are retained as the investigation record.
 
 ## Corrections to earlier claims (2026-08-17)
@@ -95,13 +102,11 @@ the M33 binary does not speak.
 
 ### What this means for the address work
 
-The address mismatch documented below is **real** — `0xA4000000` is
-`vdev0vring0`, and upstream's `0xA0000000` is System RAM here — but fixing
-it cannot make the handshake work, because the firmware never writes to
-either address. The overlay, the `FRDM_SHM_BASE` change, and the linker
-relink are all still **correct and worth keeping**: they make the memory map
-coherent and are prerequisites for any firmware that *does* implement the
-protocol. They are not sufficient.
+The FreeRTOS address mismatch documented below is **real** — upstream's
+`0xA0000000` is System RAM here — but fixing it cannot make the handshake
+work, because the old firmware never writes to either address. The dedicated
+A500 overlay, firmware-specific Linux base, and linker relink are all still
+required for the rebuilt producer. They are not sufficient by themselves.
 
 ### The actual gap at that point
 
@@ -176,7 +181,8 @@ moves that pointer. The relocation alone never supplied the missing protocol.
 
 ## The fix (2026-08-17)
 
-Three addresses must agree. Chosen base: **`0xA5000000`, 16 MB** — inside
+For the rebuilt FreeRTOS producer, three addresses must agree. Chosen base:
+**`0xA5000000`, 16 MB** — inside
 `a4120000-ffffffff : System RAM`, clear of the M33 carveout ending at
 `0xA4120000`, and 16 MB-aligned for the ARMv8-M MPU. Length matches
 upstream's `m_data2`.
@@ -187,9 +193,11 @@ upstream's `m_data2`.
    `remoteproc-cm33`'s `memory-region` — a dtbo fragment replaces rather
    than appends, which would drop the vdev phandles and break RPMsg.
 
-2. **DONE — Linux side** `FRDM_SHM_BASE` in
-   `app/custom/real_time_edge/main.h`: `0xA4000000` -> `0xA5000000`.
-   Cross-build clean.
+2. **DONE — Linux side** `M33_RTLAT_SHM_BASE` in
+   `app/custom/real_time_edge/main.h` is `0xA5000000`. The prebuilt Zephyr
+   image was verified to contain a literal `0xA4000000`, so
+   `M33_LEGACY_SHM_BASE` preserves that address for Zephyr/legacy images.
+   Cross-build clean and its disassembly contains both branch-specific bases.
 
 3. **DONE — firmware producer and relink.**
    `firmware/patches/0001-cm33-shm-base-verdin-imx93.patch` changes
@@ -198,7 +206,7 @@ upstream's `m_data2`.
    `app/custom/elf/rt_latency_cm33.elf`. The script refuses installation
    unless the base is `a5000000` and both producer symbols are present.
 
-## Target validation status — 2026-08-17
+## Target validation status — 2026-08-18
 
 Completed on `<target-host>` with Torizon OS 7.7.0 build 40:
 
@@ -211,18 +219,44 @@ Completed on `<target-host>` with Torizon OS 7.7.0 build 40:
 - the 10.1-inch display and the online LVGL application remained functional
   after reboot.
 
-Still pending before the shared-memory fix can be considered runtime-validated:
+The first runtime test of the rebuilt FreeRTOS image reached remoteproc
+`running`, but remained at `flag=1`, `wr_idx=0`. The prebuilt Zephyr image did
+the same while Linux was incorrectly polling A500 for every M33 image.
 
-1. cross-build and synchronize the updated Linux application and producer ELF;
-2. rebuild `m33-loader` and `lvgl-app` on the target;
-3. confirm remoteproc reaches `running` with `rt_latency_cm33.elf`;
-4. run the Benchmarking screen and observe `flag=2`;
-5. confirm `wr_idx` advances and the latency charts receive samples without
-   `Boot failed` messages.
+Further inspection found that the M33 firmware initializes LPUART2 and TPM
+counters before acknowledging `flag=1`, while the earlier Linux DT still had
+LPUART2 and TPM4 enabled. The deployed overlay now disables LPUART2 and
+TPM2/3/4, and keeps the LPUART2 gate initialized as in NXP's original
+multicore board DTS. The deployed Linux app now polls the address actually
+embedded in each firmware.
 
-The overlay validation proves that Linux no longer owns the shared DDR range.
-It does **not** yet prove that the CM33 producer boots or that the end-to-end
-protocol works.
+After deployment, the kernel intermittently timed out the initial probe of
+`4ac10000.system-controller`, leaving `/dev/dri/card0` absent. Manually
+rebinding the `imx93-blk-ctrl` driver immediately restored imx-drm, LVDS-1 and
+Weston. The Compose stack now runs `display-init` to retry that bind safely,
+and keeps `m33-loader` resident so both helpers restart with Docker. A service
+restart followed by a host reboot validated all four containers healthy,
+`/dev/dri/card0` present, the MediaMix controller bound, and remoteproc
+`running` with `rt_latency_cm33.elf`.
+
+End-to-end diagnostic validation completed after the reboot:
+
+- FreeRTOS M33: `[shm-config] addr:0xa5000000`, `flag:1` → `flag:2`, and
+  `wr_idx:0` → `wr_idx:16`, with IRQ delay/scheduling statistics consumed;
+- Zephyr M33: `[shm-config] addr:0xa4000000`, `flag:1` → `flag:2`, and
+  `wr_idx:0` → `wr_idx:3`, with CPU-load and IRQ statistics consumed;
+- neither run emitted `Boot failed`.
+
+The UI dropdown also had only three entries in the wrong order, despite the
+backend's fixed four-entry mapping. That made the visible FreeRTOS latency
+choice launch `hello_world` and the visible Zephyr latency choice launch the
+FreeRTOS benchmark. Both the GUI-Guider project and generated screen now use
+the required order: FreeRTOS latency/application, then Zephyr
+latency/application. The rebuilt target binary contains that exact order.
+
+The overlay validation proves that Linux no longer owns the shared DDR range;
+the direct backend runs additionally prove that both CM33 producers boot and
+complete the end-to-end protocol.
 
 ### Deployment order (all three needed)
 
@@ -230,7 +264,8 @@ protocol works.
 # 1. HOST — rebuild firmware when source/SDK inputs change
 ./firmware/build-rt-latency-cm33.sh
 
-# 2. HOST — compile + apply overlay via TorizonCore Builder, then reboot
+# 2. HOST — compile + apply overlay via TorizonCore Builder, then reboot.
+#    This revision also disables Linux lpuart2 and tpm2/tpm3/tpm4.
 dtc -@ -I dts -O dtb -o lino-imx93_cm33-shm_overlay.dtbo \
     device-tree/overlays/lino-imx93_cm33-shm_overlay.dts
 
@@ -242,7 +277,8 @@ ls /proc/device-tree/reserved-memory/ | grep cm33
 ./docker/sync-to-target.sh
 ```
 
-Expected on success (not yet observed on the target): `[shm-diag]` shows
+Expected on success (observed on the target): `[shm-config]` shows
+`0xa5000000` for FreeRTOS or `0xa4000000` for Zephyr, then `[shm-diag]` shows
 `flag:2` and `wr_idx` incrementing, with no `Boot failed` messages, and the
 BenchMarking charts populate.
 

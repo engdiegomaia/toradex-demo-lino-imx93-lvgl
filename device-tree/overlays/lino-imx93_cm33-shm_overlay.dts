@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later OR MIT
 /*
- * Reserve the Cortex-M33 non-cached shared-memory window (m_data2) for the
- * rt_latency demo on Verdin i.MX93 (Lino SoM / Mallow carrier).
+ * Reserve the Cortex-M33 non-cached shared-memory window (m_data2), and hand
+ * the latency-test peripherals to the M33, on Verdin i.MX93 (Lino SoM /
+ * Mallow carrier).
  *
  * Why this is needed
  * ------------------
@@ -12,10 +13,11 @@
  *   vdev1vring0@a4010000  vdev1vring1@a4018000
  *   vdevbuffer@a4020000   rsc-table@2021e000
  *
- * The rt_latency demo does NOT use RPMsg. It maps a plain rt_latency_shm_t
- * struct and polls it. Pointing that at 0xA4000000 (the original
- * FRDM_SHM_BASE) aimed it at vdev0vring0 — memory owned by the virtio
- * transport — which is why the flag=1 -> flag=2 handshake never completed.
+ * The rebuilt FreeRTOS rt_latency demo does NOT use RPMsg. It maps a plain
+ * rt_latency_shm_t struct at 0xA5000000 and polls it. The shipped Zephyr
+ * binary is prelinked to the original 0xA4000000 address; the Linux app
+ * selects that address only for legacy M33 images. Those images advertise no
+ * virtio device, so remoteproc does not instantiate RPMsg while they run.
  *
  * Address and size
  * ----------------
@@ -66,6 +68,59 @@
 				reg = <0x00 0xa5000000 0x00 0x01000000>;
 				no-map;
 			};
+		};
+	};
+
+	/*
+	 * The CM33 latency firmwares own these peripherals while running:
+	 *
+	 *   FreeRTOS: LPUART2, TPM2 and TPM4
+	 *   Zephyr:   LPUART2, TPM3 and TPM4
+	 *
+	 * Leaving the corresponding Linux nodes enabled lets the serial/PWM
+	 * drivers gate clocks or touch registers underneath the CM33.  In
+	 * particular, start_test_case() initializes the TPM counters before the
+	 * firmware acknowledges flag=1, so a resource conflict looks exactly like
+	 * a shared-memory failure: remoteproc says "running" while flag stays 1.
+	 */
+	fragment@1 {
+		target = <&lpuart2>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@2 {
+		target = <&tpm2>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@3 {
+		target = <&tpm3>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	fragment@4 {
+		target = <&tpm4>;
+		__overlay__ {
+			status = "disabled";
+		};
+	};
+
+	/*
+	 * Keep the LPUART2 gate initialized after its Linux consumer is disabled.
+	 * 0x87 is IMX93_CLK_LPUART2_GATE in the BSP used by this image; it also
+	 * matches the clock ID on the target's serial@44390000 node. This mirrors
+	 * the original NXP multicore board DTS in app/custom/.
+	 */
+	fragment@5 {
+		target = <&clk>;
+		__overlay__ {
+			init-on-array = <0x87>;
 		};
 	};
 

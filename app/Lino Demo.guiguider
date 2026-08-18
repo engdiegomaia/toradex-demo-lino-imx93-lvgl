@@ -146,12 +146,16 @@
             ],
             "option": [
               {
-                "id": "MNZN3YMHQNWF",
-                "text": "RT Latency of Zephyr"
-              },
-              {
                 "id": "MNZN3ZBW7ZN4",
                 "text": "RT Latency of FreeRTOS"
+              },
+              {
+                "id": "MNZN4FRTOSHW",
+                "text": "Application on FreeRTOS"
+              },
+              {
+                "id": "MNZN3YMHQNWF",
+                "text": "RT Latency of Zephyr"
               },
               {
                 "id": "MNZN47CTXTU6",

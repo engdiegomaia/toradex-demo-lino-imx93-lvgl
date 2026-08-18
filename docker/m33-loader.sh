@@ -75,4 +75,5 @@ if [ "$final_state" != "running" ]; then
     exit 1
 fi
 
-echo "m33-loader: done."
+echo "m33-loader: ready; keeping the service alive for Docker reboot recovery."
+exec sleep infinity
