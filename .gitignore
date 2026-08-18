@@ -24,3 +24,6 @@ m33-diag-*/
 firmware/workspace/
 # Backup of the original NXP EVK firmware
 *.evk-backup
+
+# Compiled device-tree overlays (built from device-tree/overlays/*.dts)
+*.dtbo
