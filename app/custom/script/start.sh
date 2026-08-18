@@ -53,6 +53,35 @@ ensure_host_firmware_tmpfs() {
     ' || return 1
 }
 
+# The Cortex-A55 secondary is a Linux CPU until we take it away. PSCI CPU_ON
+# fails with -EINVAL (already on) while Linux still owns it, so the driver
+# refuses to boot firmware unless the CPU is offline first. Offlining is itself
+# a PSCI CPU_OFF issued by that CPU, which is the only way to park it cleanly.
+#
+# Override with CA55_CPU if a future overlay targets a different affinity than
+# MPIDR 0x100.
+CA55_CPU="${CA55_CPU:-1}"
+CA55_CPU_ONLINE="/sys/devices/system/cpu/cpu${CA55_CPU}/online"
+
+ca55_cpu_offline() {
+    if [ ! -w "$CA55_CPU_ONLINE" ]; then
+        log "FAIL: $CA55_CPU_ONLINE not writable (need privileged + rw /sys)"
+        return 1
+    fi
+    if [ "$(cat "$CA55_CPU_ONLINE")" = "0" ]; then
+        log "cpu$CA55_CPU already offline"
+        return 0
+    fi
+    echo 0 > "$CA55_CPU_ONLINE" || return 1
+    # Hotplug is synchronous, but read back rather than assume.
+    if [ "$(cat "$CA55_CPU_ONLINE")" != "0" ]; then
+        log "FAIL: cpu$CA55_CPU still online after hotplug write"
+        return 1
+    fi
+    log "cpu$CA55_CPU offline; nproc now $(nproc)"
+    return 0
+}
+
 if [ "$CORE" == "a" ]; then
     CMD_DIR=$(find_rproc "ca55" || find_rproc "cortex-a" || true)
     if [ -z "$CMD_DIR" ]; then
@@ -122,6 +151,13 @@ fi
 
 log "remoteproc node: $CMD_DIR firmware=$FW_NAME"
 log "state before write: $(cat "$CMD_DIR/state" 2>/dev/null)"
+
+if [ "$CORE" == "a" ]; then
+    if ! ca55_cpu_offline; then
+        log "FAIL: could not release cpu$CA55_CPU from Linux"
+        exit 3
+    fi
+fi
 
 if ! printf '%s' "$FW_NAME" > "$CMD_DIR/firmware" 2>/tmp/fw.err; then
     log "FAIL writing firmware: $(cat /tmp/fw.err 2>/dev/null)"
