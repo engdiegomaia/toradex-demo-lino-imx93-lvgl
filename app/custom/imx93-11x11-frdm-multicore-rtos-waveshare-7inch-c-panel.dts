@@ -69,7 +69,16 @@
 };
 
 &clk {
-	init-on-array = <IMX93_CLK_LPUART2_GATE>;
+	/*
+	 * The prebuilt Zephyr M33 latency firmware expects the TPM roots to be
+	 * available on its first boot.  FreeRTOS programs TPM2/TPM4 as part of its
+	 * board setup, which previously made Zephyr depend on FreeRTOS having run
+	 * first.  Keep all latency-counter clocks initialized independently of the
+	 * selected firmware.
+	 */
+	init-on-array = <IMX93_CLK_TPM2 IMX93_CLK_TPM4
+			 IMX93_CLK_TPM2_GATE IMX93_CLK_TPM4_GATE
+			 IMX93_CLK_LPUART2_GATE>;
 };
 
 &lvds_bridge {

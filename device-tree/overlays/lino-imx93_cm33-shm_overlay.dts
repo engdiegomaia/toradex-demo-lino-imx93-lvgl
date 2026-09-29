@@ -75,7 +75,7 @@
 	 * The CM33 latency firmwares own these peripherals while running:
 	 *
 	 *   FreeRTOS: LPUART2, TPM2 and TPM4
-	 *   Zephyr:   LPUART2, TPM3 and TPM4
+	 *   Zephyr:   LPUART2, TPM2 and TPM4
 	 *
 	 * Leaving the corresponding Linux nodes enabled lets the serial/PWM
 	 * drivers gate clocks or touch registers underneath the CM33.  In
@@ -112,15 +112,22 @@
 	};
 
 	/*
-	 * Keep the LPUART2 gate initialized after its Linux consumer is disabled.
-	 * 0x87 is IMX93_CLK_LPUART2_GATE in the BSP used by this image; it also
-	 * matches the clock ID on the target's serial@44390000 node. This mirrors
-	 * the original NXP multicore board DTS in app/custom/.
+	 * Keep the timer roots/gates and the LPUART2 gate initialized after their
+	 * Linux consumers are disabled.  The prebuilt Zephyr latency image assumes
+	 * that the TPM root clocks have already been configured; it only works by
+	 * accident after FreeRTOS because FreeRTOS's board_clock_setup() programs
+	 * TPM2/TPM4 first.  Holding these clocks from Linux makes a cold Zephyr boot
+	 * independent of firmware execution order.
+	 *
+	 * Clock IDs in the BSP used by this image:
+	 *   0x1b  IMX93_CLK_TPM2       0x1d  IMX93_CLK_TPM4
+	 *   0x7f  IMX93_CLK_TPM2_GATE  0x81  IMX93_CLK_TPM4_GATE
+	 *   0x87  IMX93_CLK_LPUART2_GATE
 	 */
 	fragment@5 {
 		target = <&clk>;
 		__overlay__ {
-			init-on-array = <0x87>;
+			init-on-array = <0x1b 0x1d 0x7f 0x81 0x87>;
 		};
 	};
 

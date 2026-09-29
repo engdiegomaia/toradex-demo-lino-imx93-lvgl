@@ -51,6 +51,9 @@ echo "[m33-overlay] Validating source with the host DTC"
 dtc -@ -I dts -O dtb -o "${overlay_dtbo}" "${overlay_src}"
 
 echo "[m33-overlay] Existing overlays"
+# TorizonCore Builder 3 writes the human-readable dto status report to
+# stderr. Capture both streams; otherwise `status` is empty, the old overlay
+# is not removed, and the following `dto apply` fails with "already applied".
 status=$(tcb_cmd dto status 2>&1)
 printf '%s\n' "${status}"
 
@@ -74,7 +77,17 @@ grep -Fq "lino-imx93_panel-cap-touch-10inch-dsi_overlay" <<<"${status}"
 grep -Fq "lino-imx93_cm33-shm_overlay" <<<"${status}"
 
 echo "[m33-overlay] Creating OSTree branch ${branch}"
-tcb_cmd union --subject "Lino i.MX93 M33 SHM and peripheral handoff v2" "${branch}"
+union_args=(
+	union
+	--subject "Lino i.MX93 M33 SHM and peripheral handoff"
+)
+# Preserve filesystem customizations (for example the rotated Plymouth
+# watermark) when the Builder workspace carries a changes/ tree.
+if [[ -d "${workspace}/changes" ]]; then
+	union_args+=(--changes-directory changes)
+fi
+union_args+=("${branch}")
+tcb_cmd "${union_args[@]}"
 
 deploy_args=(
 	deploy
