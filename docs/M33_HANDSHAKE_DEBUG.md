@@ -208,7 +208,7 @@ upstream's `m_data2`.
 
 ## Target validation status — 2026-08-18
 
-Completed on `<target-host>` with Torizon OS 7.7.0 build 40:
+Completed on the validation target with Torizon OS 7.7.0 build 40:
 
 - TorizonCore Builder deployed both
   `lino-imx93_panel-cap-touch-10inch-dsi_overlay.dtbo` and
@@ -274,7 +274,7 @@ grep -E "a5000000|System RAM" /proc/iomem   # a5000000 must NOT be System RAM
 ls /proc/device-tree/reserved-memory/ | grep cm33
 
 # 4. HOST — ship app + new ELF
-./docker/sync-to-target.sh
+SYNC_TARGET=torizon@<target-host> ./docker/sync-to-target.sh
 ```
 
 Expected on success (observed on the target): `[shm-config]` shows
@@ -385,10 +385,10 @@ Documented in this repo under Phase 3 of the debug plan.
 
 ```bash
 # HOST
-./docker/sync-to-target.sh       # auto-builds if source is newer
+SYNC_TARGET=torizon@<target-host> ./docker/sync-to-target.sh  # auto-builds if source is newer
 
 # TARGET
-ssh torizon@<target-host>.local
+ssh torizon@<target-host>
 cd ~/lino-imx93-mallow-dsi-lvgl
 ./docker/rebuild-app.sh
 docker compose -f docker/docker-compose.yml down --remove-orphans

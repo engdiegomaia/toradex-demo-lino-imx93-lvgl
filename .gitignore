@@ -1,6 +1,8 @@
 # Build artifacts
 app/platform/linux/build-*/
 app/platform/linux/build/
+app/platform/simulator/build/
+/*.dtbo
 *.o
 *.d
 *.a
@@ -24,3 +26,16 @@ m33-diag-*/
 firmware/workspace/
 # Backup of the original NXP EVK firmware
 *.evk-backup
+
+# Local AI assistant configuration
+.ai/
+.agents/
+.codex/
+.claude/
+.cursor/
+.windsurf/
+/AGENTS.md
+/CLAUDE.md
+/GEMINI.md
+/.windsurfrules
+/.github/copilot-instructions.md

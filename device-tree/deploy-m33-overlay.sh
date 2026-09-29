@@ -12,8 +12,13 @@ include_dir="device-trees"
 storage_dir="${workspace}/storage"
 builder_image="${TCB_IMAGE:-torizon/torizoncore-builder:3}"
 branch="${TCB_BRANCH:-lino-imx93-shm-v2}"
-remote_host="${1:-${TCB_REMOTE_HOST:-<target-host>.local}}"
+remote_host="${1:-${TCB_REMOTE_HOST:-}}"
 remote_user="${TCB_REMOTE_USER:-torizon}"
+
+if [[ -z "${remote_host}" ]]; then
+	echo "Set TCB_REMOTE_HOST or pass the target host as the first argument" >&2
+	exit 2
+fi
 
 cd "${workspace}"
 

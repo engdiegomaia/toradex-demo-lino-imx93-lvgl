@@ -7,11 +7,15 @@
 # Usage:
 #   ./docker/sync-to-target.sh [target-host]
 #
-# Default target is the Torizon mDNS name shown in the current session.
+# Set SYNC_TARGET or pass a target host explicitly before using this helper.
 
 set -euo pipefail
 
-target="${1:-torizon@<target-host>.local}"
+target="${1:-${SYNC_TARGET:-}}"
+if [ -z "${target}" ]; then
+    echo "Usage: SYNC_TARGET=torizon@<target-host> $0 [torizon@<target-host>]" >&2
+    exit 2
+fi
 project_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 remote_dir="~/lino-imx93-mallow-dsi-lvgl"
 

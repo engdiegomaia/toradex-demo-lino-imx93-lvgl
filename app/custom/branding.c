@@ -8,7 +8,7 @@
 
 #include "lvgl.h"
 
-/* All three emitted by scripts/png-to-lvgl-image.py; see CLAUDE.md for the
+/* All three emitted by scripts/png-to-lvgl-image.py; see docs/DEVELOPMENT.md for the
  * commands. GUI-Guider does ship Torizon and Toradex lockups in gg_image.h, but
  * only at 188x72 and 164x42 -- these are the same artwork 15% larger, redrawn
  * from the high-res originals so the extra size buys sharpness rather than

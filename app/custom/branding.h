@@ -9,7 +9,7 @@
  * Torizon OS, LVGL and Toradex.
  *
  * Applied at runtime rather than by editing app/generated/, so it survives a
- * GUI-Guider regeneration (see CLAUDE.md).
+ * GUI-Guider regeneration (see docs/DEVELOPMENT.md).
  */
 
 #ifndef __BRANDING_H_

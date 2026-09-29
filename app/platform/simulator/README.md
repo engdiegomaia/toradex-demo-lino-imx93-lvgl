@@ -1,40 +1,22 @@
-## Requirements
-* **MinGW**
+# LVGL Simulator
 
-## Usage
+This directory contains the desktop simulator configuration for the GUI
+application. The simulator is optional; the primary deployment target is the
+Toradex Verdin i.MX93 running Torizon OS.
 
-### Install MinGW
-You can download MinGW from https://osdn.net/projects/mingw/releases/
+## Build
 
-### Set environment
-1. Add the path of **mingw32-make** to the system's path. By default, it is `C:\MinGW\bin`.
-2. Copy `bin\SDL2.dll` to `C:\MinGW\lib`.
+Use a host toolchain supported by the CMake project and provide SDL2. From this
+directory, configure and build in an out-of-tree directory:
 
-### Compile the project(Note: don't use git bash)
-1. Enter project direction:
-   ```
-   cd lvgl-simulator
-   ```
-2. Build the target:
-   ```
-   mingw32-make -j8
-   ```
-### Run simulator
-```
-mingw32-make run
+```sh
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
 ```
 
-### Add your code for ui's callbacks
-1. User can edit callbacks in [event_cb.c](demo/event_cb.c).
-   
-## Work with Visual Studio Code
+SDL2 discovery depends on the host platform. Install SDL2 development files or
+set the CMake package path as needed. Do not commit the generated `build/`
+directory.
 
-1. Download and install latest version of Visual Studio Code
-2. Install extensions listed below:
-   - C/C++
-   - C/C++ Clang Command Adapter
-   - Make
-3. Build the target
-   In Visual Studio Code, you can open a terminal via `Terminal-> New Terminal`. After Openning the terminal, type `make -j8` to build the target.
-4. Run simulaor
-   Type `make run` to run the simualor.
+The simulator does not reproduce the target's remoteproc, shared-memory,
+Wayland, or hardware display behavior.

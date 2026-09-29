@@ -8,7 +8,7 @@
  *
  * Everything here runs on the LVGL thread. All retitling, repositioning and axis
  * work is applied at runtime rather than by editing app/generated/, so it
- * survives a GUI-Guider regeneration (see CLAUDE.md).
+ * survives a GUI-Guider regeneration (see docs/DEVELOPMENT.md).
  */
 
 #ifndef __CPU_LOAD_UI_H_
