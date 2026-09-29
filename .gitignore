@@ -40,6 +40,11 @@ firmware/workspace/
 /.windsurfrules
 /.github/copilot-instructions.md
 
+# Local environment files can contain deployment credentials.
+.env
+.env.*
+!.env.example
+
 # Compiled device-tree overlays (built from device-tree/overlays/*.dts)
 *.dtbo
 

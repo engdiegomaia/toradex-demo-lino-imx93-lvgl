@@ -57,6 +57,22 @@ docker compose -f docker/docker-compose.yml build
 docker compose -f docker/docker-compose.yml up -d
 ```
 
+### Security and device access
+
+The Compose stack is isolated from IP networking; Weston and the application
+communicate over the shared Wayland socket. The `display-init` helper drops all
+Linux capabilities and only needs the host sysfs bind attribute plus read-only
+visibility of `/dev/dri/card0`. The M33 loader and LVGL application still run
+privileged. They enter the host mount
+namespace to stage firmware and write remoteproc sysfs. The LVGL application
+also offlines a CPU through sysfs and reads telemetry through `/dev/mem`. Treat
+those images and this source tree as host-control software: run only reviewed
+builds on a trusted target, and do not enable a remote Docker API for the device.
+
+Keep deployment credentials in local `.env` files or environment variables;
+`.env` files are ignored by Git. Commit only sanitized examples such as
+`.env.example`.
+
 The target requires the appropriate display and shared-memory device-tree
 overlays. See [firmware build and deployment](firmware/README.md) and the
 [display bring-up notes](docs/DISPLAY_BRINGUP_DEBUG.md) before applying overlays.

@@ -34,10 +34,14 @@ services:
   display-init:
     image: debian:bookworm-slim
     container_name: lino-display-init
-    privileged: true
+    # This helper only writes the block-controller sysfs bind attribute. It
+    # does not need device access or broad Linux capabilities.
+    cap_drop:
+      - ALL
+    network_mode: none
     volumes:
       - /sys:/sys
-      - /dev:/dev
+      - /dev:/dev:ro
       - ./display-init.sh:/usr/local/bin/display-init.sh:ro
     command: /usr/local/bin/display-init.sh
     healthcheck:
@@ -53,13 +57,15 @@ services:
     container_name: lino-weston
     environment:
       - ACCEPT_FSL_EULA=1
-    network_mode: host
+    # Weston clients use the shared Wayland socket under /tmp; no IP network
+    # access is needed by the compositor.
+    network_mode: none
     cap_add:
       - CAP_SYS_TTY_CONFIG
     volumes:
       - /dev:/dev
       - /tmp:/tmp
-      - /run/udev/:/run/udev/
+      - /run/udev/:/run/udev/:ro
       # Kiosk config: no panel, black background, no shell chrome.
       # Bind-mount the *directory*, not the file directly. The Torizon Weston
       # entrypoint runs dos2unix on weston.ini and does a rename(2) over it;
@@ -101,6 +107,7 @@ services:
     image: lino-imx93-m33-loader:latest
     container_name: lino-m33-loader
     privileged: true
+    network_mode: none
     pid: host          # nsenter -t 1 -m to reach host mount namespace
     volumes:
       - /sys:/sys
@@ -118,6 +125,7 @@ services:
       dockerfile: docker/Dockerfile.runtime
     image: lino-imx93-lvgl-app:latest
     container_name: lino-lvgl-app
+    network_mode: none
     depends_on:
       weston:
         condition: service_healthy
