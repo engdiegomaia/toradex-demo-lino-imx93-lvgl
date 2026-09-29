@@ -39,3 +39,14 @@ firmware/workspace/
 /GEMINI.md
 /.windsurfrules
 /.github/copilot-instructions.md
+
+# Compiled device-tree overlays (built from device-tree/overlays/*.dts)
+*.dtbo
+
+# Out-of-tree kernel module build artifacts
+*.ko
+*.mod
+*.mod.c
+Module.symvers
+modules.order
+.tmp_versions/

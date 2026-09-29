@@ -105,7 +105,7 @@ services:
     volumes:
       - /sys:/sys
     healthcheck:
-      test: ["CMD-SHELL", "test \"$$(cat /sys/class/remoteproc/remoteproc0/state 2>/dev/null)\" = running"]
+      test: ["CMD-SHELL", "test -f /run/m33-loader.ready"]
       interval: 2s
       timeout: 1s
       retries: 30

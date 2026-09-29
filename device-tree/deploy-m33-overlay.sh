@@ -51,7 +51,7 @@ echo "[m33-overlay] Validating source with the host DTC"
 dtc -@ -I dts -O dtb -o "${overlay_dtbo}" "${overlay_src}"
 
 echo "[m33-overlay] Existing overlays"
-status=$(tcb_cmd dto status)
+status=$(tcb_cmd dto status 2>&1)
 printf '%s\n' "${status}"
 
 # Updating an overlay with the same output name requires removing its old
@@ -68,7 +68,7 @@ tcb_cmd dto apply \
 	"${overlay_src}"
 
 echo "[m33-overlay] Final overlays"
-status=$(tcb_cmd dto status)
+status=$(tcb_cmd dto status 2>&1)
 printf '%s\n' "${status}"
 grep -Fq "lino-imx93_panel-cap-touch-10inch-dsi_overlay" <<<"${status}"
 grep -Fq "lino-imx93_cm33-shm_overlay" <<<"${status}"

@@ -43,3 +43,22 @@ if [ "$current" = "running" ]; then
     echo stop > "$CMD_DIR/state" 2>/dev/null || true
     log "state after stop: $(cat "$CMD_DIR/state" 2>/dev/null)"
 fi
+
+# Give the Cortex-A55 back to Linux, but only once remoteproc agrees the core
+# is parked. PSCI has no way for one CPU to switch another off, so the core
+# only leaves the firmware if the firmware itself called CPU_OFF. Re-onlining a
+# CPU that is still executing firmware would hand Linux a core it does not own.
+if [ "$CORE" == "a" ]; then
+    CA55_CPU="${CA55_CPU:-1}"
+    CA55_CPU_ONLINE="/sys/devices/system/cpu/cpu${CA55_CPU}/online"
+    state_now=$(cat "$CMD_DIR/state" 2>/dev/null || echo "")
+
+    if [ "$state_now" = "offline" ] && [ -w "$CA55_CPU_ONLINE" ]; then
+        if [ "$(cat "$CA55_CPU_ONLINE")" = "0" ]; then
+            echo 1 > "$CA55_CPU_ONLINE" 2>/dev/null || true
+            log "cpu$CA55_CPU online=$(cat "$CA55_CPU_ONLINE" 2>/dev/null); nproc now $(nproc)"
+        fi
+    elif [ "$state_now" = "running" ]; then
+        log "cpu$CA55_CPU NOT reclaimed: firmware still running (rproc state=$state_now)"
+    fi
+fi

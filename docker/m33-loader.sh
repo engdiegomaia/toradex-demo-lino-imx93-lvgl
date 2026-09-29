@@ -76,4 +76,14 @@ if [ "$final_state" != "running" ]; then
 fi
 
 echo "m33-loader: ready; keeping the service alive for Docker reboot recovery."
+
+# Readiness marker for the compose healthcheck. The check deliberately does not
+# assert "remoteproc0 is running": the LVGL app legitimately stops the M33 at
+# runtime, because starting a Cortex-A55 rt_latency has to release TPM2/TPM4 —
+# both firmwares drive the same two timers. Gating on live state would flip this
+# service to unhealthy the moment the user picks an A55 demo, which in turn
+# blocks lvgl-app from ever being restarted. What this service is responsible
+# for is staging the firmware and booting the M33 once; that is what we assert.
+: > /run/m33-loader.ready
+
 exec sleep infinity
