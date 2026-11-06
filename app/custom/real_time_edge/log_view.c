@@ -66,9 +66,28 @@ void log_view_m33_publish(void)
 		log_printf(MC_IDX, "%s", frame);
 }
 
+static int s_load_level;
+static int s_has_jitter;
+static int32_t s_jit_mean, s_jit_max;
+
+void log_view_a55_set_loadgen(int level_pct)
+{
+	s_load_level = level_pct;
+}
+
+void log_view_a55_set_jitter(int32_t mean_ns, int32_t max_ns)
+{
+	s_has_jitter = 1;
+	s_jit_mean = mean_ns;
+	s_jit_max = max_ns;
+}
+
 void log_view_a55_publish(int total, int app, int idle)
 {
-	log_frame_a55_t f = {total, app, idle};
+	log_frame_a55_t f = {.total = total, .app = app, .idle = idle,
+			     .load_level = s_load_level,
+			     .has_jitter = s_has_jitter,
+			     .jit_mean = s_jit_mean, .jit_max = s_jit_max};
 	char frame[LOG_BUF_SIZE];
 
 	if (log_frame_render_a55(&f, frame, sizeof(frame)))

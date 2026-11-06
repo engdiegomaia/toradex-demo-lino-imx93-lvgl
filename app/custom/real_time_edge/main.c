@@ -17,6 +17,8 @@
 #include "log_view.h"
 #include "boot_names.h"
 #include "applog.h"
+#include "linux_jitter.h"
+#include "load_gen.h"
 
 
 static uint32_t scur_sec = 0;
@@ -458,6 +460,8 @@ int main(int argc, char **argv)
 	/* Weston may still be starting; see wait_for_wayland_display(). */
 	wait_for_wayland_display(60);
 	start_lvgl_gui();
+	if (linux_jitter_start() || load_gen_start())
+		applog(APPLOG_WARN, "app", "jitter/load threads not started");
 
 	while (is_running()) {
 		run_flag = 0;
@@ -523,6 +527,11 @@ int main(int argc, char **argv)
 		 * and Console_A1 already display. */
 		if (cpu_load_sample()) {
 			cpu_load_t load;
+			jitter_snapshot_t jit;
+
+			log_view_a55_set_loadgen(load_gen_get_level());
+			if (linux_jitter_take(&jit))
+				log_view_a55_set_jitter(jit.mean_ns, jit.max_ns);
 
 			if (cpu_load_peek(&load))
 				log_view_a55_publish(load.total, load.app, load.idle);
@@ -545,6 +554,8 @@ int main(int argc, char **argv)
 	}
 	stop_ram_console_thread(AC_IDX);
 
+	load_gen_stop();
+	linux_jitter_stop();
 	stop_lvgl_gui();
 	exit_mem_mgr();
 

@@ -37,6 +37,9 @@ typedef struct {
 	int total; /* percent */
 	int app;
 	int idle;
+	int load_level;  /* load generator duty: 0 (OFF), 25, 50, 100 */
+	int has_jitter;  /* Linux timer jitter measured this window */
+	int32_t jit_mean, jit_max; /* ns */
 } log_frame_a55_t;
 
 /* Render into out (NUL-terminated, truncated to cap - 1). Return the length,

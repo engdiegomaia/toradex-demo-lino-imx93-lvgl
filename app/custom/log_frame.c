@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "load_gen.h"
 #include "terminal_buf.h"
 
 #define FRAME_MAX 512
@@ -91,20 +92,34 @@ size_t log_frame_render_m33(const log_frame_m33_t *f, char *out, size_t cap)
 size_t log_frame_render_a55(const log_frame_a55_t *f, char *out, size_t cap)
 {
 	char tmp[FRAME_MAX];
+	char gen[8], jmean[16], jmax[16];
 
 	if (out && cap > 0)
 		out[0] = '\0';
 	if (!f || !out || cap < 2)
 		return 0;
 
+	snprintf(gen, sizeof(gen), "%s", load_gen_level_name(f->load_level));
+	if (f->has_jitter) {
+		snprintf(jmean, sizeof(jmean), "%6d", (int)clamp_ns(f->jit_mean));
+		snprintf(jmax, sizeof(jmax), "%6d", (int)clamp_ns(f->jit_max));
+	} else {
+		snprintf(jmean, sizeof(jmean), "%6s", "-");
+		snprintf(jmax, sizeof(jmax), "%6s", "-");
+	}
+
 	snprintf(tmp, sizeof(tmp),
 		 "%c"
 		 "CORE     Cortex-A55-0\n"
 		 "TOTAL    %3d %%\n"
 		 "APP      %3d %%\n"
-		 "IDLE     %3d %%",
+		 "IDLE     %3d %%\n"
+		 "LOADGEN  %s\n"
+		 "JIT mean %s ns\n"
+		 "JIT max  %s ns",
 		 TERMINAL_BUF_CLEAR, clamp_int(f->total, 0, 100),
-		 clamp_int(f->app, 0, 100), clamp_int(f->idle, 0, 100));
+		 clamp_int(f->app, 0, 100), clamp_int(f->idle, 0, 100), gen,
+		 jmean, jmax);
 
 	return finish(tmp, out, cap);
 }

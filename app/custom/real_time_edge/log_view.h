@@ -22,5 +22,10 @@ void log_view_m33_publish(void);
 
 /* Cortex-A55-0 utilisation frame, in percent. Publishes immediately. */
 void log_view_a55_publish(int total, int app, int idle);
+/* Remember the last load-generator level and Linux jitter window; they are
+ * shown on the A55 frame on the next publish. has_jitter == 0 keeps the last
+ * jitter values. */
+void log_view_a55_set_loadgen(int level_pct);
+void log_view_a55_set_jitter(int32_t mean_ns, int32_t max_ns);
 
 #endif /* LOG_VIEW_H */

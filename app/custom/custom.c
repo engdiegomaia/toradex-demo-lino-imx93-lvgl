@@ -20,6 +20,7 @@
 #include "cpu_load_ui.h"
 #include "log_terminal.h"
 #include "home_labels.h"
+#include "load_gen.h"
 
 
 /*********************
@@ -57,6 +58,14 @@ static pthread_mutex_t g_operation_info_mutex = PTHREAD_MUTEX_INITIALIZER;
  * Create a demo application
  */
 
+/* Tapping the Cortex-A55-0 card cycles the CPU load generator
+ * (OFF -> 25 -> 50 -> 100 -> OFF). The level shows on the A55 frame within 1 s. */
+static void load_gen_tap_cb(lv_event_t *e)
+{
+    (void)e;
+    load_gen_set_level(load_gen_level_next(load_gen_get_level()));
+}
+
 void custom_init(gg_ui_t *ui)
 {
     init_operation_info();
@@ -70,6 +79,12 @@ void custom_init(gg_ui_t *ui)
 
     /* Fixed-width font so the log columns line up. */
     log_terminal_init(ui);
+
+    if (ui->Home.container_cortexA1) {
+        lv_obj_add_flag(ui->Home.container_cortexA1, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(ui->Home.container_cortexA1, load_gen_tap_cb,
+                            LV_EVENT_CLICKED, NULL);
+    }
 }
 
 /**
