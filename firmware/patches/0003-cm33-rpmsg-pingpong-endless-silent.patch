@@ -1,0 +1,20 @@
+--- a/examples/multicore_examples/rpmsg_lite_pingpong_rtos/secondary/main.c	2026-11-06 13:44:13.576485490 -0300
++++ b/examples/multicore_examples/rpmsg_lite_pingpong_rtos/secondary/main.c	2026-11-06 13:44:13.578530286 -0300
+@@ -160,13 +160,14 @@
+                            RL_BLOCK);
+ #endif /* RPMSG_LITE_MASTER_IS_LINUX */
+ 
+-    while (msg.DATA <= 100U)
++    /* Demo patch: echo forever and stay silent on the console. The upstream
++     * loop stops after 100 messages and prints twice per round trip over a
++     * blocking UART, which would dominate the round-trip time being measured. */
++    for (;;)
+     {
+-        (void)PRINTF("Waiting for ping...\r\n");
+         (void)rpmsg_queue_recv(my_rpmsg, my_queue, (uint32_t *)&remote_addr, (char *)&msg, sizeof(THE_MESSAGE),
+                                ((void *)0), RL_BLOCK);
+         msg.DATA++;
+-        (void)PRINTF("Sending pong...\r\n");
+         (void)rpmsg_lite_send(my_rpmsg, my_ept, remote_addr, (char *)&msg, sizeof(THE_MESSAGE), RL_BLOCK);
+     }
+ 

@@ -42,9 +42,20 @@ typedef struct {
 	int32_t jit_mean, jit_max; /* ns */
 } log_frame_a55_t;
 
+typedef struct {
+	char state[LOG_FRAME_STATE_COLS + 1];
+	int uptime_s;
+	int linked;   /* replies are flowing */
+	int has_rtt;
+	int32_t rtt_min, rtt_mean, rtt_max; /* ns */
+	uint32_t sent, lost;
+	char event[64];
+} log_frame_rpmsg_t;
+
 /* Render into out (NUL-terminated, truncated to cap - 1). Return the length,
  * or 0 for NULL/too-small arguments. */
 size_t log_frame_render_m33(const log_frame_m33_t *f, char *out, size_t cap);
+size_t log_frame_render_rpmsg(const log_frame_rpmsg_t *f, char *out, size_t cap);
 size_t log_frame_render_a55(const log_frame_a55_t *f, char *out, size_t cap);
 
 #endif /* LOG_FRAME_H */

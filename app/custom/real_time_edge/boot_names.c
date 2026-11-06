@@ -7,7 +7,7 @@
 /* Short names: card title and log-frame event row (<= 23 characters). */
 static const char *const s_app_name[APPS_PER_CORE] = {
 	"FreeRTOS IRQ latency",
-	"FreeRTOS heartbeat",
+	"FreeRTOS RPMsg pingpong",
 	"Zephyr IRQ latency",
 	"Zephyr heartbeat",
 };
@@ -15,7 +15,7 @@ static const char *const s_app_name[APPS_PER_CORE] = {
 /* Dropdown entries say what the application does, not its source folder. */
 static const char *const s_menu_name[APPS_PER_CORE] = {
 	"FreeRTOS: Interrupt latency benchmark",
-	"FreeRTOS: Heartbeat (tic/tac)",
+	"FreeRTOS: RPMsg round-trip A55-M33",
 	"Zephyr: Interrupt latency benchmark",
 	"Zephyr: Heartbeat (tic/tac)",
 };

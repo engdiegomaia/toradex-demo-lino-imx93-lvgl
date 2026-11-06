@@ -123,3 +123,52 @@ size_t log_frame_render_a55(const log_frame_a55_t *f, char *out, size_t cap)
 
 	return finish(tmp, out, cap);
 }
+
+static void put_rtt_row(char *dst, size_t cap, const char *label, int valid,
+			int32_t v)
+{
+	if (valid)
+		snprintf(dst, cap, "%-6s %8d", label, (int)clamp_ns(v));
+	else
+		snprintf(dst, cap, "%-6s %8s", label, "-");
+}
+
+size_t log_frame_render_rpmsg(const log_frame_rpmsg_t *f, char *out, size_t cap)
+{
+	char tmp[FRAME_MAX], rule[LOG_FRAME_MAX_COLS + 1];
+	char r_min[32], r_mean[32], r_max[32];
+	unsigned sent, lost;
+
+	if (out && cap > 0)
+		out[0] = '\0';
+	if (!f || !out || cap < 2)
+		return 0;
+
+	memset(rule, '-', LOG_FRAME_MAX_COLS);
+	rule[LOG_FRAME_MAX_COLS] = '\0';
+	put_rtt_row(r_min, sizeof(r_min), "min", f->has_rtt, f->rtt_min);
+	put_rtt_row(r_mean, sizeof(r_mean), "mean", f->has_rtt, f->rtt_mean);
+	put_rtt_row(r_max, sizeof(r_max), "max", f->has_rtt, f->rtt_max);
+	sent = f->sent > 999999u ? 999999u : f->sent;
+	lost = f->lost > 99999u ? 99999u : f->lost;
+
+	snprintf(tmp, sizeof(tmp),
+		 "%c"
+		 "STATE    %.*s\n"
+		 "UPTIME   %04d s\n"
+		 "LINK     %s\n"
+		 "%s\n"
+		 "RTT (ns)\n"
+		 "%s\n"
+		 "%s\n"
+		 "%s\n"
+		 "%s\n"
+		 "SENT %06u  LOST %05u\n"
+		 "> %.*s",
+		 TERMINAL_BUF_CLEAR, LOG_FRAME_STATE_COLS, f->state,
+		 clamp_int(f->uptime_s, 0, UPTIME_MAX), f->linked ? "UP" : "WAIT",
+		 rule, r_min, r_mean, r_max, rule, sent, lost,
+		 LOG_FRAME_EVENT_COLS, f->event);
+
+	return finish(tmp, out, cap);
+}

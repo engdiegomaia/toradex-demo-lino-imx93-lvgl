@@ -21,7 +21,7 @@
 
 CORE=$1     # a = Cortex-A secondary, m = Cortex-M33
 RTOS=$2     # z = Zephyr, r = FreeRTOS
-TYPE=$3     # h = hello_world, r = rt_latency
+TYPE=$3     # h = hello_world (M33 FreeRTOS: RPMsg ping-pong), r = rt_latency
 
 ELF_DIR="$PWD/elf"
 
@@ -106,7 +106,7 @@ else
         if [ "$TYPE" == "h" ]; then FW="$ELF_DIR/hello_world_cm33_zephyr.elf"
         else                        FW="$ELF_DIR/rt_latency_cm33_zephyr.elf"; fi
     else
-        if [ "$TYPE" == "h" ]; then FW="$ELF_DIR/hello_world_cm33.elf"
+        if [ "$TYPE" == "h" ]; then FW="$ELF_DIR/rpmsg_pingpong_cm33.elf"
         else                        FW="$ELF_DIR/rt_latency_cm33.elf"; fi
     fi
 fi

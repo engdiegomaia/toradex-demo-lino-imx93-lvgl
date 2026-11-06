@@ -9,6 +9,7 @@
 #define LOG_VIEW_H
 
 #include "basedef.h"
+#include "linux_jitter.h"
 
 /* Clear the Cortex-M33 frame to the given state/event (no data yet). */
 void log_view_m33_reset(const char *state, const char *event);
@@ -19,6 +20,12 @@ void log_view_m33_set_load(double load_pct);
 void log_view_m33_set_latency(const rt_latency_shm_stat *delay,
 			      const rt_latency_shm_stat *sched);
 void log_view_m33_publish(void);
+
+/* RPMsg round-trip frame on the Cortex-M33 terminal. Publishes immediately.
+ * rtt may be NULL when no reply arrived in this window (last values are kept). */
+void log_view_rpmsg_publish(const char *state, int uptime_s, int linked,
+			    const jitter_snapshot_t *rtt, uint32_t sent,
+			    uint32_t lost, const char *event);
 
 /* Cortex-A55-0 utilisation frame, in percent. Publishes immediately. */
 void log_view_a55_publish(int total, int app, int idle);

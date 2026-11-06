@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include <stdio.h>
 #include "log_frame.h"
 #include "log_tools.h"
 
@@ -92,4 +93,27 @@ void log_view_a55_publish(int total, int app, int idle)
 
 	if (log_frame_render_a55(&f, frame, sizeof(frame)))
 		log_printf(AC_IDX, "%s", frame);
+}
+
+void log_view_rpmsg_publish(const char *state, int uptime_s, int linked,
+			    const jitter_snapshot_t *rtt, uint32_t sent,
+			    uint32_t lost, const char *event)
+{
+	static log_frame_rpmsg_t f;
+	char frame[LOG_BUF_SIZE];
+
+	snprintf(f.state, sizeof(f.state), "%s", state ? state : "");
+	snprintf(f.event, sizeof(f.event), "%s", event ? event : "");
+	f.uptime_s = uptime_s;
+	f.linked = linked;
+	f.sent = sent;
+	f.lost = lost;
+	if (rtt) {
+		f.has_rtt = 1;
+		f.rtt_min = rtt->min_ns;
+		f.rtt_mean = rtt->mean_ns;
+		f.rtt_max = rtt->max_ns;
+	}
+	if (log_frame_render_rpmsg(&f, frame, sizeof(frame)))
+		log_printf(MC_IDX, "%s", frame);
 }

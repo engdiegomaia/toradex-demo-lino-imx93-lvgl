@@ -19,6 +19,7 @@
 #include "applog.h"
 #include "linux_jitter.h"
 #include "load_gen.h"
+#include "rpmsg_ping.h"
 
 
 static uint32_t scur_sec = 0;
@@ -256,6 +257,9 @@ static int stop_multi_core_prog(uint8_t boot_type, int op_flag)
 		push_oper_cmd(am_idx, &op_cmd);
 	}
 
+	if (boot_type == TYPE_M_RTOS_HELLO)
+		rpmsg_ping_stop();
+
 	if (BOOT_TYPE_ACORE(boot_type)) {
 		stop_ram_console_thread(am_idx);
 		run_system_cmd("./stop.sh a");
@@ -298,12 +302,15 @@ static int stop_multi_core_prog(uint8_t boot_type, int op_flag)
  *
  * show_stat_shm_data will be called only when ram_shm address is set.
  * */
+static int s_rpmsg_start_sec;
+
 static int start_multi_core_prog(uint8_t boot_type, int reboot)
 {
 	uint8_t am_idx = BOOT_TYPE_AM_IDX(boot_type);
 	off_t shm_addr = M33_LEGACY_SHM_BASE;
 	core_session_t *ps = NULL;
 	off_t ram_addr = 0;
+	int rpmsg_mode = 0;
 	cmd_type_t op_cmd;
 
 	ps = get_core_session(am_idx);
@@ -338,7 +345,13 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 		break;
 
 	case TYPE_M_RTOS_HELLO:
+		/* RPMsg round-trip firmware: no shared-memory producer, so the SHM
+		 * handshake poll must stay off (it would report a boot failure). */
 		run_system_cmd("./start.sh m r h");
+		s_rpmsg_start_sec = scur_sec;
+		if (rpmsg_ping_start())
+			applog(APPLOG_WARN, "rpmsg", "ping thread not started");
+		rpmsg_mode = 1;
 		break;
 
 	case TYPE_M_ZEPH_RTLAT:
@@ -370,6 +383,9 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 		set_ram_shm_addr(am_idx, 0);
 		set_ram_console_addr(am_idx, ram_addr);
 		start_ram_console_thread(am_idx);
+	} else if (rpmsg_mode) {
+		set_ram_shm_addr(am_idx, 0);
+		applog(APPLOG_INFO, "rpmsg", "round-trip test started");
 	} else {
 		applog(APPLOG_INFO, "shm", "config boot_type=%d addr=0x%llx", boot_type,
 		       (unsigned long long)shm_addr);
@@ -520,6 +536,17 @@ int main(int argc, char **argv)
 			applog(APPLOG_INFO, "app", "heartbeat uptime=%ds", scur_sec);
 
 		output_shm_data();  /* Show latency data in share memory */
+
+		if (get_boot_type(MC_IDX) == TYPE_M_RTOS_HELLO) {
+			jitter_snapshot_t rtt;
+			rpmsg_ping_counters_t tot = {0, 0};
+			int got = rpmsg_ping_take(&rtt, &tot);
+
+			log_view_rpmsg_publish("RUNNING", scur_sec - s_rpmsg_start_sec,
+					       rpmsg_ping_linked(), got ? &rtt : NULL,
+					       tot.sent, rpmsg_ping_lost(&tot),
+					       rpmsg_ping_linked() ? "ping-pong ok" : "waiting for M33");
+		}
 
 		/* Cortex-A55-0 utilisation. Sampling only reads /proc, so it stays on this
 		 * thread; cpu_load_ui_render() does the widget work on the LVGL thread.
