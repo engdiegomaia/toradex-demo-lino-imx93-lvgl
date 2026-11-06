@@ -130,7 +130,7 @@ static void put_rtt_row(char *dst, size_t cap, const char *label, int valid,
 	if (valid)
 		snprintf(dst, cap, "%-6s %8d", label, (int)clamp_ns(v));
 	else
-		snprintf(dst, cap, "%-6s %8s", label, "-");
+		snprintf(dst, cap, "%-6s %8s", label, "--");
 }
 
 size_t log_frame_render_rpmsg(const log_frame_rpmsg_t *f, char *out, size_t cap)

@@ -542,6 +542,11 @@ int main(int argc, char **argv)
 			rpmsg_ping_counters_t tot = {0, 0};
 			int got = rpmsg_ping_take(&rtt, &tot);
 
+			if (got)
+				applog(APPLOG_DEBUG, "rpmsg", "rtt n=%d min=%d mean=%d max=%d ns sent=%u ok=%u",
+				       rtt.count, rtt.min_ns, rtt.mean_ns, rtt.max_ns,
+				       (unsigned)tot.sent, (unsigned)tot.ok);
+
 			log_view_rpmsg_publish("RUNNING", scur_sec - s_rpmsg_start_sec,
 					       rpmsg_ping_linked(), got ? &rtt : NULL,
 					       tot.sent, rpmsg_ping_lost(&tot),
