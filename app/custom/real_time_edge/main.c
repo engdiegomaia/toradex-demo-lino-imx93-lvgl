@@ -133,19 +133,18 @@ static void signal_handler(int sig)
 #define STRCAT(x, y) strncat(x, y, sizeof(x) - strlen(x) - 1)
 static int init_boot_type(void)
 {
+	static const uint8_t app_slots[] = {TYPE_A_RTOS_RTLAT, TYPE_A_RTOS_HELLO,
+					       TYPE_A_ZEPH_RTLAT, TYPE_A_ZEPH_HELLO};
 	char str[64];
+	size_t i;
 
-	snprintf(str, sizeof(str), "%d. FreeRTOS rt_latency\n", TYPE_A_RTOS_RTLAT);
-	STRCAT(sboot_type_str, str);
-
-	snprintf(str, sizeof(str), "%d. FreeRTOS hello_world\n", TYPE_A_RTOS_HELLO);
-	STRCAT(sboot_type_str, str);
-
-	snprintf(str, sizeof(str), "%d. Zephyr   rt_latency\n", TYPE_A_ZEPH_RTLAT);
-	STRCAT(sboot_type_str, str);
-
-	snprintf(str, sizeof(str), "%d. Zephyr   hello_world", TYPE_A_ZEPH_HELLO);
-	STRCAT(sboot_type_str, str);
+	/* One dropdown row per application, in boot-type order; the selected row
+	 * index is what selects the application, so the order must not change. */
+	for (i = 0; i < sizeof(app_slots) / sizeof(app_slots[0]); i++) {
+		snprintf(str, sizeof(str), "%s%zu. %s", i ? "\n" : "", i + 1,
+			 boot_type_menu_name(app_slots[i]));
+		STRCAT(sboot_type_str, str);
+	}
 
 	sboot_type_len = strlen(sboot_type_str);
 	return sboot_type_len;

@@ -4,11 +4,20 @@
 #define BOOT_TYPE_LAST 8
 #define APPS_PER_CORE 4
 
+/* Short names: card title and log-frame event row (<= 23 characters). */
 static const char *const s_app_name[APPS_PER_CORE] = {
-	"FreeRTOS rt_latency",
-	"FreeRTOS hello_world",
-	"Zephyr rt_latency",
-	"Zephyr hello_world",
+	"FreeRTOS IRQ latency",
+	"FreeRTOS heartbeat",
+	"Zephyr IRQ latency",
+	"Zephyr heartbeat",
+};
+
+/* Dropdown entries say what the application does, not its source folder. */
+static const char *const s_menu_name[APPS_PER_CORE] = {
+	"FreeRTOS: Interrupt latency benchmark",
+	"FreeRTOS: Heartbeat (tic/tac)",
+	"Zephyr: Interrupt latency benchmark",
+	"Zephyr: Heartbeat (tic/tac)",
 };
 
 static const char *const s_os_name[APPS_PER_CORE] = {
@@ -27,6 +36,13 @@ const char *boot_type_app_name(uint8_t boot_type)
 	int i = app_index(boot_type);
 
 	return i < 0 ? "No application" : s_app_name[i];
+}
+
+const char *boot_type_menu_name(uint8_t boot_type)
+{
+	int i = app_index(boot_type);
+
+	return i < 0 ? "No application" : s_menu_name[i];
 }
 
 const char *boot_type_os_name(uint8_t boot_type)

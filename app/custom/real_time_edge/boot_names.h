@@ -10,9 +10,14 @@
 
 #include <stdint.h>
 
-/* e.g. "FreeRTOS rt_latency"; at most 23 characters so it fits the on-screen
- * frame's event row. "No application" for an invalid boot type. */
+/* Short name for the card and the log frame, e.g. "FreeRTOS IRQ latency".
+ * At most 23 characters so it fits the frame's event row. "No application"
+ * for an invalid boot type. */
 const char *boot_type_app_name(uint8_t boot_type);
+
+/* Descriptive name for the application dropdown, e.g.
+ * "FreeRTOS: Interrupt latency benchmark". "No application" if invalid. */
+const char *boot_type_menu_name(uint8_t boot_type);
 
 /* "FreeRTOS" or "Zephyr"; "RTOS" for an invalid boot type. */
 const char *boot_type_os_name(uint8_t boot_type);
