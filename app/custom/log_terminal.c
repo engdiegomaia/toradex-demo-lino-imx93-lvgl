@@ -9,6 +9,10 @@
 #include "lvgl.h"
 #include "log_frame.h"
 
+/* Fixed-width fonts built into LVGL. unscii_16 is readable on the panel;
+ * unscii_8 was judged too small. At 16 px the Home terminal holds ~27 columns,
+ * so frames are limited to LOG_FRAME_MAX_COLS (log_frame.h). */
+#define LOG_TERMINAL_FONT (&lv_font_unscii_16)
 #define LOG_TERMINAL_LINE_SPACE 2
 
 void log_terminal_style(lv_obj_t * ta)
@@ -16,9 +20,9 @@ void log_terminal_style(lv_obj_t * ta)
     if(ta == NULL) return;
 
     /* Skip when already styled: re-setting a style invalidates the widget. */
-    if(lv_obj_get_style_text_font(ta, LV_PART_MAIN) == &lv_font_unscii_16) return;
+    if(lv_obj_get_style_text_font(ta, LV_PART_MAIN) == LOG_TERMINAL_FONT) return;
 
-    lv_obj_set_style_text_font(ta, &lv_font_unscii_16, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ta, LOG_TERMINAL_FONT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(ta, LOG_TERMINAL_LINE_SPACE, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 

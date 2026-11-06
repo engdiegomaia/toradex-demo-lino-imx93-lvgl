@@ -15,7 +15,11 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define LOG_FRAME_EVENT_COLS 24
+/* Widest frame line. The Home terminal wrapped at ~27 columns with the
+ * 16 px font, so every line stays within this. */
+#define LOG_FRAME_MAX_COLS 25
+/* The event row is "> " plus the text. */
+#define LOG_FRAME_EVENT_COLS (LOG_FRAME_MAX_COLS - 2)
 #define LOG_FRAME_STATE_COLS 10
 
 typedef struct {
