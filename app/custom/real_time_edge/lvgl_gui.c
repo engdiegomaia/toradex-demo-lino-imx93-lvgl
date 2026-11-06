@@ -14,6 +14,7 @@
 #include "log_tools.h"
 #include "net_tools.h"
 #include "terminal_buf.h"
+#include "log_terminal.h"
 #include "lvgl_gui.h"
 
 #ifndef _DEFAULT_SOURCE
@@ -166,6 +167,7 @@ static void hal_init(void)
 static void terminal_add(char* txt_log, int8_t isLarge, lv_obj_t * ta, const char * txt_in)
 {
     if(ta == NULL) return;                /*Check if the window is exists*/
+    log_terminal_style(ta);               /* Console_* terminals are created lazily */
     size_t terminal_length = isLarge == 0 ? TERMINAL_LOG_LENGTH : TERMINAL_LARGE_LOG_LENGTH;
 
     /* Keep the newest lines: when full, the oldest whole lines are dropped

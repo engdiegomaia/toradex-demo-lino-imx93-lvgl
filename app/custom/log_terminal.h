@@ -12,7 +12,13 @@
 
 #include "gui_guider.h"
 
-/* Called from custom_init() once every screen has been built. */
+/* Called from custom_init(). Only Home exists at that point; the Console
+ * screens are created on demand, so their terminals are styled lazily through
+ * log_terminal_style(). */
 void log_terminal_init(gg_ui_t * ui);
+
+/* Apply the fixed-width style to one terminal. Idempotent and NULL-safe, so it
+ * can be called every time text is written to the widget. */
+void log_terminal_style(lv_obj_t * ta);
 
 #endif /* LOG_TERMINAL_H */
