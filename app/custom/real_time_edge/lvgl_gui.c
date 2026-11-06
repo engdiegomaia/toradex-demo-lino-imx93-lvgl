@@ -271,7 +271,9 @@ static int gui_update_log_data(void)
 	core_session_t *ps = NULL;
 	uint8_t boot_type = 0;
 	uint8_t am_idx = 0;
-	int size = 32;
+	/* Whole frames are published in one chunk; read as much as fits so a
+	 * frame is never drawn in pieces. */
+	int size = (int)sizeof(((core_session_t *)0)->gui_log) - 1;
 	int len = 0;
 
 	for (am_idx = 0; am_idx < AM_MAX; am_idx++) {

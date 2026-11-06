@@ -13,6 +13,7 @@
 #include "mem_mgr.h"
 #include "lvgl_gui.h"
 #include "applog.h"
+#include "log_view.h"
 
 
 int reset_rt_stats(uint8_t am_idx)
@@ -51,7 +52,8 @@ int set_boot_flag(uint8_t am_idx, int flag)
 	if (!ps->boot_flag && flag) {
 		ps->boot_flag = flag;
 		ps->boot_fail = 0;
-		log_printf(am_idx, "Done\n\n");
+		log_view_m33_set_state("RUNNING");
+		log_view_m33_set_event("handshake ok");
 	}
 
 	return 0;
@@ -64,30 +66,22 @@ int is_boot_failed(uint8_t am_idx)
 	return ps->boot_fail;
 }
 
-static void stats_print(uint8_t am_idx, char *pn, rt_latency_shm_stat *s)
+/* Latency rows go to the container log at DEBUG; the screen shows them in the
+ * M33 frame (log_view.h). */
+static void stats_print(char *pn, rt_latency_shm_stat *s)
 {
 	char row[96];
 
 	applog_format_latency(row, sizeof(row), pn, s->min, s->mean, s->max);
-	log_printf(am_idx, "%s\n", row);
+	applog(APPLOG_DEBUG, "m33", "%s", row);
 }
 
 static void update_tic_tac(uint8_t am_idx)
 {
 	static int tic = 1;
-	static int cnt = 0;
 
-	if (tic)
-		log_printf(am_idx, "tic ");
-	else
-		log_printf(am_idx, "tac ");
-
-	cnt++;
-	if (cnt >= 20) {
-		log_printf(am_idx, "\n");
-		cnt = 0;
-	}
-
+	(void)am_idx;
+	log_view_m33_set_event(tic ? "tic" : "tac");
 	tic = !tic;
 }
 
@@ -116,8 +110,12 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 		      ps->boot_fail = 1;
 	}
 
-	if (BOOT_TYPE_RTLAT(boot_type) && !ps->boot_fail)
-		log_printf(am_idx, ".");
+	if (ps->boot_fail) {
+		log_view_m33_set_state("FAILED");
+		log_view_m33_set_event("no handshake from M33");
+	} else if (!ps->boot_flag) {
+		log_view_m33_set_state("BOOTING");
+	}
 
 	if (get_debug_mode() & DEBUG_MODE(2))
 		applog(APPLOG_DEBUG, "shm", "poll am=%d rd_idx=%u wr_idx=%u type=%u flag=%u fail=%d",
@@ -140,12 +138,12 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 
 	if (BOOT_TYPE_RTLAT(boot_type)) {
 		if (pshm->wr_idx > 1)
-			log_printf(am_idx, "\nt=%ds  M33 load %.2f%%\n", ps->boot_sec, pshm->cpu_load);
-		else
-			log_printf(am_idx, "\nt=%ds\n", ps->boot_sec);
+			log_view_m33_set_load(pshm->cpu_load);
 
-		stats_print(am_idx, "irq_delay", &pshm->irq_delay);
-		stats_print(am_idx, "irq_sched", &pshm->irq_sched);
+		stats_print("irq_delay", &pshm->irq_delay);
+		stats_print("irq_sched", &pshm->irq_sched);
+		log_view_m33_set_latency(&pshm->irq_delay, &pshm->irq_sched);
+		log_view_m33_set_event("sampling");
 
 		notify_update_gui_latency(am_idx, &pshm->irq_sched);
 	}
@@ -153,6 +151,11 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 	pshm->rd_idx++;
 
 ret_tag:
+	/* One complete frame per poll tick keeps every value in a fixed place. */
+	if (am_idx == MC_IDX) {
+		log_view_m33_set_uptime(ps->boot_sec);
+		log_view_m33_publish();
+	}
 	wr_flush_cache(p, shm_len);
 	return 0;
 }

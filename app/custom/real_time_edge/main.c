@@ -14,6 +14,7 @@
 #include "mem_mgr.h"
 #include "main.h"
 #include "cpu_load.h"
+#include "log_view.h"
 #include "applog.h"
 
 
@@ -65,6 +66,19 @@ static int run_system_cmd(char *pcmd)
 	printf("\n");
 	return ret;
 }
+
+/* Fits the 24-column EVENT row of the on-screen frame. */
+static const char *sboot_type_short[TYPE_AM_MAX] = {
+	"invalid boot type",
+	"FreeRTOS rt_latency",
+	"FreeRTOS hello_world",
+	"Zephyr rt_latency",
+	"Zephyr hello_world",
+	"FreeRTOS rt_latency",
+	"FreeRTOS hello_world",
+	"Zephyr rt_latency",
+	"Zephyr hello_world",
+};
 
 static char *sboot_type_title[TYPE_AM_MAX] = {
 	"Invalid Boot Type!",
@@ -205,12 +219,10 @@ static int show_title_to_console(uint8_t boot_type)
 {
 	uint8_t am_idx = BOOT_TYPE_AM_IDX(boot_type);
 
-	log_printf(am_idx, "\n\n****************************************\n");
-	log_printf(am_idx, "%s\n", sboot_type_title[boot_type]);
-	log_printf(am_idx, "****************************************\n\n");
-	log_printf(am_idx, "\nbooting...");
-
-	fflush(stdout);
+	if (am_idx == MC_IDX) {
+		log_view_m33_reset("BOOTING", sboot_type_short[boot_type]);
+		log_view_m33_publish();
+	}
 
 	return 0;
 }
@@ -242,6 +254,11 @@ static int stop_multi_core_prog(uint8_t boot_type, int op_flag)
 	}
 
 	reset_rt_stats(am_idx);  /* Reset important data */
+
+	if (am_idx == MC_IDX) {
+		log_view_m33_reset("STOPPED", "stopped");
+		log_view_m33_publish();
+	}
 
 	if (op_flag == CMD_STOP) {
 		op_cmd.op_sec = scur_sec;
@@ -486,6 +503,14 @@ int main(int argc, char **argv)
 			fail_cnt++;
 			if (boot_type == TYPE_M_RTOS_RTLAT) {
 				applog(APPLOG_ERROR, "m33", "boot failed; restarting (attempt %d/3)", fail_cnt);
+				{
+					char ev[32];
+
+					snprintf(ev, sizeof(ev), "boot failed, retry %d/3", fail_cnt);
+					log_view_m33_set_state("FAILED");
+					log_view_m33_set_event(ev);
+					log_view_m33_publish();
+				}
 				/* Filesystem gate is more robust than env: env vars only
 				 * reach PID 1 via docker compose recreate, but a file at
 				 * /tmp/rt_no_autorestart can be toggled with `docker exec
@@ -513,8 +538,7 @@ int main(int argc, char **argv)
 			cpu_load_t load;
 
 			if (cpu_load_peek(&load))
-				log_printf(AC_IDX, "A55-0  total:%3d%%  app:%3d%%  idle:%3d%%\n",
-					   load.total, load.app, load.idle);
+				log_view_a55_publish(load.total, load.app, load.idle);
 		}
 #ifdef DEBUG_TEST
 		if (!(scur_sec % 10)) {

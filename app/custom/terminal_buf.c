@@ -5,19 +5,29 @@
 int terminal_buf_append(char *buf, size_t cap, const char *add)
 {
 	size_t cur, add_len, need, drop;
-	const char *nl;
+	const char *nl, *ff;
+	int cleared = 0;
 
 	if (!buf || !add || cap == 0)
 		return 0;
 
+	/* A form feed means "start over": discard everything before the last one
+	 * (including the current contents) and keep only the text after it. */
+	ff = strrchr(add, TERMINAL_BUF_CLEAR);
+	if (ff) {
+		buf[0] = '\0';
+		add = ff + 1;
+		cleared = 1;
+	}
+
 	add_len = strlen(add);
 	if (add_len == 0)
-		return 0;
+		return cleared;
 
 	cur = strlen(buf);
 	if (cur + add_len <= cap) {
 		memcpy(buf + cur, add, add_len + 1);
-		return 0;
+		return cleared;
 	}
 
 	/* The new chunk alone fills the buffer: keep only its tail. */
