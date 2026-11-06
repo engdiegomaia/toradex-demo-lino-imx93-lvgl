@@ -19,6 +19,7 @@
 #include "gg_event.h"
 #include "cpu_load_ui.h"
 #include "log_terminal.h"
+#include "home_labels.h"
 
 
 /*********************
@@ -63,6 +64,9 @@ void custom_init(gg_ui_t *ui)
     /* Home exists by now (setup_ui() built it), so the A1 lane can be swapped
      * over to Cortex-A55-0 before the first frame is drawn. */
     cpu_load_ui_init(ui);
+
+    /* Replace stale text inherited from the NXP demo. */
+    home_labels_init(ui);
 
     /* Fixed-width font so the log columns line up. */
     log_terminal_init(ui);
@@ -110,7 +114,7 @@ void stop_refresh_anim(int cortexID)
      * lane has an idle state to fall back to. */
     if (cortexID == 1) {
         lv_obj_set_style_img_recolor_opa(guider_ui.Home.container_cortexM33_coreM33_icon, 100, LV_PART_MAIN);
-        lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_status, "Pending");
+        lv_label_set_text(guider_ui.Home.container_cortexM33_coreM33_status, "Idle");
         gg_pause_anim(guider_ui.Home.container_cortexM33_coreM33_run, anim_rotation_cb);
     }
 }

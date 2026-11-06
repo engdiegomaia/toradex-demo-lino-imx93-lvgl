@@ -14,6 +14,7 @@
 #include "custom.h"
 #include "events/gg_event.h"
 #include "real_time_edge/basedef.h"
+#include "real_time_edge/boot_names.h"
 
 /* Colors kept in sync with the palette used in setup_Home() so the app never
  * has to depend on runtime widget-state introspection. */
@@ -22,7 +23,7 @@
 #define STATUS_COLOR_RUNNING  0x22C55E  /* green */
 #define STATUS_COLOR_FAILED   0xEF4444  /* red */
 
-#define STATUS_TEXT_IDLE     "Pending"
+#define STATUS_TEXT_IDLE     "Idle"
 #define STATUS_TEXT_BOOTING  "Booting"
 #define STATUS_TEXT_RUNNING  "Running"
 #define STATUS_TEXT_FAILED   "Failed"
@@ -32,7 +33,10 @@ typedef struct {
     lv_obj_t *status_label;
     lv_obj_t *anim_target;
     lv_obj_t *lt_container;   /* Latency Test button — hidden for hello_world */
+    lv_obj_t *app_label;      /* "FreeRTOS rt_latency", ... */
+    lv_obj_t *os_label;       /* "FreeRTOS" / "Zephyr" */
     home_core_state_t last_state;
+    int last_boot_type;
 } home_core_widgets_t;
 
 static home_core_widgets_t s_widgets[AM_MAX];
@@ -47,7 +51,10 @@ static void bind_widgets(void)
     s_widgets[MC_IDX].status_label = guider_ui.Home.container_cortexM33_coreM33_status;
     s_widgets[MC_IDX].anim_target  = guider_ui.Home.container_cortexM33_coreM33_run;
     s_widgets[MC_IDX].lt_container = guider_ui.Home.container_cortexM33_coreM33_LT;
+    s_widgets[MC_IDX].app_label    = guider_ui.Home.container_cortexM33_coreM33_app;
+    s_widgets[MC_IDX].os_label     = guider_ui.Home.container_cortexM33_coreM33_os;
     s_widgets[MC_IDX].last_state   = (home_core_state_t)-1;
+    s_widgets[MC_IDX].last_boot_type = -1;
 
     s_widgets_bound = 1;
 }
@@ -61,6 +68,19 @@ static home_core_state_t derive_state(uint8_t am_idx, int op_status_for_core)
     if (ps->boot_flag)  return HOME_STATE_RUNNING;
     if (op_status_for_core) return HOME_STATE_BOOTING;
     return HOME_STATE_IDLE;
+}
+
+/* The generated card hard-codes "RT-Latency of Zephyr" and "RTOS". Show the
+ * application actually selected, and only while one is active. */
+static void paint_app(home_core_widgets_t *w, home_core_state_t state, int boot_type)
+{
+    if (w->app_label)
+        lv_label_set_text(w->app_label, state == HOME_STATE_IDLE
+                          ? "No application running"
+                          : boot_type_app_name((uint8_t)boot_type));
+    if (w->os_label)
+        lv_label_set_text(w->os_label, state == HOME_STATE_IDLE
+                          ? "-" : boot_type_os_name((uint8_t)boot_type));
 }
 
 static void paint_state(int am_idx, home_core_state_t state)
@@ -79,7 +99,19 @@ static void paint_state(int am_idx, home_core_state_t state)
             lv_obj_remove_flag(w->lt_container, LV_OBJ_FLAG_HIDDEN);
     }
 
+    core_session_t *ps = get_core_session(am_idx);
+    int boot_type = ps ? ps->boot_type : 0;
+
+    /* The app can change while the coarse state stays the same, so track the
+     * boot type separately from the state. */
+    if (boot_type != w->last_boot_type) {
+        paint_app(w, state, boot_type);
+        w->last_boot_type = boot_type;
+    }
+
     if (state == w->last_state) return;
+
+    paint_app(w, state, boot_type);
 
     uint32_t color;
     const char *text;

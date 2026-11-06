@@ -15,6 +15,7 @@
 #include "main.h"
 #include "cpu_load.h"
 #include "log_view.h"
+#include "boot_names.h"
 #include "applog.h"
 
 
@@ -66,19 +67,6 @@ static int run_system_cmd(char *pcmd)
 	printf("\n");
 	return ret;
 }
-
-/* Fits the 24-column EVENT row of the on-screen frame. */
-static const char *sboot_type_short[TYPE_AM_MAX] = {
-	"invalid boot type",
-	"FreeRTOS rt_latency",
-	"FreeRTOS hello_world",
-	"Zephyr rt_latency",
-	"Zephyr hello_world",
-	"FreeRTOS rt_latency",
-	"FreeRTOS hello_world",
-	"Zephyr rt_latency",
-	"Zephyr hello_world",
-};
 
 static char *sboot_type_title[TYPE_AM_MAX] = {
 	"Invalid Boot Type!",
@@ -220,7 +208,7 @@ static int show_title_to_console(uint8_t boot_type)
 	uint8_t am_idx = BOOT_TYPE_AM_IDX(boot_type);
 
 	if (am_idx == MC_IDX) {
-		log_view_m33_reset("BOOTING", sboot_type_short[boot_type]);
+		log_view_m33_reset("BOOTING", boot_type_app_name(boot_type));
 		log_view_m33_publish();
 	}
 
