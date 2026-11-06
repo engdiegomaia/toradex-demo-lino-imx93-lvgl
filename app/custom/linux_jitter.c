@@ -55,6 +55,16 @@ int jitter_stats_snapshot(jitter_stats_t *s, jitter_snapshot_t *out)
 	return ok;
 }
 
+int64_t jitter_next_deadline_ns(int64_t prev_deadline_ns, int64_t now_ns,
+				int64_t period_ns)
+{
+	int64_t next = prev_deadline_ns + period_ns;
+
+	if (now_ns - next > JITTER_RESYNC_NS)
+		return now_ns + period_ns;
+	return next;
+}
+
 static jitter_stats_t s_stats;
 static pthread_t s_thread;
 static volatile int s_running;
@@ -68,18 +78,15 @@ static int64_t to_ns(const struct timespec *t)
 static void *jitter_main(void *arg)
 {
 	struct timespec next, now;
+	int64_t deadline;
 
 	(void)arg;
-	clock_gettime(CLOCK_MONOTONIC, &next);
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	deadline = to_ns(&now);
 	while (s_running) {
-		int64_t deadline;
-
-		next.tv_nsec += JITTER_PERIOD_NS;
-		if (next.tv_nsec >= NSEC_PER_SEC) {
-			next.tv_nsec -= NSEC_PER_SEC;
-			next.tv_sec++;
-		}
-		deadline = to_ns(&next);
+		deadline = jitter_next_deadline_ns(deadline, to_ns(&now), JITTER_PERIOD_NS);
+		next.tv_sec = deadline / NSEC_PER_SEC;
+		next.tv_nsec = deadline % NSEC_PER_SEC;
 		clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &next, NULL);
 		clock_gettime(CLOCK_MONOTONIC, &now);
 		jitter_stats_add(&s_stats, jitter_lateness_ns(deadline, to_ns(&now)));

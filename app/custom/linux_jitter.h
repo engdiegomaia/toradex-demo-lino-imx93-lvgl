@@ -31,6 +31,13 @@ int jitter_stats_snapshot(jitter_stats_t *s, jitter_snapshot_t *out);
 /* max(0, actual - deadline) */
 int64_t jitter_lateness_ns(int64_t deadline_ns, int64_t actual_ns);
 
+/* Deadline after `prev_deadline_ns`. Normally prev + period. When the thread
+ * is more than JITTER_RESYNC_NS late it skips ahead to now + period, so an
+ * overloaded system does not make the probe spin to catch up. */
+#define JITTER_RESYNC_NS 20000000LL
+int64_t jitter_next_deadline_ns(int64_t prev_deadline_ns, int64_t now_ns,
+				int64_t period_ns);
+
 /* Start/stop the measuring thread (idempotent). Samples go to the global stats. */
 int linux_jitter_start(void);
 void linux_jitter_stop(void);
