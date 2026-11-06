@@ -1,6 +1,7 @@
 #include "home_header_layout.h"
 
-void home_header_layout_compute(int name_w, int name_h, home_header_layout_t *out)
+void home_header_layout_compute(int name_w, int name_h, int align_right_px,
+				home_header_layout_t *out)
 {
 	int name_end, centre;
 
@@ -18,6 +19,12 @@ void home_header_layout_compute(int name_w, int name_h, home_header_layout_t *ou
 
 	out->m33_icon_x = HOME_HEADER_A0_ICON_X + HOME_HEADER_ICON_W + HOME_HEADER_ICON_GAP;
 	out->box_w = out->m33_icon_x + HOME_HEADER_ICON_W + HOME_HEADER_BOX_RIGHT_PAD;
+
+	if (align_right_px > 0) {
+		int x = align_right_px - out->box_w;
+
+		out->box_x = x > name_end ? x : name_end;
+	}
 
 	/* Centre the checkbox under the M33 icon. */
 	out->radio_w = HOME_HEADER_RADIO_W;

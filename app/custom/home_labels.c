@@ -18,12 +18,15 @@ static void apply_header_layout(gg_ui_t * ui)
     gg_Home_t * h = &ui->Home;
     home_header_layout_t l;
     lv_point_t size;
+    int right_edge;
 
     if(h->board_name == NULL || h->container_1 == NULL) return;
 
     lv_obj_set_style_text_font(h->board_name, BOARD_NAME_FONT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_text_get_size(&size, BOARD_NAME, BOARD_NAME_FONT, 0, 0, LV_COORD_MAX, LV_TEXT_FLAG_NONE);
-    home_header_layout_compute(size.x, size.y, &l);
+    /* Right-align the box with the app dropdown below it. */
+    right_edge = h->ddlist_apps ? lv_obj_get_x(h->ddlist_apps) + lv_obj_get_width(h->ddlist_apps) : 0;
+    home_header_layout_compute(size.x, size.y, right_edge, &l);
 
     lv_obj_set_y(h->board_name, l.name_y);
     lv_obj_set_x(h->container_1, l.box_x);

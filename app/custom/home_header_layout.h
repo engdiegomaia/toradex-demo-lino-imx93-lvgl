@@ -33,7 +33,11 @@ typedef struct {
 	int name_y;              /* board name, screen coordinates */
 } home_header_layout_t;
 
-/* name_w/name_h are the rendered size of the board name in pixels. */
-void home_header_layout_compute(int name_w, int name_h, home_header_layout_t *out);
+/* name_w/name_h are the rendered size of the board name in pixels.
+ * align_right_px > 0 puts the box's right edge there (the dropdown's right
+ * edge), as long as the box still clears the board name; <= 0 keeps the
+ * generated left position. */
+void home_header_layout_compute(int name_w, int name_h, int align_right_px,
+				home_header_layout_t *out);
 
 #endif
