@@ -124,11 +124,20 @@ size_t log_frame_render_a55(const log_frame_a55_t *f, char *out, size_t cap)
 	return finish(tmp, out, cap);
 }
 
+/* RTT is shown in microseconds: round trips run from ~50 us to several ms,
+ * which saturates a nanosecond column. */
+static int ns_to_us(int32_t ns)
+{
+	int64_t us = ((int64_t)(ns < 0 ? 0 : ns) + 500) / 1000;
+
+	return us > VALUE_MAX ? VALUE_MAX : (int)us;
+}
+
 static void put_rtt_row(char *dst, size_t cap, const char *label, int valid,
 			int32_t v)
 {
 	if (valid)
-		snprintf(dst, cap, "%-6s %8d", label, (int)clamp_ns(v));
+		snprintf(dst, cap, "%-6s %8d", label, ns_to_us(v));
 	else
 		snprintf(dst, cap, "%-6s %8s", label, "--");
 }
@@ -158,7 +167,7 @@ size_t log_frame_render_rpmsg(const log_frame_rpmsg_t *f, char *out, size_t cap)
 		 "UPTIME   %04d s\n"
 		 "LINK     %s\n"
 		 "%s\n"
-		 "RTT (ns)\n"
+		 "RTT (us)\n"
 		 "%s\n"
 		 "%s\n"
 		 "%s\n"
