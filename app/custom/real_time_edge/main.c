@@ -542,6 +542,12 @@ int main(int argc, char **argv)
 			rpmsg_ping_counters_t tot = {0, 0};
 			int got = rpmsg_ping_take(&rtt, &tot);
 
+			/* The card status is derived from boot_flag, which the SHM
+			 * handshake sets for the other firmwares. RPMsg has no SHM
+			 * handshake, so the first answered ping plays that role. */
+			if (rpmsg_ping_linked())
+				set_boot_flag(MC_IDX, 1);
+
 			if (got)
 				applog(APPLOG_DEBUG, "rpmsg", "rtt n=%d min=%d mean=%d max=%d ns sent=%u ok=%u",
 				       rtt.count, rtt.min_ns, rtt.mean_ns, rtt.max_ns,
