@@ -5,8 +5,8 @@
 #
 # The sample's overlay already places the shared memory at 0xA4000000 and the
 # resource table at 0x2001E000, which the module's base device tree reserves,
-# so no source change is needed. It announces "rpmsg-client-sample" and echoes
-# the payload; the HMI measures the round trip over rpmsg_char.
+# so only the echo loop is patched (see patches/0004): it announces
+# "rpmsg-client-sample" and echoes the payload forever; the HMI measures the round trip over rpmsg_char.
 #
 # Requires: west, cmake, ninja, pyelftools, and an arm-none-eabi toolchain
 # (used through ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb). pyelftools may be
@@ -34,7 +34,21 @@ if [ -z "${GNUARMEMB_TOOLCHAIN_PATH:-}" ]; then
 fi
 export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb GNUARMEMB_TOOLCHAIN_PATH
 
+PATCH="${SCRIPT_DIR}/patches/0004-zephyr-rpmsg-client-endless-silent.patch"
+SRC_REL="${SAMPLE}/src/main_remote.c"
+[ -f "${PATCH}" ] || die "patch not found: ${PATCH}"
+
 cd "${ZEPHYR}"
+# Apply the demo patch once (idempotent): the upstream sample answers only 100
+# messages and then destroys its endpoint.
+if grep -q "echo forever" "${SRC_REL}"; then
+    echo "==> demo patch already applied"
+elif patch -p1 --dry-run --silent --forward --batch < "${PATCH}"; then
+    patch -p1 --forward --batch < "${PATCH}"
+else
+    die "patch does not apply to this Zephyr revision."
+fi
+
 west build -p always -b imx93_evk/mimx9352/m33 "${SAMPLE}" -d "${BUILD_DIR}"
 
 ELF="${BUILD_DIR}/zephyr/zephyr_openamp_rsc_table.elf"

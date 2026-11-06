@@ -1,0 +1,29 @@
+--- a/samples/subsys/ipc/openamp_rsc_table/src/main_remote.c	2026-11-06 15:26:44.879484939 -0300
++++ b/samples/subsys/ipc/openamp_rsc_table/src/main_remote.c	2026-11-06 15:26:44.909820292 -0300
+@@ -252,7 +252,6 @@
+ 	ARG_UNUSED(arg2);
+ 	ARG_UNUSED(arg3);
+ 
+-	unsigned int msg_cnt = 0;
+ 	int ret = 0;
+ 
+ 	k_sem_take(&data_sc_sem,  K_FOREVER);
+@@ -267,14 +266,13 @@
+ 		goto task_end;
+ 	}
+ 
+-	while (msg_cnt < 100) {
++	/* Demo patch: echo forever and stay silent. Upstream answers 100 messages,
++	 * then destroys the endpoint, and logs every message over a blocking UART;
++	 * both would break a continuous round-trip measurement. */
++	for (;;) {
+ 		k_sem_take(&data_sc_sem,  K_FOREVER);
+-		msg_cnt++;
+-		LOG_INF("[Linux sample client] incoming msg %d: %.*s", msg_cnt, sc_msg.len,
+-			(char *)sc_msg.data);
+ 		rpmsg_send(&sc_ept, sc_msg.data, sc_msg.len);
+ 	}
+-	rpmsg_destroy_ept(&sc_ept);
+ 
+ task_end:
+ 	LOG_INF("OpenAMP Linux sample client responder ended");
