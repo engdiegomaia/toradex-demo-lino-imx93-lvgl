@@ -11,8 +11,6 @@ This directory carries two downstream patches and a reproducible build:
 1. relocate `m_data2` to the reserved Verdin/Lino carveout;
 2. add the missing M33 shared-memory producer.
 
-See [`../docs/M33_HANDSHAKE_DEBUG.md`](../docs/M33_HANDSHAKE_DEBUG.md) for
-the investigation history.
 
 ## Shared-memory addresses
 
@@ -117,11 +115,8 @@ dtc -@ -I dts -O dtb \
 
 Then apply per the
 [Toradex Device Tree Overlays guide](https://developer.toradex.com/torizon/os-customization/use-cases/device-tree-overlays-on-torizon/).
-For the exact storage/deploy flow used on this target, copy
-`device-tree/deploy-m33-overlay.sh` into the self-contained TorizonCore Builder
-workspace (beside `storage/`, `device-trees/`, the base DTB and overlay DTS)
-and run it there. The helper explicitly mounts that workspace's `storage/`,
-avoiding the unrelated global Docker volume with the same name.
+Use TorizonCore Builder (`dto apply`, `union`, `deploy`) from a workspace
+that contains the base DTB and this overlay DTS.
 
 After reboot, confirm the carveout is reserved and out of System RAM:
 

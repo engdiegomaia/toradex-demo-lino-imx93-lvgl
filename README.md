@@ -24,7 +24,6 @@ telemetry.
 - Torizon OS container and Weston configuration under `docker/`.
 - Device-tree overlay sources under `device-tree/`.
 - Cortex-M33 firmware patches and build instructions under `firmware/`.
-- Bring-up and integration investigation notes under `docs/`.
 
 The UI runs as a Wayland client. Weston provides the display compositor. The
 application loads M33 firmware through Linux remoteproc and reads benchmark
@@ -74,24 +73,17 @@ Keep deployment credentials in local `.env` files or environment variables;
 `.env.example`.
 
 The target requires the appropriate display and shared-memory device-tree
-overlays. See [firmware build and deployment](firmware/README.md) and the
-[display bring-up notes](docs/DISPLAY_BRINGUP_DEBUG.md) before applying overlays.
-The helper scripts accept target host configuration through their arguments or
-environment variables; review them before using them on a device.
-
-For firmware build details, see [firmware/README.md](firmware/README.md). The
-focused integration notes are in [`docs/`](docs/).
+overlays. See [firmware build and deployment](firmware/README.md) before
+applying overlays. Review the helper scripts before using them on a device.
 
 ## Repository layout
 
 ```text
 app/          LVGL application, generated UI, custom logic, and vendor sources
 assets/       Runtime assets
-device-tree/  Device-tree overlay source and deployment helper
-docker/       Container definitions and host/target helper scripts
-docs/         Display and M33 integration notes
+device-tree/  Device-tree overlay source
+docker/       Container definitions and build helper scripts
 firmware/     Firmware patches and reproducible build helper
-scripts/      Diagnostics and small host-side utilities
 ```
 
 ## Licensing
