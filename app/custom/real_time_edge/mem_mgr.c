@@ -8,6 +8,7 @@
 */
 
 #include "mem_mgr.h"
+#include "applog.h"
 
 
 static int smem_fd = INV_MEM_FD;
@@ -94,7 +95,7 @@ int init_mem_mgr(void)
 
 	smem_fd = open("/dev/mem", O_RDWR | O_SYNC);
 	if (smem_fd == INV_MEM_FD)
-		printf("%s(): open \"/dev/mem\" ERROR!\n", __func__);
+		applog(APPLOG_ERROR, "mem", "cannot open /dev/mem (needs CAP_SYS_RAWIO)");
 
 	smm_cnt = 0;
 	for (i = 0; i < MAX_MEM_MAP_NUM; i++) {
@@ -171,7 +172,7 @@ void *mem_map_page(off_t pa, size_t *len, void **pva)
 
 	virt = mem_map(length, pa_offset);
 	if (virt == MAP_FAILED) {
-		printf("%s(): mmap failed! virt:%p pa:%lX pa_offset:%lX\n", __func__, virt, pa, pa_offset);
+		applog(APPLOG_ERROR, "mem", "mmap failed virt=%p pa=0x%lX pa_offset=0x%lX", virt, pa, pa_offset);
 		return NULL;
 	}
 

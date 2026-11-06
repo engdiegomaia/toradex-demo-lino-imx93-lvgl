@@ -12,6 +12,7 @@
 #include "rt_stats.h"
 #include "mem_mgr.h"
 #include "lvgl_gui.h"
+#include "applog.h"
 
 
 int reset_rt_stats(uint8_t am_idx)
@@ -65,8 +66,10 @@ int is_boot_failed(uint8_t am_idx)
 
 static void stats_print(uint8_t am_idx, char *pn, rt_latency_shm_stat *s)
 {
-	log_printf(am_idx, "%s: min %d mean %d max %d rms^2 %lu stddev^2 %lu absmin %d absmax %d\n",
-		pn, s->min, s->mean, s->max, s->rms, s->var, s->abs_min, s->abs_max);
+	char row[96];
+
+	applog_format_latency(row, sizeof(row), pn, s->min, s->mean, s->max);
+	log_printf(am_idx, "%s\n", row);
 }
 
 static void update_tic_tac(uint8_t am_idx)
@@ -117,17 +120,16 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 		log_printf(am_idx, ".");
 
 	if (get_debug_mode() & DEBUG_MODE(2))
-		printf("%s() am_idx:%d rd_idx:%d wr_idx:%d type:%d flag:%d fail:%d\n", __func__,\
-			am_idx, pshm->rd_idx, pshm->wr_idx, pshm->type, pshm->flag, ps->boot_fail);
+		applog(APPLOG_DEBUG, "shm", "poll am=%d rd_idx=%u wr_idx=%u type=%u flag=%u fail=%d",
+		       am_idx, pshm->rd_idx, pshm->wr_idx, pshm->type, pshm->flag, ps->boot_fail);
 
-	/* Always log the handshake fields once per second so we can tell whether
-	 * the M33 side is advancing wr_idx. The `goto ret_tag` below silently
-	 * suppresses every latency print when rd_idx == wr_idx, which hides the
-	 * root cause. Remove after the handshake is confirmed working. */
-	printf("[shm-diag] am_idx:%u sec:%d flag:%u type:%u rd_idx:%u wr_idx:%u cpu_load:%.2f\n",
-		am_idx, ps->boot_sec, pshm->flag, pshm->type,
-		pshm->rd_idx, pshm->wr_idx, pshm->cpu_load);
-	fflush(stdout);
+	/* Handshake fields once per second. The `goto ret_tag` below silently
+	 * suppresses every latency print when rd_idx == wr_idx, so this DEBUG
+	 * line (APPLOG_LEVEL=debug) is how to tell whether the M33 advances
+	 * wr_idx. */
+	applog(APPLOG_DEBUG, "shm", "handshake am=%u sec=%d flag=%u type=%u rd_idx=%u wr_idx=%u cpu_load=%.2f%%",
+	       am_idx, ps->boot_sec, pshm->flag, pshm->type,
+	       pshm->rd_idx, pshm->wr_idx, pshm->cpu_load);
 
 	if (pshm->rd_idx == pshm->wr_idx)
 		goto ret_tag;
@@ -138,9 +140,9 @@ static int update_shm_data(uint8_t am_idx, rt_latency_shm_t *pshm)
 
 	if (BOOT_TYPE_RTLAT(boot_type)) {
 		if (pshm->wr_idx > 1)
-			log_printf(am_idx, "\nsec:%d cpu_load:%.2f%%\n", ps->boot_sec, pshm->cpu_load);
+			log_printf(am_idx, "\nt=%ds  M33 load %.2f%%\n", ps->boot_sec, pshm->cpu_load);
 		else
-			log_printf(am_idx, "\nsec:%d\n", ps->boot_sec);
+			log_printf(am_idx, "\nt=%ds\n", ps->boot_sec);
 
 		stats_print(am_idx, "irq_delay", &pshm->irq_delay);
 		stats_print(am_idx, "irq_sched", &pshm->irq_sched);
@@ -176,14 +178,13 @@ int show_stat_shm_data(uint8_t am_idx, uint64_t addr)
 			wr_flush_cache((uint8_t *)canary, sizeof(*canary));
 			rd_invalid_cache((uint8_t *)canary, sizeof(*canary));
 			uint32_t after = *canary;
-			printf("[shm-canary] addr:0x%lx before:0x%08x wrote:0xDEADBEEF read:0x%08x %s\n",
-				(unsigned long)addr + 0x100, before, after,
-				after == 0xDEADBEEFu ? "OK" : "FAIL");
-			fflush(stdout);
+			applog(after == 0xDEADBEEFu ? APPLOG_INFO : APPLOG_ERROR, "shm",
+			       "canary addr=0x%lx before=0x%08x wrote=0xDEADBEEF read=0x%08x %s",
+			       (unsigned long)addr + 0x100, before, after,
+			       after == 0xDEADBEEFu ? "ok" : "MISMATCH");
 		} else {
-			printf("[shm-canary] mem_map_page returned NULL for 0x%lx\n",
-				(unsigned long)addr);
-			fflush(stdout);
+			applog(APPLOG_ERROR, "shm", "mem_map_page failed addr=0x%lx",
+			       (unsigned long)addr);
 			return -1;
 		}
 

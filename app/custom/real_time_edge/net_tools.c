@@ -8,6 +8,7 @@
 */
 
 #include "net_tools.h"
+#include "applog.h"
 
 
 static char seth_dev_buf[ETH_BUF_LEN];
@@ -26,7 +27,7 @@ static int get_inet_cfg(char *ifname, int req, void *buf, int len)
 
 	sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockfd < 0) {
-		printf("%s() create socket failed! ret:%d\n", __func__, sockfd);
+		applog(APPLOG_ERROR, "net", "create socket failed ret=%d", sockfd);
 		return -2;
 	}
 
@@ -35,7 +36,7 @@ static int get_inet_cfg(char *ifname, int req, void *buf, int len)
 
 	ret = ioctl(sockfd, req, &ifr);
 	if (ret < 0) {
-		printf("%s() ioctl error! ret:%d\n", __func__, ret);
+		applog(APPLOG_ERROR, "net", "ioctl failed ret=%d", ret);
 		ret = -3;
 		goto ret_tag;
 	}
@@ -69,7 +70,7 @@ int get_inet_ip(char *pif_buf, int buf_len)
 
 	fd = fopen("/proc/net/dev", "r");
 	if (!fd) {
-		printf("Open \"/proc/net/dev\" failed!\n");
+		applog(APPLOG_ERROR, "net", "cannot open /proc/net/dev");
 		return -2;
 	}
 

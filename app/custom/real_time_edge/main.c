@@ -14,6 +14,7 @@
 #include "mem_mgr.h"
 #include "main.h"
 #include "cpu_load.h"
+#include "applog.h"
 
 
 static uint32_t scur_sec = 0;
@@ -357,14 +358,14 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 	}
 
 	ps->boot_type = boot_type;
-	printf("%s() am_idx:%d boot_type:%d test_type:%d\n", __func__, am_idx, boot_type, ps->test_type);
+	applog(APPLOG_INFO, "app", "start am=%d boot_type=%d test_type=%d", am_idx, boot_type, ps->test_type);
 
 	if (ram_addr) {
 		set_ram_shm_addr(am_idx, 0);
 		set_ram_console_addr(am_idx, ram_addr);
 		start_ram_console_thread(am_idx);
 	} else {
-		printf("[shm-config] boot_type:%d addr:0x%llx\n", boot_type,
+		applog(APPLOG_INFO, "shm", "config boot_type=%d addr=0x%llx", boot_type,
 		       (unsigned long long)shm_addr);
 		set_ram_shm_addr(am_idx, shm_addr);
 	}
@@ -398,7 +399,7 @@ static int wait_for_wayland_display(int timeout_sec)
 	int waited = 0;
 
 	if (!runtime_dir || !display) {
-		printf("[wayland-wait] XDG_RUNTIME_DIR or WAYLAND_DISPLAY unset; not waiting\n");
+		applog(APPLOG_WARN, "wayland", "XDG_RUNTIME_DIR or WAYLAND_DISPLAY unset; not waiting");
 		return 0;
 	}
 
@@ -406,17 +407,17 @@ static int wait_for_wayland_display(int timeout_sec)
 
 	while (access(path, F_OK) != 0) {
 		if (waited >= timeout_sec) {
-			printf("[wayland-wait] %s absent after %ds; starting anyway\n",
+			applog(APPLOG_ERROR, "wayland", "%s absent after %ds; starting anyway",
 			       path, waited);
 			return -1;
 		}
 		if (!waited)
-			printf("[wayland-wait] waiting for %s\n", path);
+			applog(APPLOG_INFO, "wayland", "waiting for %s", path);
 		sleep(1);
 		waited++;
 	}
 
-	printf("[wayland-wait] %s ready after %ds\n", path, waited);
+	applog(APPLOG_INFO, "wayland", "%s ready after %ds", path, waited);
 	return 0;
 }
 
@@ -484,8 +485,7 @@ int main(int argc, char **argv)
 		if (is_boot_failed(am_idx) && (fail_cnt < 3)) {
 			fail_cnt++;
 			if (boot_type == TYPE_M_RTOS_RTLAT) {
-				printf("Boot failed! reboot it! fail_cnt:%d\n", fail_cnt);
-				fflush(stdout);
+				applog(APPLOG_ERROR, "m33", "boot failed; restarting (attempt %d/3)", fail_cnt);
 				/* Filesystem gate is more robust than env: env vars only
 				 * reach PID 1 via docker compose recreate, but a file at
 				 * /tmp/rt_no_autorestart can be toggled with `docker exec
@@ -493,8 +493,7 @@ int main(int argc, char **argv)
 				 * bit us with RT_NO_AUTORESTART=1. */
 				if (access("/tmp/rt_no_autorestart", F_OK) == 0 ||
 				    getenv("RT_NO_AUTORESTART")) {
-					printf("[diag] auto-restart disabled, holding state (no reboot)\n");
-					fflush(stdout);
+					applog(APPLOG_WARN, "m33", "auto-restart disabled; holding state (no reboot)");
 					continue;
 				}
 				start_multi_core_prog(boot_type, 1);
@@ -502,10 +501,7 @@ int main(int argc, char **argv)
 		}
 
 		if (!(scur_sec % 10))
-			printf("\nsec:%d\n", scur_sec);
-		else
-			printf(".");
-		fflush(stdout);
+			applog(APPLOG_INFO, "app", "heartbeat uptime=%ds", scur_sec);
 
 		output_shm_data();  /* Show latency data in share memory */
 

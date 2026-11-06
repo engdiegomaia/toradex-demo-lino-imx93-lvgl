@@ -69,3 +69,4 @@ antness/
 /docker/rebuild-app.sh
 /device-tree/deploy-m33-overlay.sh
 /assets/splash-*.png
+/tests/

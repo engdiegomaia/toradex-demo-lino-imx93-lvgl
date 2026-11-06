@@ -11,6 +11,7 @@
 #include "rt_stats.h"
 #include "log_tools.h"
 #include "mem_mgr.h"
+#include "applog.h"
 
 
 int set_ram_console_addr(uint8_t am_idx, off_t addr)
@@ -18,7 +19,7 @@ int set_ram_console_addr(uint8_t am_idx, off_t addr)
 	core_session_t *ps = get_core_session(am_idx);
 
 	ps->ram_console_addr = addr;
-	printf("%s() am_idx:%d addr:0x%lX\n", __func__, am_idx, addr);
+	applog(APPLOG_DEBUG, "ramcon", "set console addr am=%d addr=0x%lX", am_idx, addr);
 	return 0;
 }
 
@@ -27,7 +28,7 @@ int set_ram_shm_addr(uint8_t am_idx, off_t addr)
 	core_session_t *ps = get_core_session(am_idx);
 
 	ps->shm_addr = addr;
-	printf("%s() am_idx:%d addr:0x%lX\n", __func__, am_idx, addr);
+	applog(APPLOG_DEBUG, "shm", "set shm addr am=%d addr=0x%lX", am_idx, addr);
 	return 0;
 }
 
@@ -85,39 +86,39 @@ static void *ram_console_thread(void *p)
 	ps = get_core_session(am_idx);
 
 	ram_con_addr = ps->ram_console_addr;
-	printf("ram console addr is 0x%lX!\n", ram_con_addr);
+	applog(APPLOG_INFO, "ramcon", "console addr=0x%lX", ram_con_addr);
 	if (!ram_con_addr)
 		goto err;
 
 	/* Map RAM Console Header firstly */
 	header = mem_map(RAM_CONSOLE_HEAD_SIZE, ram_con_addr);
 	if (header == (void *) -1) {
-		fprintf(stderr, "mapping header memory failed\r\n");
+		applog(APPLOG_ERROR, "ramcon", "mapping header memory failed");
 		goto err;
 	}
 	if (strcmp(header->flag_string, RAM_CONSOLE_HEAD_STR) != 0) {
 		mem_unmap(header, RAM_CONSOLE_HEAD_SIZE);
-		fprintf(stderr, "Invalid RAM Console header at 0x%lx\r\n", ram_con_addr);
+		applog(APPLOG_ERROR, "ramcon", "invalid console header at 0x%lx", ram_con_addr);
 		goto err;
 	}
 	buf_size = header->ram_console_buf_size;
 	pos = header->pos;
 
 	if (mem_unmap(header, RAM_CONSOLE_HEAD_SIZE) == -1) {
-		fprintf(stderr, "unmapping header memory failed\r\n");
+		applog(APPLOG_ERROR, "ramcon", "unmapping header memory failed");
 		goto err;
 	}
 	/* Re-map RAM Console Header and Buffer Memory */
 	ps->ram_buf_size = buf_size + RAM_CONSOLE_HEAD_SIZE;
 	buf_addr = mem_map(ps->ram_buf_size, ram_con_addr);
 	if (buf_addr == (void *) -1) {
-		fprintf(stderr, "mapping buffer memory failed\r\n");
+		applog(APPLOG_ERROR, "ramcon", "mapping buffer memory failed");
 		goto err;
 	}
 	ps->ram_buf_addr = buf_addr;
 
 	real_pos = pos % buf_size;
-	printf("RAM Console@0x%lx, buf_size:%ld\r\n", ram_con_addr, buf_size);
+	applog(APPLOG_INFO, "ramcon", "console mapped addr=0x%lx buf_size=%ld", ram_con_addr, buf_size);
 
 	if (pos > buf_size)
 		print_buf(am_idx, real_pos + 1, buf_size, buf_addr, false, true);
@@ -166,7 +167,7 @@ static void *ram_console_thread(void *p)
 			pstr = strstr(ps->shm_str, pkey);
 			if (pstr) {
 				ps->shm_addr = strtoul(pstr + strlen(pkey), NULL, 0);
-				printf("Got am_idx:%d shm_addr:0x%lX\n", am_idx, ps->shm_addr);
+				applog(APPLOG_INFO, "ramcon", "got am=%d shm_addr=0x%lX", am_idx, ps->shm_addr);
 			}
 		}
 
@@ -175,7 +176,7 @@ loop_tag:
 	};
 
 	if (mem_unmap(buf_addr, ps->ram_buf_size) == -1)
-		fprintf(stderr, "unmapping buffer memory failed\r\n");
+		applog(APPLOG_ERROR, "ramcon", "unmapping buffer memory failed");
 	else
 		ps->ram_buf_addr = NULL;
 
@@ -198,7 +199,7 @@ int start_ram_console_thread(uint8_t am_idx)
 	ps->ram_console_flag = 1;
 	ret = pthread_create(&ps->ram_console_thread, NULL, ram_console_thread, &sboot_idx[am_idx]);
 	if (ret) {
-		printf("failed to create cyclic task, ret:%d-%s\n", ret, strerror(-ret));
+		applog(APPLOG_ERROR, "ramcon", "cannot create cyclic task ret=%d (%s)", ret, strerror(-ret));
 		goto out_tag;
 	}
 
