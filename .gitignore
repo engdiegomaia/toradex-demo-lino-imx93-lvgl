@@ -71,3 +71,4 @@ antness/
 /assets/splash-*.png
 /tests/
 firmware/build-rpmsg/
+firmware/build-rpmsg-zephyr/

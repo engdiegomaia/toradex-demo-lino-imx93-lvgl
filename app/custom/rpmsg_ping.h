@@ -15,8 +15,25 @@
 #include "linux_jitter.h"
 
 #define RPMSG_PING_MSG_SIZE 4
-#define RPMSG_PING_CHANNEL "rpmsg-openamp-demo-channel"
-#define RPMSG_PING_REMOTE_ADDR 30u
+/* Two M33 firmwares answer on different channels:
+ *  FreeRTOS (NXP pingpong): "rpmsg-openamp-demo-channel", replies counter + 1
+ *  Zephyr (openamp_rsc_table): "rpmsg-client-sample", echoes the payload
+ * The remote endpoint address is taken from the announced device name. */
+#define RPMSG_PING_CHANNEL_FREERTOS "rpmsg-openamp-demo-channel"
+#define RPMSG_PING_CHANNEL_ZEPHYR "rpmsg-client-sample"
+
+typedef enum {
+	RPMSG_PING_MODE_NONE = 0,
+	RPMSG_PING_MODE_INCREMENT,
+	RPMSG_PING_MODE_ECHO
+} rpmsg_ping_mode_t;
+
+/* Mode for an rpmsg device name such as "virtio1.rpmsg-openamp-demo-channel.-1.30". */
+rpmsg_ping_mode_t rpmsg_ping_mode_of(const char *devname);
+/* Trailing destination address of that name; 0 when absent. */
+uint32_t rpmsg_ping_dst_of(const char *devname);
+/* Counter the firmware answers with for a ping carrying `sent`. */
+uint32_t rpmsg_ping_expected_reply(uint32_t sent, rpmsg_ping_mode_t mode);
 
 typedef struct {
 	uint32_t sent;

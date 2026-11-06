@@ -9,7 +9,7 @@ static const char *const s_app_name[APPS_PER_CORE] = {
 	"FreeRTOS IRQ latency",
 	"FreeRTOS RPMsg pingpong",
 	"Zephyr IRQ latency",
-	"Zephyr heartbeat",
+	"Zephyr RPMsg pingpong",
 };
 
 /* Dropdown entries say what the application does, not its source folder. */
@@ -17,7 +17,7 @@ static const char *const s_menu_name[APPS_PER_CORE] = {
 	"FreeRTOS: Interrupt latency benchmark",
 	"FreeRTOS: RPMsg round-trip A55-M33",
 	"Zephyr: Interrupt latency benchmark",
-	"Zephyr: Heartbeat (tic/tac)",
+	"Zephyr: RPMsg round-trip A55-M33",
 };
 
 static const char *const s_os_name[APPS_PER_CORE] = {

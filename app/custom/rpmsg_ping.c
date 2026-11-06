@@ -47,6 +47,29 @@ int rpmsg_ping_reply_matches(uint32_t sent, uint32_t reply)
 	return reply == (uint32_t)(sent + 1u);
 }
 
+rpmsg_ping_mode_t rpmsg_ping_mode_of(const char *devname)
+{
+	if (!devname)
+		return RPMSG_PING_MODE_NONE;
+	if (strstr(devname, RPMSG_PING_CHANNEL_FREERTOS))
+		return RPMSG_PING_MODE_INCREMENT;
+	if (strstr(devname, RPMSG_PING_CHANNEL_ZEPHYR))
+		return RPMSG_PING_MODE_ECHO;
+	return RPMSG_PING_MODE_NONE;
+}
+
+uint32_t rpmsg_ping_dst_of(const char *devname)
+{
+	const char *dot = devname ? strrchr(devname, '.') : NULL;
+
+	return (dot && dot[1]) ? (uint32_t)strtoul(dot + 1, NULL, 10) : 0;
+}
+
+uint32_t rpmsg_ping_expected_reply(uint32_t sent, rpmsg_ping_mode_t mode)
+{
+	return mode == RPMSG_PING_MODE_INCREMENT ? (uint32_t)(sent + 1u) : sent;
+}
+
 int rpmsg_ping_virtio_of(const char *devname, char *out, int cap)
 {
 	int n = 0;
@@ -128,7 +151,7 @@ static int ensure_node(const char *sysdir, const char *node)
 }
 
 /* Find the rpmsgN class entry created for our channel name. */
-static int find_eptdev(char *sysdir, size_t cap)
+static int find_eptdev(const char *channel, char *sysdir, size_t cap)
 {
 	DIR *d = opendir("/sys/class/rpmsg");
 	struct dirent *e;
@@ -152,7 +175,7 @@ static int find_eptdev(char *sysdir, size_t cap)
 			continue;
 		idx = atoi(e->d_name + 5);
 		if (fgets(name, sizeof(name), f) &&
-		    strncmp(name, RPMSG_PING_CHANNEL, strlen(RPMSG_PING_CHANNEL)) == 0 &&
+		    strncmp(name, channel, strlen(channel)) == 0 &&
 		    idx > best) {
 			snprintf(sysdir, cap, "/sys/class/rpmsg/%s", e->d_name);
 			best = idx;
@@ -164,8 +187,9 @@ static int find_eptdev(char *sysdir, size_t cap)
 	return found;
 }
 
-/* virtio bus that carries the announced channel, e.g. "virtio1". */
-static int find_channel_virtio(char *out, int cap)
+/* Device name of an announced channel we can ping, e.g.
+ * "virtio1.rpmsg-openamp-demo-channel.-1.30". */
+static int find_channel(char *out, size_t cap)
 {
 	DIR *d = opendir("/sys/bus/rpmsg/devices");
 	struct dirent *e;
@@ -174,8 +198,10 @@ static int find_channel_virtio(char *out, int cap)
 	if (!d)
 		return 0;
 	while (!found && (e = readdir(d)))
-		if (strstr(e->d_name, RPMSG_PING_CHANNEL))
-			found = rpmsg_ping_virtio_of(e->d_name, out, cap);
+		if (rpmsg_ping_mode_of(e->d_name) != RPMSG_PING_MODE_NONE) {
+			snprintf(out, cap, "%s", e->d_name);
+			found = 1;
+		}
 	closedir(d);
 	return found;
 }
@@ -206,10 +232,12 @@ static int find_ctrl(const char *virtio, char *sysdir, size_t cap)
 	return found;
 }
 
-static int open_endpoint(int *ctrl_fd_out)
+static int open_endpoint(int *ctrl_fd_out, rpmsg_ping_mode_t *mode_out)
 {
 	struct rpmsg_endpoint_info info;
-	char sysdir[128], node[192], virtio[24] = "", ctrl_dir[128], ctrl_node[192];
+	char sysdir[128], node[192], virtio[24] = "", ctrl_dir[128], ctrl_node[192], devname[128] = "";
+	const char *channel;
+	rpmsg_ping_mode_t mode;
 	int ctrl, fd, tries;
 
 	/* Modules are only built, not loaded, on Torizon. Best effort. */
@@ -219,7 +247,8 @@ static int open_endpoint(int *ctrl_fd_out)
 	/* Wait for the M33 to announce the channel; this also tells us which of
 	 * the two virtio buses (SRTM or user) the firmware is on. */
 	for (tries = 0; tries < 100 && s_running; tries++) {
-		if (find_channel_virtio(virtio, sizeof(virtio)) &&
+		if (find_channel(devname, sizeof(devname)) &&
+		    rpmsg_ping_virtio_of(devname, virtio, sizeof(virtio)) &&
 		    find_ctrl(virtio, ctrl_dir, sizeof(ctrl_dir)) == 0)
 			break;
 		virtio[0] = '\0';
@@ -235,14 +264,17 @@ static int open_endpoint(int *ctrl_fd_out)
 		return -1;
 
 	memset(&info, 0, sizeof(info));
-	snprintf(info.name, sizeof(info.name), "%s", RPMSG_PING_CHANNEL);
+	mode = rpmsg_ping_mode_of(devname);
+	channel = mode == RPMSG_PING_MODE_ECHO ? RPMSG_PING_CHANNEL_ZEPHYR
+					       : RPMSG_PING_CHANNEL_FREERTOS;
+	snprintf(info.name, sizeof(info.name), "%s", channel);
 	info.src = RPMSG_ADDR_ANY;
-	info.dst = RPMSG_PING_REMOTE_ADDR;
+	info.dst = rpmsg_ping_dst_of(devname);
 	if (ioctl(ctrl, RPMSG_CREATE_EPT_IOCTL, &info) < 0) {
 		close(ctrl);
 		return -1;
 	}
-	if (find_eptdev(sysdir, sizeof(sysdir)) < 0) {
+	if (find_eptdev(channel, sysdir, sizeof(sysdir)) < 0) {
 		close(ctrl);
 		return -1;
 	}
@@ -257,27 +289,32 @@ static int open_endpoint(int *ctrl_fd_out)
 		return -1;
 	}
 	*ctrl_fd_out = ctrl;
+	*mode_out = mode;
 	return fd;
 }
 
 static void *ping_main(void *arg)
 {
 	int ctrl = -1, fd = -1;
+	rpmsg_ping_mode_t mode = RPMSG_PING_MODE_NONE;
 	uint32_t seq = 0;
 	uint8_t tx[RPMSG_PING_MSG_SIZE], rx[64];
 
 	(void)arg;
 	while (s_running && fd < 0) {
-		fd = open_endpoint(&ctrl);
+		fd = open_endpoint(&ctrl, &mode);
 		if (fd < 0)
 			sleep(1);
 	}
 	if (fd < 0)
 		return NULL;
-	applog(APPLOG_INFO, "rpmsg", "endpoint open, ping dst=%u", RPMSG_PING_REMOTE_ADDR);
+	applog(APPLOG_INFO, "rpmsg", "endpoint open, mode=%s",
+	       mode == RPMSG_PING_MODE_ECHO ? "echo (Zephyr)" : "counter+1 (FreeRTOS)");
 
-	/* The M33 waits for a first message (hello) before it starts echoing. */
-	(void)write(fd, "hello", 5);
+	/* The FreeRTOS example waits for a first message (hello) before it starts
+	 * answering. The Zephyr one would echo it back and offset every reply. */
+	if (mode == RPMSG_PING_MODE_INCREMENT)
+		(void)write(fd, "hello", 5);
 
 	while (s_running) {
 		struct pollfd pfd = {.fd = fd, .events = POLLIN};
@@ -291,18 +328,25 @@ static void *ping_main(void *arg)
 		rpmsg_ping_count_sent(&s_totals);
 		pthread_mutex_unlock(&s_totals_lock);
 
+		/* Drain everything queued: a stale or late answer must not shift
+		 * the pairing of later pings. Only the reply to this seq counts. */
 		if (poll(&pfd, 1, REPLY_TIMEOUT_MS) > 0) {
-			ssize_t n = read(fd, rx, sizeof(rx));
-			uint32_t reply;
+			int matched = 0;
 
-			if (n > 0 && rpmsg_ping_decode(rx, (int)n, &reply) &&
-			    rpmsg_ping_reply_matches(seq, reply)) {
-				jitter_stats_add(&s_rtt, now_ns() - t0);
-				pthread_mutex_lock(&s_totals_lock);
-				rpmsg_ping_count_ok(&s_totals);
-				pthread_mutex_unlock(&s_totals_lock);
-				s_linked = 1;
-			}
+			do {
+				ssize_t n = read(fd, rx, sizeof(rx));
+				uint32_t reply;
+
+				if (n > 0 && !matched && rpmsg_ping_decode(rx, (int)n, &reply) &&
+				    reply == rpmsg_ping_expected_reply(seq, mode)) {
+					jitter_stats_add(&s_rtt, now_ns() - t0);
+					pthread_mutex_lock(&s_totals_lock);
+					rpmsg_ping_count_ok(&s_totals);
+					pthread_mutex_unlock(&s_totals_lock);
+					s_linked = 1;
+					matched = 1;
+				}
+			} while (poll(&pfd, 1, 0) > 0);
 		}
 		seq++;
 		usleep(PING_PERIOD_US);

@@ -257,7 +257,7 @@ static int stop_multi_core_prog(uint8_t boot_type, int op_flag)
 		push_oper_cmd(am_idx, &op_cmd);
 	}
 
-	if (boot_type == TYPE_M_RTOS_HELLO)
+	if (boot_type == TYPE_M_RTOS_HELLO || boot_type == TYPE_M_ZEPH_HELLO)
 		rpmsg_ping_stop();
 
 	if (BOOT_TYPE_ACORE(boot_type)) {
@@ -359,7 +359,12 @@ static int start_multi_core_prog(uint8_t boot_type, int reboot)
 		break;
 
 	case TYPE_M_ZEPH_HELLO:
+		/* Zephyr openamp_rsc_table: same RPMsg round-trip as the FreeRTOS one. */
 		run_system_cmd("./start.sh m z h");
+		s_rpmsg_start_sec = scur_sec;
+		if (rpmsg_ping_start())
+			applog(APPLOG_WARN, "rpmsg", "ping thread not started");
+		rpmsg_mode = 1;
 		break;
 
 	default:
@@ -537,7 +542,8 @@ int main(int argc, char **argv)
 
 		output_shm_data();  /* Show latency data in share memory */
 
-		if (get_boot_type(MC_IDX) == TYPE_M_RTOS_HELLO) {
+		if (get_boot_type(MC_IDX) == TYPE_M_RTOS_HELLO ||
+		    get_boot_type(MC_IDX) == TYPE_M_ZEPH_HELLO) {
 			jitter_snapshot_t rtt;
 			rpmsg_ping_counters_t tot = {0, 0};
 			int got = rpmsg_ping_take(&rtt, &tot);
