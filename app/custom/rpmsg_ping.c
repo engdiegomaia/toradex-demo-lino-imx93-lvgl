@@ -3,6 +3,7 @@
 
 #include <dirent.h>
 #include <errno.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <poll.h>
 #include <pthread.h>
@@ -44,6 +45,21 @@ int rpmsg_ping_decode(const uint8_t *buf, int len, uint32_t *seq)
 int rpmsg_ping_reply_matches(uint32_t sent, uint32_t reply)
 {
 	return reply == (uint32_t)(sent + 1u);
+}
+
+int rpmsg_ping_virtio_of(const char *devname, char *out, int cap)
+{
+	int n = 0;
+
+	if (!devname || !out || strncmp(devname, "virtio", 6) != 0)
+		return 0;
+	while (devname[6 + n] >= '0' && devname[6 + n] <= '9')
+		n++;
+	if (n == 0 || devname[6 + n] != '.' || 6 + n + 1 > cap)
+		return 0;
+	memcpy(out, devname, (size_t)(6 + n));
+	out[6 + n] = '\0';
+	return 1;
 }
 
 void rpmsg_ping_count_sent(rpmsg_ping_counters_t *c)
@@ -116,12 +132,15 @@ static int find_eptdev(char *sysdir, size_t cap)
 {
 	DIR *d = opendir("/sys/class/rpmsg");
 	struct dirent *e;
-	int found = -1;
+	int found = -1, best = -1;
 
 	if (!d)
 		return -1;
+	/* Stale endpoints survive a restart of this process, so take the newest
+	 * (highest rpmsgN) one that carries our channel name. */
 	while ((e = readdir(d))) {
 		char p[320], name[64] = "";
+		int idx;
 		FILE *f;
 
 		if (strncmp(e->d_name, "rpmsg", 5) != 0 ||
@@ -131,14 +150,57 @@ static int find_eptdev(char *sysdir, size_t cap)
 		f = fopen(p, "r");
 		if (!f)
 			continue;
+		idx = atoi(e->d_name + 5);
 		if (fgets(name, sizeof(name), f) &&
-		    strncmp(name, RPMSG_PING_CHANNEL, strlen(RPMSG_PING_CHANNEL)) == 0) {
+		    strncmp(name, RPMSG_PING_CHANNEL, strlen(RPMSG_PING_CHANNEL)) == 0 &&
+		    idx > best) {
 			snprintf(sysdir, cap, "/sys/class/rpmsg/%s", e->d_name);
+			best = idx;
 			found = 0;
 		}
 		fclose(f);
-		if (found == 0)
-			break;
+	}
+	closedir(d);
+	return found;
+}
+
+/* virtio bus that carries the announced channel, e.g. "virtio1". */
+static int find_channel_virtio(char *out, int cap)
+{
+	DIR *d = opendir("/sys/bus/rpmsg/devices");
+	struct dirent *e;
+	int found = 0;
+
+	if (!d)
+		return 0;
+	while (!found && (e = readdir(d)))
+		if (strstr(e->d_name, RPMSG_PING_CHANNEL))
+			found = rpmsg_ping_virtio_of(e->d_name, out, cap);
+	closedir(d);
+	return found;
+}
+
+/* rpmsg_ctrlN whose parent device path runs through the given virtio bus. */
+static int find_ctrl(const char *virtio, char *sysdir, size_t cap)
+{
+	DIR *d = opendir("/sys/class/rpmsg");
+	struct dirent *e;
+	int found = -1;
+	char needle[32];
+
+	if (!d)
+		return -1;
+	snprintf(needle, sizeof(needle), "/%s/", virtio);
+	while (found < 0 && (e = readdir(d))) {
+		char link[320], real[PATH_MAX];
+
+		if (strncmp(e->d_name, "rpmsg_ctrl", 10) != 0)
+			continue;
+		snprintf(link, sizeof(link), "/sys/class/rpmsg/%s", e->d_name);
+		if (realpath(link, real) && strstr(real, needle)) {
+			snprintf(sysdir, cap, "%s", link);
+			found = 0;
+		}
 	}
 	closedir(d);
 	return found;
@@ -147,19 +209,28 @@ static int find_eptdev(char *sysdir, size_t cap)
 static int open_endpoint(int *ctrl_fd_out)
 {
 	struct rpmsg_endpoint_info info;
-	char sysdir[128], node[192];
+	char sysdir[128], node[192], virtio[24] = "", ctrl_dir[128], ctrl_node[192];
 	int ctrl, fd, tries;
 
 	/* Modules are only built, not loaded, on Torizon. Best effort. */
 	(void)system("nsenter -t 1 -m -- modprobe rpmsg_char >/dev/null 2>&1; "
 		     "nsenter -t 1 -m -- modprobe rpmsg_ctrl >/dev/null 2>&1");
 
+	/* Wait for the M33 to announce the channel; this also tells us which of
+	 * the two virtio buses (SRTM or user) the firmware is on. */
 	for (tries = 0; tries < 100 && s_running; tries++) {
-		if (ensure_node("/sys/class/rpmsg/rpmsg_ctrl0", "/dev/rpmsg_ctrl0") == 0)
+		if (find_channel_virtio(virtio, sizeof(virtio)) &&
+		    find_ctrl(virtio, ctrl_dir, sizeof(ctrl_dir)) == 0)
 			break;
+		virtio[0] = '\0';
 		usleep(100000);
 	}
-	ctrl = open("/dev/rpmsg_ctrl0", O_RDWR);
+	if (!virtio[0])
+		return -1;
+	snprintf(ctrl_node, sizeof(ctrl_node), "/dev/%s", strrchr(ctrl_dir, '/') + 1);
+	if (ensure_node(ctrl_dir, ctrl_node) != 0 && access(ctrl_node, F_OK) != 0)
+		return -1;
+	ctrl = open(ctrl_node, O_RDWR);
 	if (ctrl < 0)
 		return -1;
 
@@ -237,8 +308,9 @@ static void *ping_main(void *arg)
 		usleep(PING_PERIOD_US);
 	}
 	s_linked = 0;
+	/* The destroy ioctl belongs to the endpoint fd, not the control fd. */
+	ioctl(fd, RPMSG_DESTROY_EPT_IOCTL);
 	close(fd);
-	ioctl(ctrl, RPMSG_DESTROY_EPT_IOCTL);
 	close(ctrl);
 	return NULL;
 }

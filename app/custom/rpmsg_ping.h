@@ -29,6 +29,11 @@ int rpmsg_ping_decode(const uint8_t *buf, int len, uint32_t *seq);
 /* The M33 answers with sent + 1 (wrapping). */
 int rpmsg_ping_reply_matches(uint32_t sent, uint32_t reply);
 
+/* "virtio1.rpmsg-...-.30" -> "virtio1". Returns 1 on success. The device has
+ * two rpmsg_ctrl nodes (SRTM and user vdev); the endpoint must be created on
+ * the one whose virtio device carries the announced channel. */
+int rpmsg_ping_virtio_of(const char *devname, char *out, int cap);
+
 void rpmsg_ping_count_sent(rpmsg_ping_counters_t *c);
 void rpmsg_ping_count_ok(rpmsg_ping_counters_t *c);
 uint32_t rpmsg_ping_lost(const rpmsg_ping_counters_t *c);
