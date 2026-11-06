@@ -18,6 +18,7 @@
 #include "custom.h"
 #include "gg_event.h"
 #include "cpu_load_ui.h"
+#include "log_terminal.h"
 
 
 /*********************
@@ -62,6 +63,9 @@ void custom_init(gg_ui_t *ui)
     /* Home exists by now (setup_ui() built it), so the A1 lane can be swapped
      * over to Cortex-A55-0 before the first frame is drawn. */
     cpu_load_ui_init(ui);
+
+    /* Fixed-width font so the log columns line up. */
+    log_terminal_init(ui);
 }
 
 /**

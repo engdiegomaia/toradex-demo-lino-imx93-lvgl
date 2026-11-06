@@ -13,6 +13,7 @@
 #include "ram_console.h"
 #include "log_tools.h"
 #include "net_tools.h"
+#include "terminal_buf.h"
 #include "lvgl_gui.h"
 
 #ifndef _DEFAULT_SOURCE
@@ -34,8 +35,8 @@
 #include "gg_utils.h"
 
 gg_ui_t guider_ui;
-#define TERMINAL_LOG_LENGTH  320
-#define TERMINAL_LARGE_LOG_LENGTH  1600
+#define TERMINAL_LOG_LENGTH  1024
+#define TERMINAL_LARGE_LOG_LENGTH  4096
 
 static pthread_t slvgl_gui_thread;
 static int srun_flag;
@@ -155,7 +156,7 @@ static void hal_init(void)
  * 
  * This function adds text to a terminal (text area) widget and manages the text buffer.
  * If the combined length of existing text and new text exceeds the terminal's capacity,
- * it replaces the entire content with just the new text.
+ * the oldest whole lines are discarded and the widget is rewritten (see terminal_buf.h).
  * 
  * @param txt_log Pointer to the buffer storing the terminal's text content
  * @param isLarge Flag indicating if this is a large terminal (0 for standard, non-zero for large)
@@ -165,23 +166,15 @@ static void hal_init(void)
 static void terminal_add(char* txt_log, int8_t isLarge, lv_obj_t * ta, const char * txt_in)
 {
     if(ta == NULL) return;                /*Check if the window is exists*/
-    int terninal_length = 0;
-    if(isLarge == 0) {
-        terninal_length = TERMINAL_LOG_LENGTH;
-    } else {
-        terninal_length = TERMINAL_LARGE_LOG_LENGTH;
-    }
+    size_t terminal_length = isLarge == 0 ? TERMINAL_LOG_LENGTH : TERMINAL_LARGE_LOG_LENGTH;
 
-    uint16_t txt_len = strlen(txt_in);
-    uint16_t old_len = strlen(txt_log);
-
-    if(old_len + txt_len > terninal_length) {
-        lv_textarea_set_text(ta, txt_in);
-        memset(txt_log, '\0', terninal_length + 1);
+    /* Keep the newest lines: when full, the oldest whole lines are dropped
+     * and the widget is rewritten, instead of wiping the whole terminal. */
+    if(terminal_buf_append(txt_log, terminal_length, txt_in)) {
+        lv_textarea_set_text(ta, txt_log);
+        lv_textarea_set_cursor_pos(ta, LV_TEXTAREA_CURSOR_LAST);
     } else {
         lv_textarea_add_text(ta, txt_in);
-        memcpy(&txt_log[old_len], txt_in, txt_len);
-        txt_log[old_len + txt_len] = '\0';
     }
 }
 

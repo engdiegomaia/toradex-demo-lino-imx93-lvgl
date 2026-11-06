@@ -15,8 +15,8 @@
 #include "custom.h"
 
 
-#define TERMINAL_LOG_LENGTH  320
-#define TERMINAL_LARGE_LOG_LENGTH  1600
+#define TERMINAL_LOG_LENGTH  1024
+#define TERMINAL_LARGE_LOG_LENGTH  4096
 /* Widget type definitions */
 #define WIDGET_TYPE_DROPDOWN         1
 #define WIDGET_TYPE_TERMINAL_A1      2
