@@ -21,6 +21,7 @@
 #include "log_terminal.h"
 #include "home_labels.h"
 #include "load_gen.h"
+#include "core_select.h"
 
 
 /*********************
@@ -58,7 +59,7 @@ static pthread_mutex_t g_operation_info_mutex = PTHREAD_MUTEX_INITIALIZER;
  * Create a demo application
  */
 
-/* Tapping the Cortex-A55-0 card cycles the CPU load generator
+/* Tapping the Cortex-A55-0 title cycles the CPU load generator
  * (OFF -> 25 -> 50 -> 100 -> OFF). The level shows on the A55 frame within 1 s. */
 static void load_gen_tap_cb(lv_event_t *e)
 {
@@ -80,9 +81,12 @@ void custom_init(gg_ui_t *ui)
     /* Fixed-width font so the log columns line up. */
     log_terminal_init(ui);
 
-    if (ui->Home.container_cortexA1) {
-        lv_obj_add_flag(ui->Home.container_cortexA1, LV_OBJ_FLAG_CLICKABLE);
-        lv_obj_add_event_cb(ui->Home.container_cortexA1, load_gen_tap_cb,
+    /* The card itself must stay non-clickable (cpu_load_ui.c): its generated
+     * handler would select the hidden A-core checkbox. Its title label does not
+     * bubble, so tap that instead. */
+    if (ui->Home.container_cortexA1_title_coreA1) {
+        lv_obj_add_flag(ui->Home.container_cortexA1_title_coreA1, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_add_event_cb(ui->Home.container_cortexA1_title_coreA1, load_gen_tap_cb,
                             LV_EVENT_CLICKED, NULL);
     }
 }
@@ -98,27 +102,39 @@ void custom_init(gg_ui_t *ui)
  */
 void radio_event_handler(lv_event_t * e)
 {
-    uint32_t * active_id = lv_event_get_user_data(e);
     lv_obj_t * cont = lv_event_get_current_target(e);
     lv_obj_t * act_cb = lv_event_get_target(e);
-    lv_obj_t * old_cb = lv_obj_get_child(cont, *active_id);
+    int selection;
+    int i;
 
     /*Do nothing if the container was clicked*/
     if(act_cb == cont) return;
 
-    lv_obj_clear_state(old_cb, LV_STATE_CHECKED);   /*Uncheck the previous radio button*/
-    lv_obj_add_state(act_cb, LV_STATE_CHECKED);     /*Uncheck the current radio button*/
+    /* Clicking the checked box clears the selection. */
+    selection = core_select_toggle(cortexID, (int)lv_obj_get_index(act_cb));
 
-    *active_id = lv_obj_get_index(act_cb);
-    if(*active_id == 0) {
-        lv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x2563EB), LV_PART_MAIN|LV_STATE_DEFAULT);
-        lv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);
-        cortexID = 0;
-    } else if (*active_id == 1)
-    {
-        lv_obj_set_style_border_color(guider_ui.Home.container_cortexM33, lv_color_hex(0x2563EB), LV_PART_MAIN|LV_STATE_DEFAULT);
-        lv_obj_set_style_border_color(guider_ui.Home.container_cortexA1, lv_color_hex(0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);
-        cortexID = 1;
+    for(i = CORE_SELECT_A55; i <= CORE_SELECT_M33; i++) {
+        lv_obj_t * cb = lv_obj_get_child(cont, i);
+        if(!cb) continue;
+        if(i == selection) lv_obj_add_state(cb, LV_STATE_CHECKED);
+        else lv_obj_clear_state(cb, LV_STATE_CHECKED);
+    }
+
+    lv_obj_set_style_border_color(guider_ui.Home.container_cortexA1,
+        lv_color_hex(selection == CORE_SELECT_A55 ? 0x2563EB : 0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(guider_ui.Home.container_cortexM33,
+        lv_color_hex(selection == CORE_SELECT_M33 ? 0x2563EB : 0x27364A), LV_PART_MAIN|LV_STATE_DEFAULT);
+
+    cortexID = selection;
+
+    /* A negative core id would map to an invalid boot type, so START/STOP are
+     * only usable while a core is selected. */
+    if(core_select_can_operate(selection)) {
+        lv_obj_clear_state(guider_ui.Home.btn_start, LV_STATE_DISABLED);
+        lv_obj_clear_state(guider_ui.Home.btn_stop, LV_STATE_DISABLED);
+    } else {
+        lv_obj_add_state(guider_ui.Home.btn_start, LV_STATE_DISABLED);
+        lv_obj_add_state(guider_ui.Home.btn_stop, LV_STATE_DISABLED);
     }
 }
 
