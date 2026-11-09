@@ -5,7 +5,7 @@
 #
 # The sample's overlay already places the shared memory at 0xA4000000 and the
 # resource table at 0x2001E000, which the module's base device tree reserves,
-# so only the echo loop is patched (see patches/0004): it announces
+# so the echo loop and Linux GPIO ownership are patched (0004/0005): it announces
 # "rpmsg-client-sample" and echoes the payload forever; the HMI measures the round trip over rpmsg_char.
 #
 # Requires: west, cmake, ninja, pyelftools, and an arm-none-eabi toolchain
@@ -49,7 +49,22 @@ else
     die "patch does not apply to this Zephyr revision."
 fi
 
+GPIO_PATCH="${SCRIPT_DIR}/patches/0005-zephyr-imx93-preserve-linux-gpio-security.patch"
+[ -f "${GPIO_PATCH}" ] || die "patch not found: ${GPIO_PATCH}"
+if patch -p1 --dry-run --silent --forward --batch < "${GPIO_PATCH}"; then
+    patch -p1 --forward --batch < "${GPIO_PATCH}"
+elif patch -p1 --dry-run --silent --reverse --batch < "${GPIO_PATCH}"; then
+    echo "==> GPIO ownership patch already applied"
+else
+    die "GPIO ownership patch does not apply to this Zephyr revision."
+fi
+
 west build -p always -b imx93_evk/mimx9352/m33 "${SAMPLE}" -d "${BUILD_DIR}"
+
+# This firmware leaves all GPIO banks owned by Linux. Refuse a configuration
+# that would initialize GPIO drivers under that ownership contract.
+grep -qx '# CONFIG_GPIO is not set' "${BUILD_DIR}/zephyr/.config" \
+    || die "RPMsg firmware must leave CONFIG_GPIO disabled for Linux ownership."
 
 ELF="${BUILD_DIR}/zephyr/zephyr_openamp_rsc_table.elf"
 [ -f "${ELF}" ] || die "build produced no ${ELF}"

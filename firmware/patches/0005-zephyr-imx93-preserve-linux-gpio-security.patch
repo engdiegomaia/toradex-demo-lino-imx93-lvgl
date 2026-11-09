@@ -1,0 +1,28 @@
+Subject: [PATCH] soc: imx93: preserve Linux GPIO ownership for RPMsg
+
+The RPMsg-only M33 application does not use GPIO. Linux owns the GPIO
+banks, including the touchscreen IRQ. Do not turn every pin secure-only
+when remoteproc starts this firmware. Stopping M33 does not restore PCNS.
+
+Source: MIMX9352_cm33.h, RGPIO_PCNS_NSE0: zero selects Secure access;
+Non-Secure reads return zero and writes are ignored.
+
+This patch is for the Linux-hosted RPMsg build with CONFIG_GPIO disabled.
+Upstream-Status: Inappropriate [application-specific resource ownership]
+
+--- a/soc/nxp/imx/imx9/imx93/m33/soc.c
++++ b/soc/nxp/imx/imx9/imx93/m33/soc.c
+@@ -57,11 +57,8 @@
+ 
+ void soc_early_init_hook(void)
+ {
+-	/* Configure secure access to pin registers */
+-	GPIO1->PCNS = 0x0;
+-	GPIO2->PCNS = 0x0;
+-	GPIO3->PCNS = 0x0;
+-	GPIO4->PCNS = 0x0;
++	/* Linux owns GPIO security in this RPMsg-only build (CONFIG_GPIO=n).
++	 * Preserve PCNS: changing it breaks Linux GPIO access, including touch. */
+ 
+ 	/* keep system tick work fine during idle task */
+ 	GPC_CTRL_CM33->CM_MISC &= ~GPC_CPU_CTRL_CM_MISC_SLEEP_HOLD_EN_MASK;

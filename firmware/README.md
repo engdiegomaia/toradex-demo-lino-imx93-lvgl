@@ -1,4 +1,10 @@
-# Building `rt_latency_cm33.elf` for Verdin i.MX93
+# Firmware for Verdin / Lino i.MX93
+
+For the Zephyr RPMsg touch-loss and A55-0 saturation fix, see
+[Preserve Linux GPIO ownership](ZEPHYR_RPMSG_GPIO_FIX.md). It includes the cause,
+build and deployment steps, rollback, and initial hardware validation.
+
+## Building `rt_latency_cm33.elf` for Verdin i.MX93
 
 The `rt_latency_cm33.elf` originally shipped in `app/custom/elf/` is the
 upstream NXP console-only benchmark. It does not implement the
